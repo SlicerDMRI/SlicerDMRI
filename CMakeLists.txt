@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.8.9)
 
 set(EXTENSION_NAME SlicerDMRI)
-project(SlicerDMRI)
 
 #-----------------------------------------------------------------------------
 # Extension meta-information
@@ -18,12 +17,10 @@ set(SUPERBUILD_TOPLEVEL_PROJECT inner)
 
 #-----------------------------------------------------------------------------
 # Extension dependencies
+find_package(Slicer COMPONENTS ConfigurePrerequisites REQUIRED)
+project(SlicerDMRI)
 find_package(Slicer REQUIRED)
 include(${Slicer_USE_FILE})
-mark_as_superbuild(Slicer_DIR)
-
-find_package(Git REQUIRED)
-mark_as_superbuild(GIT_EXECUTABLE)
 
 #-----------------------------------------------------------------------------
 # SuperBuild setup
@@ -36,7 +33,18 @@ endif()
 
 #-----------------------------------------------------------------------------
 # Extension modules
-## NEXT_MODULE
+add_subdirectory("Modules/Loadable/TractographyDisplay")
+add_subdirectory("Modules/Loadable/TractographyInteractiveSeeding")
+
+add_subdirectory("Modules/CLI/DWIToDTIEstimation")
+add_subdirectory("Modules/CLI/DiffusionWeightedVolumeMasking")
+add_subdirectory("Modules/CLI/DiffusionTensorScalarMeasurements")
+add_subdirectory("Modules/CLI/FiberTractMeasurements")
+add_subdirectory("Modules/CLI/TractographyLabelMapSeeding")
+add_subdirectory("Modules/CLI/FiberBundleLabelSelect")
+
+add_subdirectory("Modules/Scripted/DICOM2FullBrainTractography")
+add_subdirectory("Modules/Scripted/FiberBundleToLabelMap")
 
 #-----------------------------------------------------------------------------
 set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_BINARY_DIR};${EXTENSION_NAME};ALL;/")

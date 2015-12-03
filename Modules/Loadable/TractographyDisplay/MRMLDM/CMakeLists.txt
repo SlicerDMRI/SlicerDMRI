@@ -16,6 +16,11 @@ set(displayable_manager_SRCS
   )
 
 set(VTK_USE_INSTANTIATOR_NEW 1)
+
+if(${VTK_VERSION_MAJOR} GREATER 5)
+  include(${VTK_CMAKE_DIR}/vtkMakeInstantiator.cmake)
+endif()
+
 VTK_MAKE_INSTANTIATOR3("${MODULE_NAME}Instantiator"
   displayable_manager_instantiator_SRCS
   "${displayable_manager_SRCS}"
