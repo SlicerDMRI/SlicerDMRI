@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 2.8.9)
 
+foreach(p
+  CMP0048 # CMake 3.0
+  )
+  if(POLICY ${p})
+    cmake_policy(SET ${p} NEW)
+  endif()
+endforeach()
+
 set(EXTENSION_NAME SlicerDMRI)
 
 #-----------------------------------------------------------------------------
