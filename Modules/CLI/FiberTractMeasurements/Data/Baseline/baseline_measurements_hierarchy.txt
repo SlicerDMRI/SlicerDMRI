@@ -1,0 +1,4 @@
+Name 	 Num_Points 	 Num_Fibers 	 Tensors_.FractionalAnisotropy 	 Tensors_.LinearMeasurement 	 Tensors_.MaxEigenvalue 	 Tensors_.MidEigenvalue 	 Tensors_.MinEigenvalue 	 Tensors_.PlanarMeasurement 	 Tensors_.RelativeAnisotropy 	 Tensors_.SphericalMeasurement 	 Tensors_.Trace
+fibers_hierarchy:fiber_vtk 	 1079.000000 	 8.000000 	 0.532655 	 0.533004 	 0.001213 	 0.000534 	 0.000406 	 0.112007 	 0.364176 	 0.354989 	 0.002153
+fibers_hierarchy:fiber_vtp 	 1079.000000 	 8.000000 	 0.532655 	 0.533004 	 0.001213 	 0.000534 	 0.000406 	 0.112007 	 0.364176 	 0.354989 	 0.002153
+fibers_hierarchy 	 2158.000000 	 16.000000 	 0.532655 	 0.533004 	 0.001213 	 0.000534 	 0.000406 	 0.112007 	 0.364176 	 0.354989 	 0.002153
