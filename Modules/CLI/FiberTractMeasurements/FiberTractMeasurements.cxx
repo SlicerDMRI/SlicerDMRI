@@ -132,7 +132,7 @@ int main( int argc, char * argv[] )
     // check for the model mrml file
     if (sceneFilename.empty())
       {
-      std::cout << "No MRML scene file specified." << std::endl;
+      std::cerr << "No MRML scene file specified." << std::endl;
       return EXIT_FAILURE;
       }
 
@@ -161,7 +161,7 @@ int main( int argc, char * argv[] )
       }
     else
       {
-      std::cerr << "Model scene file doesn't exist: " <<  sceneFilename.c_str() << std::endl;
+      std::cout << "Model scene file doesn't exist: " <<  sceneFilename.c_str() << std::endl;
       }
 
     if (inputType == std::string("Fibers_Hierarchy"))
@@ -247,7 +247,7 @@ int main( int argc, char * argv[] )
 
       if( !setTensors(readerVTP->GetOutput()) )
         {
-        std::cerr << argv[0] << ": No tensor data for file " << fileName << std::endl;
+        std::cout << argv[0] << " : No tensor data for file " << fileName << std::endl;
         continue;
         }
 
@@ -273,7 +273,7 @@ int main( int argc, char * argv[] )
 
       if( !setTensors(readerVTK->GetOutput()) )
         {
-        std::cerr << argv[0] << ": No tensor data for file " << fileName << std::endl;
+        std::cout << argv[0] << ": No tensor data for file " << fileName << std::endl;
         continue;
         }
 
@@ -406,9 +406,6 @@ void computeScalarMeasurements(vtkPolyData *poly,
       sum = vtkMath::Nan();
       }
 
-    std::cout << " : " << name << " = " << sum << std::endl;
-    //ofs << id << " : " << name << " = " << sum << std::endl;
-
     std::map< std::string, std::map<std::string, double> >::iterator it = OutTable.find(id);
     if (it == OutTable.end())
       {
@@ -497,7 +494,7 @@ int computeTensorMeasurement(vtkPolyDataTensorToColor *math,
 
     if (!math->GetOutput()->GetPointData() || !math->GetOutput()->GetPointData()->GetScalars())
       {
-      std::cerr << "no scalars computed" << std::endl;
+      std::cout << "no scalars computed" << std::endl;
       }
     std::string scalarName = name + std::string(".") + operation;
     computeScalarMeasurements(math->GetOutput(), id, scalarName);
