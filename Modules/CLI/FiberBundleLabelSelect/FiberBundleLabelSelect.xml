@@ -4,7 +4,7 @@
   Diffusion.Tractography
   </category>
   <title>
-  FiberBundleLabelSelect
+  Fiber Bundle Label Select
   </title>
   <description>
 Fiber bundle label select allows a user to select tracts passing or not passing through a single or multiple labels. The label is defined as a labelmap and has to be provided by the user. One approach to generate the labeled volume is by means of the Editor module.
