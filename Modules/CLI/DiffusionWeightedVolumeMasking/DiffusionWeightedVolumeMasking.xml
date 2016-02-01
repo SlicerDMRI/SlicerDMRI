@@ -47,6 +47,18 @@
         <step>0.1</step>
       </constraints>
     </double>
+    <double>
+      <name>baselineBValueThreshold</name>
+      <label>Baseline B-Value Threshold Parameter</label>
+      <flag>b</flag>
+      <longflag>baselineBValueThreshold</longflag>
+      <description><![CDATA[Volumes with B-value below this threshold will be considered baseline images and included in mask calculation.]]></description>
+      <default>100</default>
+      <constraints>
+        <minimum>0.0</minimum>
+        <step>1</step>
+      </constraints>
+    </double>
     <boolean>
       <name>removeIslands</name>
       <label>Remove Islands in Threshold Mask</label>

@@ -30,8 +30,6 @@
 
 #include "DiffusionWeightedVolumeMaskingCLP.h"
 
-#define GRAD_0_TOL 1e-6
-
 int main( int argc, char * argv[] )
 {
 
@@ -63,14 +61,14 @@ int main( int argc, char * argv[] )
     imageWeightedSum->NormalizeByWeightOn();
 
     int b0_count = 0;
-    for( int gradient_n = 0; gradient_n < grads->GetNumberOfTuples(); gradient_n++ )
+    for( int bval_n = 0; bval_n < bValues->GetNumberOfTuples(); bval_n++ )
       {
-      double* gradient = grads->GetTuple3(gradient_n);
-      if( fabs(gradient[0]) + fabs(gradient[1]) + fabs(gradient[2]) < GRAD_0_TOL )
+      double bvalue = bValues->GetTuple1(bval_n);
+      if( bvalue <= baselineBValueThreshold )
         {
         vtkNew<vtkImageExtractComponents> extractComponents;
         extractComponents->SetInputConnection(reader->GetOutputPort() );
-        extractComponents->SetComponents(gradient_n);
+        extractComponents->SetComponents(bval_n);
         extractComponents->Update();
 
         imageWeightedSum->AddInputConnection(extractComponents->GetOutputPort() );
