@@ -74,9 +74,7 @@ void qSlicerTractographyDisplayModuleWidgetPrivate::init()
 
   QObject::connect(this->TractographyDisplayTreeView, SIGNAL(visibilityChanged(int)),
                    this->TractDisplayModesTabWidget, SLOT(setCurrentIndex (int)));
-
 }
-
 
 //-----------------------------------------------------------------------------
 qSlicerTractographyDisplayModuleWidget::qSlicerTractographyDisplayModuleWidget(QWidget* _parent)
@@ -113,7 +111,6 @@ void qSlicerTractographyDisplayModuleWidget::exit()
   this->Superclass::exit();
 }
 
-
 void qSlicerTractographyDisplayModuleWidget::setFiberBundleNode(vtkMRMLNode* inputNode)
 {
   this->setFiberBundleNode(vtkMRMLFiberBundleNode::SafeDownCast(inputNode));
@@ -123,11 +120,25 @@ void qSlicerTractographyDisplayModuleWidget::setFiberBundleNode(vtkMRMLFiberBund
 {
   Q_D(qSlicerTractographyDisplayModuleWidget);
 
+  if (fiberBundleNode == 0)
+    {
+    d->TractDisplayModesTabWidget->setEnabled(false);
+    d->ROIEditorWidget->setEnabled(false);
+    d->percentageWidget->setEnabled(false);
+    d->SolidTubeColorCheckbox->setEnabled(false);
+    }
+  else
+    {
+    d->TractDisplayModesTabWidget->setEnabled(true);
+    d->ROIEditorWidget->setEnabled(true);
+    d->percentageWidget->setEnabled(true);
+    d->SolidTubeColorCheckbox->setEnabled(true);
+    }
+
   if (d->fiberBundleNode == fiberBundleNode)
     return;
 
   d->fiberBundleNode = fiberBundleNode;
-
 
   d->LineDisplayWidget->setFiberBundleNode(fiberBundleNode);
   d->TubeDisplayWidget->setFiberBundleNode(fiberBundleNode);
@@ -174,6 +185,5 @@ void qSlicerTractographyDisplayModuleWidget::setSolidTubeColor(bool solid)
       node->SetColorMode(vtkMRMLFiberBundleDisplayNode::colorModeScalar);
       }
     }
-
 }
 
