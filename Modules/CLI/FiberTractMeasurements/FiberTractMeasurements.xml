@@ -3,15 +3,14 @@
   <category>Diffusion.Tractography</category>
   <title>Fiber Tract Scalar Measurements</title>
   <description><![CDATA[Compute a set of different scalar measurements from a directory of fibers]]></description>
-  <version>0.1.0.$Revision: 2014</version>
+  <version>1.1.0.$Revision: 2016</version>
   <documentation-url>http://wiki.slicer.org/slicerWiki/index.php/Documentation/Nightly/Modules/DiffusionTensorMathematics</documentation-url>
   <license/>
-  <contributor>Alex Yarmarkovich (SPL, BWH)</contributor>
-  <acknowledgements><![CDATA[LMI]]></acknowledgements>
+  <contributor>Alex Yarmarkovich, Fan Zhang, Lauren O'Donnell</contributor>
+  <acknowledgements><![CDATA[SPL, LMI, BWH, USYD]]></acknowledgements>
   <parameters>
     <label>IO</label>
     <description><![CDATA[Input/output parameters]]></description>
-
     <string-enumeration>
       <name>inputType</name>
       <flag>i</flag>
@@ -22,7 +21,6 @@
       <element>Fibers_Hierarchy</element>
       <element>Fibers_File_Folder</element>
     </string-enumeration>
-
     <geometry type="fiberbundle" aggregate="true" fileExtensions=".mrml" multiple="true">
       <name>FiberHierarchyNode</name>
       <channel>input</channel>
@@ -30,7 +28,6 @@
       <longflag>--fiberHierarchy</longflag>
       <description><![CDATA[Fibers top hierarchy node]]></description>
     </geometry>
-
     <directory>
       <name>InputDirectory</name>
       <label>Fibers File Folder</label>
