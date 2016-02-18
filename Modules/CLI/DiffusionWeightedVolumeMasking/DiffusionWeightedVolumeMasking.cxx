@@ -1,26 +1,34 @@
-
-// SlicerBaseLogic includes
-#include "vtkImageConnectivity.h"
-
 // MRMLCore includes
 #include <vtkMRMLNRRDStorageNode.h>
-
-// vtkITK includes
-#include <vtkITKNewOtsuThresholdImageFilter.h>
 
 // vtkTeem includes
 #include <vtkNRRDReader.h>
 #include <vtkNRRDWriter.h>
 
 // VTK includes
-#include <vtkImageExtractComponents.h>
-#include <vtkImageSeedConnectivity.h>
-#include <vtkImageWeightedSum.h>
 #include <vtkNew.h>
 #include <vtkVersion.h>
+#include <vtkPoints.h>
+#include <vtkImageCast.h>
+#include <vtkImageExtractComponents.h>
+#include <vtkImageMedian3D.h>
+#include <vtkImageSeedConnectivity.h>
+#include <vtkImageThresholdConnectivity.h>
+#include <vtkImageWeightedSum.h>
 
 // ITK includes
-#include "itkFloatingPointExceptions.h"
+#include <itkFloatingPointExceptions.h>
+#include <itkBinaryFillholeImageFilter.h>
+#include <itkBinaryThresholdImageFilter.h>
+#include <itkConnectedComponentImageFilter.h>
+#include <itkMedianImageFilter.h>
+#include <itkOtsuMultipleThresholdsImageFilter.h>
+#include <itkRelabelComponentImageFilter.h>
+#include <itkSliceBySliceImageFilter.h>
+
+// ITKVtkGlue
+#include "itkVTKImageToImageFilter.h"
+#include "itkImageToVTKImageFilter.h"
 
 // XXX # Workaround bug in packaging of DCMTK 3.6.0 on Debian.
 //     # See http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=637687
@@ -83,65 +91,72 @@ int main( int argc, char * argv[] )
       return EXIT_FAILURE;
       }
 
-    // compute DWI mask
-    vtkNew<vtkITKNewOtsuThresholdImageFilter> otsu;
-    otsu->SetInputConnection(imageWeightedSum->GetOutputPort() );
-    otsu->SetOmega(1 + otsuOmegaThreshold);
-    otsu->SetOutsideValue(1);
-    otsu->SetInsideValue(0);
+    typedef itk::Image<short, 3> ImageType;
+    typedef itk::VTKImageToImageFilter<ImageType> VTKImageToImageType;
+
+    VTKImageToImageType::Pointer vtkToITK = VTKImageToImageType::New();
+    vtkToITK->SetInput(imageWeightedSum->GetOutput());
+
+    typedef itk::MedianImageFilter<ImageType, ImageType> medianType;
+    medianType::Pointer median = medianType::New();
+    median->SetInput(vtkToITK->GetOutput());
+    median->Update();
+
+    typedef itk::OtsuMultipleThresholdsImageFilter<ImageType, ImageType> otsuType;
+    otsuType::Pointer otsu = otsuType::New();
+    otsu->SetInput(median->GetOutput());
+    otsu->SetNumberOfThresholds(2);
+    otsu->SetNumberOfHistogramBins(128);
     otsu->Update();
 
-    vtkNew<vtkImageData> mask;
-    mask->DeepCopy(otsu->GetOutput());
+    typedef itk::ConnectedComponentImageFilter<ImageType, ImageType> ccType;
+    ccType::Pointer cc = ccType::New();
+    cc->SetInput(otsu->GetOutput());
+    cc->Update();
 
-    int *dims = mask->GetDimensions();
-    int  px = dims[0] / 2;
-    int  py = dims[1] / 2;
-    int  pz = dims[2] / 2;
+    typedef itk::RelabelComponentImageFilter<ImageType, ImageType> rlType;
+    rlType::Pointer rl = rlType::New();
+    rl->SetMinimumObjectSize(10000);
+    rl->SetInput(cc->GetOutput());
+    rl->Update();
 
-    vtkNew<vtkImageCast> cast;
-    cast->SetInputData(mask.GetPointer());
-    cast->SetOutputScalarTypeToUnsignedChar();
-    cast->Update();
+    typedef itk::BinaryThresholdImageFilter<ImageType, ImageType> threshType;
+    threshType::Pointer thresh = threshType::New();
+    thresh->SetLowerThreshold(1);
+    thresh->SetUpperThreshold(1);
+    thresh->SetOutsideValue(0);
+    thresh->SetInsideValue(1);
+    thresh->SetInput(rl->GetOutput());
+    thresh->Update();
 
-    vtkNew<vtkImageSeedConnectivity> con;
-    con->SetInputConnection(cast->GetOutputPort() );
-    con->SetInputConnectValue(1);
-    con->SetOutputConnectedValue(1);
-    con->SetOutputUnconnectedValue(0);
-    con->AddSeed(px, py, pz);
-    con->Update();
+    typedef itk::Image<short, 2> BinImageType;
+    typedef itk::BinaryFillholeImageFilter<BinImageType> binfillType;
+    binfillType::Pointer binFiller = binfillType::New();
+    binFiller->SetForegroundValue(1);
 
-    vtkNew<vtkImageCast> cast1;
-    cast1->SetInputConnection(con->GetOutputPort() );
-    cast1->SetOutputScalarTypeToShort();
-    cast1->Update();
+    typedef itk::SliceBySliceImageFilter<ImageType, ImageType> sbsType;
+    sbsType::Pointer sbsFilter = sbsType::New();
+    sbsFilter->SetFilter(binFiller);
+    sbsFilter->SetInput(thresh->GetOutput());
+    sbsFilter->Update();
 
-    vtkNew<vtkImageConnectivity> conn;
-
-    if( removeIslands )
-      {
-      conn->SetBackground(1);
-      conn->SetMinForeground( -32768);
-      conn->SetMaxForeground( 32767);
-      conn->SetFunctionToRemoveIslands();
-      conn->SetMinSize(10000);
-      conn->SliceBySliceOn();
-      conn->SetInputConnection(cast1->GetOutputPort() );
-      conn->Update();
-      }
+    typedef itk::ImageToVTKImageFilter<ImageType> ITKOutType;
+    ITKOutType::Pointer itkToVTK = ITKOutType::New();
 
     vtkNew<vtkImageCast> cast2;
     cast2->SetOutputScalarTypeToUnsignedChar();
 
     if( removeIslands )
       {
-      cast2->SetInputConnection(conn->GetOutputPort() );
+      itkToVTK->SetInput(sbsFilter->GetOutput());
+      cast2->SetInputData(itkToVTK->GetOutput());
       }
     else
       {
-      cast2->SetInputConnection(cast1->GetOutputPort() );
+      itkToVTK->SetInput(thresh->GetOutput());
+      cast2->SetInputData(itkToVTK->GetOutput() );
       }
+    itkToVTK->Update();
 
     vtkMatrix4x4* ijkToRasMatrix = reader->GetRasToIjkMatrix();
     ijkToRasMatrix->Invert();
@@ -156,14 +171,8 @@ int main( int argc, char * argv[] )
 
     // Save mask
     vtkNew<vtkNRRDWriter> writer2;
-    if( removeIslands )
-      {
-      writer2->SetInputConnection(conn->GetOutputPort() );
-      }
-    else
-      {
-      writer2->SetInputConnection(cast1->GetOutputPort() );
-      }
+    writer2->SetInputConnection(cast2->GetOutputPort() );
+
     writer2->SetFileName( thresholdMask.c_str() );
     writer2->UseCompressionOn();
     writer2->SetIJKToRASMatrix( ijkToRasMatrix );
