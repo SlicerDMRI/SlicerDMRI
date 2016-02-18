@@ -1,4 +1,3 @@
-
 #-----------------------------------------------------------------------------
 set(MODULE_NAME DiffusionWeightedVolumeMasking)
 
@@ -13,22 +12,22 @@ include_directories(BEFORE ${vtkTeem_INCLUDE_DIRS})
 find_package(SlicerExecutionModel REQUIRED)
 include(${SlicerExecutionModel_USE_FILE})
 
-#
-# VTK
-#
-#find_package(VTK REQUIRED)
-#include(${VTK_USE_FILE})
-
 #-----------------------------------------------------------------------------
 set(${MODULE_NAME}_TARGET_LIBRARIES
-  MRMLCore vtkTeem vtkSlicerEditorLibModuleLogic ${VTK_LIBRARIES}
+  MRMLCore vtkTeem ${VTK_LIBRARIES}
   )
+
+#-----------------------------------------------------------------------------
+# NOTE: this must be changed for future ITK versions
+set(ITK_SOURCE_PATH ${Slicer_HOME}/../ITKv4/)
 
 #-----------------------------------------------------------------------------
 SEMMacroBuildCLI(
   NAME ${MODULE_NAME}
   LOGO_HEADER ${Slicer_SOURCE_DIR}/Resources/ITKLogo.h
   INCLUDE_DIRECTORIES
+    ${ITK_SOURCE_PATH}/Modules/Bridge/VTK/include
+    ${ITK_SOURCE_PATH}/Modules/Bridge/VtkGlue/include
     ${vtkITK_INCLUDE_DIRS}
     ${MRMLCore_INCLUDE_DIRS}
     ${vtkTeem_INCLUDE_DIRS}

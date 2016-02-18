@@ -35,16 +35,15 @@
   </parameters>
   <parameters>
     <double>
-      <name>otsuOmegaThreshold</name>
-      <label>Otsu Omega Threshold Parameter</label>
-      <flag>o</flag>
-      <longflag>otsuomegathreshold</longflag>
-      <description><![CDATA[Control the sharpness of the threshold in the Otsu computation. 0: lower threshold, 1: higher threhold]]></description>
-      <default>0.5</default>
+      <name>baselineBValueThreshold</name>
+      <label>Baseline B-Value Threshold Parameter</label>
+      <flag>b</flag>
+      <longflag>baselineBValueThreshold</longflag>
+      <description><![CDATA[Volumes with B-value below this threshold will be considered baseline images and included in mask calculation.]]></description>
+      <default>100</default>
       <constraints>
         <minimum>0.0</minimum>
-        <maximum>1.0</maximum>
-        <step>0.1</step>
+        <step>1</step>
       </constraints>
     </double>
     <boolean>
