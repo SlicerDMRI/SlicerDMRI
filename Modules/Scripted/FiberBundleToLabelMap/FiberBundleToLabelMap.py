@@ -108,7 +108,7 @@ class FiberBundleToLabelMapWidget:
 
     # 'Advanced' collapsible button
     advancedCollapsibleButton = ctk.ctkCollapsibleButton()
-    advancedCollapsibleButton.text = "Parameters"
+    advancedCollapsibleButton.text = "Advanced"
     advancedCollapsibleButton.collapsed = True
     self.layout.addWidget(advancedCollapsibleButton)
     advancedFormLayout = qt.QFormLayout(advancedCollapsibleButton)
