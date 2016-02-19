@@ -1,6 +1,6 @@
 import os
 import unittest
-import vtk, qt, ctk, slicer
+import vtk, qt, ctk, slicer, numpy
 
 #
 # FiberBundleToLabelMap
@@ -106,6 +106,23 @@ class FiberBundleToLabelMapWidget:
 
     self.applyButton.connect('clicked()', self.onApply)
 
+    # 'Advanced' collapsible button
+    advancedCollapsibleButton = ctk.ctkCollapsibleButton()
+    advancedCollapsibleButton.text = "Parameters"
+    advancedCollapsibleButton.collapsed = True
+    self.layout.addWidget(advancedCollapsibleButton)
+    advancedFormLayout = qt.QFormLayout(advancedCollapsibleButton)
+
+    self.samplingDistance = ctk.ctkDoubleSpinBox()
+    self.samplingDistance.minimum = 0.01
+    self.samplingDistance.maximum = 5.0
+    self.samplingDistance.decimals = 2
+    self.samplingDistance.singleStep = 0.1
+    self.samplingDistance.value = 0.1
+    self.samplingDistance.decimalsOption = (ctk.ctkDoubleSpinBox.ReplaceDecimals |
+                                                    ctk.ctkDoubleSpinBox.DecimalsByKey)
+    advancedFormLayout.addRow("Sampling distance (mm)", self.samplingDistance)
+
     # Add vertical spacer
     self.layout.addStretch(1)
 
@@ -116,7 +133,7 @@ class FiberBundleToLabelMapWidget:
       qt.QMessageBox.critical(slicer.util.mainWindow(), 'FiberBundleToLabelMap', "Must select fiber bundle and label map")
 
     logic = FiberBundleToLabelMapLogic()
-    logic.rasterizeFibers(fiberNode, labelNode, self.labelValue.value)
+    logic.rasterizeFibers(fiberNode, labelNode, self.labelValue.value, self.samplingDistance.value)
 
 #
 # FiberBundleToLabelMapLogic
@@ -145,7 +162,7 @@ class FiberBundleToLabelMapLogic:
       return False
     return True
 
-  def rasterizeFibers(self,fiberNode,labelNode,labelValue=1):
+  def rasterizeFibers(self,fiberNode,labelNode,labelValue=1,samplingDistance=0.1):
     """Trace through the given fiber bundles and
     set the corresponding pixels in the given labelNode volume"""
     print('rasterizing...')
@@ -153,17 +170,64 @@ class FiberBundleToLabelMapLogic:
     labelNode.GetRASToIJKMatrix(rasToIJK)
     labelArray = slicer.util.array(labelNode.GetID())
     polyData = fiberNode.GetPolyData()
-    pointCount = polyData.GetNumberOfPoints()
-    points= polyData.GetPoints()
-    for pointIndex in xrange(pointCount):
-      point = points.GetPoint(pointIndex)
-      ijkFloat = rasToIJK.MultiplyPoint(point+(1,))[:3]
-      ijk = [int(round(element)) for element in ijkFloat]
-      ijk.reverse()
-      try:
-        labelArray[tuple(ijk)] = labelValue
-      except IndexError:
-        pass
+    cellCount = polyData.GetNumberOfCells()
+
+    selection = vtk.vtkSelection()
+    selectionNode = vtk.vtkSelectionNode()
+    selectionNode.SetFieldType(vtk.vtkSelectionNode.CELL)
+    selectionNode.SetContentType(vtk.vtkSelectionNode.INDICES)
+
+    extractor = vtk.vtkExtractSelectedPolyDataIds()
+    extractor.SetInputData(0, polyData)
+
+    resampler = vtk.vtkPolyDataPointSampler()
+    resampler.GenerateEdgePointsOn()
+    resampler.GenerateVertexPointsOff()
+    resampler.GenerateInteriorPointsOff()
+    resampler.GenerateVerticesOff()
+    resampler.SetDistance(samplingDistance)
+
+    cellIds = vtk.vtkIdTypeArray()
+
+    # as a compromise between memory blowup (for large fiberbundles) and not
+    # eating time in the python loop, resample CELLS_TO_PROCESS at once.
+    CELLS_TO_PROCESS = 100
+
+    for startCellId in xrange(0, cellCount, CELLS_TO_PROCESS):
+      # generate list of cell Ids to sample
+      cellIdsAr = numpy.arange(startCellId,
+                               min(cellCount, startCellId + CELLS_TO_PROCESS))
+      cellIds.SetVoidArray(cellIdsAr, cellIdsAr.size, 1)
+
+      # update the selection node to extract those cells
+      selectionNode.SetSelectionList(cellIds)
+      selection.AddNode(selectionNode)
+      selection.Modified()
+      extractor.SetInputData(1, selection)
+      extractor.Update()
+      resampler.SetInputConnection(extractor.GetOutputPort())
+      resampler.Update()
+
+      # get the resampler output
+      # note: to test without resampling, just use
+      # `pdSubset = extractor.GetOutput()` instead
+      pdSubset = resampler.GetOutput()
+      pointCount = pdSubset.GetNumberOfPoints()
+      points = pdSubset.GetPoints()
+
+      for pointIndex in xrange(pointCount):
+        point = points.GetPoint(pointIndex)
+        ijkFloat = rasToIJK.MultiplyPoint(point+(1,))[:3]
+        ijk = [int(round(element)) for element in ijkFloat]
+        ijk.reverse()
+        try:
+          # paint the voxels
+          labelArray[tuple(ijk)] = labelValue
+        except IndexError:
+          pass
+      # reset the selection node
+      selection.RemoveAllNodes()
+
     labelNode.GetImageData().Modified()
     labelNode.Modified()
     print('finished')
@@ -245,13 +309,14 @@ class FiberBundleToLabelMapTest(unittest.TestCase):
     if not labelNode:
       labelNode = self.volumesLogic.CreateLabelVolume( slicer.mrmlScene, volumeNode, "FA-label" )
 
+    samplingDistance = self.samplingDistanceSelector.value
 
     selectionNode = self.applicationLogic.GetSelectionNode()
     selectionNode.SetReferenceActiveVolumeID( volumeNode.GetID() )
     selectionNode.SetReferenceActiveLabelVolumeID( labelNode.GetID() )
     self.applicationLogic.PropagateVolumeSelection(0)
 
-    logic.rasterizeFibers(fiberNode, labelNode, labelValue=10)
+    logic.rasterizeFibers(fiberNode, labelNode, labelValue=10, samplingDistance=0.1)
 
     self.assertIsNotNone( logic.hasImageData(labelNode) )
     self.delayDisplay('Test passed!')
