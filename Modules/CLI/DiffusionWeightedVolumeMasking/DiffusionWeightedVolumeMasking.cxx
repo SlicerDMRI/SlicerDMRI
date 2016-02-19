@@ -91,11 +91,16 @@ int main( int argc, char * argv[] )
       return EXIT_FAILURE;
       }
 
+    vtkNew<vtkImageCast> inputCast;
+    inputCast->SetOutputScalarTypeToShort();
+    inputCast->SetInputConnection(imageWeightedSum->GetOutputPort());
+    inputCast->Update();
+
     typedef itk::Image<short, 3> ImageType;
     typedef itk::VTKImageToImageFilter<ImageType> VTKImageToImageType;
 
     VTKImageToImageType::Pointer vtkToITK = VTKImageToImageType::New();
-    vtkToITK->SetInput(imageWeightedSum->GetOutput());
+    vtkToITK->SetInput(inputCast->GetOutput());
 
     typedef itk::MedianImageFilter<ImageType, ImageType> medianType;
     medianType::Pointer median = medianType::New();
