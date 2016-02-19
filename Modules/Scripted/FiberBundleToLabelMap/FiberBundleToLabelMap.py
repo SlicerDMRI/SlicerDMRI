@@ -218,6 +218,12 @@ class FiberBundleToLabelMapLogic:
       for pointIndex in xrange(pointCount):
         point = points.GetPoint(pointIndex)
         ijkFloat = rasToIJK.MultiplyPoint(point+(1,))[:3]
+
+        # skip any negative indices to avoid wrap-around
+        # to the other side of the image.
+        if (any(coord < 0 for coord in ijkFloat)):
+          continue
+
         ijk = [int(round(element)) for element in ijkFloat]
         ijk.reverse()
         try:
