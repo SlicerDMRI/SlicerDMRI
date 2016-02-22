@@ -7,6 +7,7 @@
 #endif
 
 // STD includes
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -22,8 +23,8 @@ int main( int argc, char * argv[] )
 
   std::string resultTxtPath = argv[1];
   std::string baselineTxtPath = argv[2];
-  std::ifstream resultTxt(resultTxtPath);
-  std::ifstream baselineTxt(baselineTxtPath);
+  std::ifstream resultTxt(resultTxtPath.c_str());
+  std::ifstream baselineTxt(baselineTxtPath.c_str());
 
   std::string resultLine;
   std::string baselineLine;
