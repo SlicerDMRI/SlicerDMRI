@@ -14,7 +14,6 @@ add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test
   --compare ${BASELINE}/${CLP}Test_EstimatedBaseline.nhdr ${TEMP}/${CLP}Test_EstimatedBaseline.nhdr
   --compare ${BASELINE}/${CLP}Test_OtsuThresholdMask.nhdr ${TEMP}/${CLP}Test_OtsuThresholdMask.nhdr
   ${CLP}Test
-    --otsuomegathreshold 0.5
     ${MRML_TEST_DATA}/helix-DWI.nhdr
     ${TEMP}/${CLP}Test_EstimatedBaseline.nhdr
     ${TEMP}/${CLP}Test_OtsuThresholdMask.nhdr
