@@ -43,6 +43,7 @@
       <default>100</default>
       <constraints>
         <minimum>0.0</minimum>
+        <maximum>20000.0</maximum>
         <step>1</step>
       </constraints>
     </double>
