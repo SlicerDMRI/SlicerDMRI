@@ -11,9 +11,10 @@ target_link_libraries(${CLP}Test ${CLP}Lib ${SlicerExecutionModel_EXTRA_EXECUTAB
 set_target_properties(${CLP}Test PROPERTIES LABELS ${CLP})
 set_target_properties(${CLP}Test PROPERTIES FOLDER ${${CLP}_TARGETS_FOLDER})
 
+#-----------------------------------------------------------------------------
 set(testname ${CLP}TestFolder)
 add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test>
-  ModuleEntryPoint
+  ${CLP}Test
     --inputtype Fibers_File_Folder
     --inputdirectory ${TEST_DATA}
     --outputfile ${TEMP}/fibermeasurementstestingoutputfolder.txt
@@ -24,7 +25,7 @@ set_property(TEST ${testname} PROPERTY LABELS ${CLP})
 
 set(testname ${CLP}TestHierarchy)
 add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test>
-  ModuleEntryPoint
+  ${CLP}Test
     --inputtype Fibers_Hierarchy
     --fiberHierarchy ${TEST_DATA}/fibers_hierarchy.mrml\#vtkMRMLModelHierarchyNode1
     --outputfile ${TEMP}/fibermeasurementstestingoutputhierarchy.txt
@@ -33,6 +34,7 @@ add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test
   )
 set_property(TEST ${testname} PROPERTY LABELS ${CLP})
 
+#-----------------------------------------------------------------------------
 add_executable(CompareTxtsMeasures CompareTxts.cxx)
 target_link_libraries(CompareTxtsMeasures ${CLP}Lib ${SlicerExecutionModel_EXTRA_EXECUTABLE_TARGET_LIBRARIES})
 set_target_properties(CompareTxtsMeasures PROPERTIES LABELS ${CLP})
