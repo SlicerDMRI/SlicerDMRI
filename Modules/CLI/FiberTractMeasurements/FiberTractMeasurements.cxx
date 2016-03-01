@@ -395,6 +395,9 @@ void computeScalarMeasurements(vtkPolyData *poly,
     for (int n=0; n<npoints; n++)
       {
       arr->GetTuple(n, &val);
+
+      if (vtkMath::IsNan(val)) continue;
+
       sum += val;
       }
     if (npoints)
