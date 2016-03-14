@@ -1,3 +1,4 @@
+set(TEMP "${CMAKE_BINARY_DIR}/Testing/Temporary")
 
 #-----------------------------------------------------------------------------
 set(BASELINE ${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline)
