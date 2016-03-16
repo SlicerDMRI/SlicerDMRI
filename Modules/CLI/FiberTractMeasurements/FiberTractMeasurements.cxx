@@ -4,16 +4,18 @@
 #include <vtkNRRDWriter.h>
 
 // VTK includes
+#include <vtkAssignAttribute.h>
+#include <vtkGlobFileNames.h>
 #include <vtkImageData.h>
-#include <vtkNew.h>
 #include <vtkMath.h>
+#include <vtkNew.h>
 #include <vtkPointData.h>
 #include <vtkPolyDataTensorToColor.h>
 #include <vtkPolyDataReader.h>
-#include <vtkXMLPolyDataReader.h>
-#include <vtkGlobFileNames.h>
 #include <vtkStringArray.h>
-#include <vtkAssignAttribute.h>
+#include <vtkXMLPolyDataReader.h>
+// VTKsys includes
+#include <vtksys/SystemTools.hxx>
 
 // MRML
 #include <vtkMRMLModelHierarchyNode.h>
@@ -29,23 +31,34 @@
 #include <vtkMRMLSceneViewStorageNode.h>
 #include <vtkMRMLCommandLineModuleNode.h>
 
-// VTKsys includes
-#include <vtksys/SystemTools.hxx>
-
 // ITK includes
 #include <itkFloatingPointExceptions.h>
 
+// Auto-generated CLP include
 #include "FiberTractMeasurementsCLP.h"
 
-void computeFiberStats(vtkPolyData *poly,
+//=============================================================================
+// Typedef smartpointer and global helper.
+typedef vtkSmartPointer<vtkPolyData> vtkPDSP;
+
+// Maps to hold results
+std::map< std::string, std::map<std::string, double> > OutTable;
+std::map< std::string, std::string> ClusterNames;
+std::map< std::string, std::map<std::string, double> > Clusters;
+
+#define INVALID_NUMBER_PRINT std::string("NAN")
+std::string SEPARATOR;
+
+//=============================================================================
+// Function declarations
+void computeFiberStats(vtkPDSP input,
                        std::string &id);
 
-void computeScalarMeasurements(vtkPolyData *poly,
+void computeScalarMeasurements(vtkPDSP input,
                                std::string &id,
                                std::string &operation);
 
-int computeTensorMeasurement(vtkPolyDataTensorToColor *math,
-                             vtkAlgorithmOutput *input,
+int computeTensorMeasurement(vtkPDSP input,
                              std::string &id,
                              std::string &operation);
 
@@ -75,252 +88,8 @@ void printCluster(const std::string &id,
                   std::stringstream &measureNames,
                   std::stringstream &measureValues);
 
-std::map< std::string, std::map<std::string, double> > OutTable;
-std::map< std::string, std::string> ClusterNames;
-std::map< std::string, std::map<std::string, double> > Clusters;
-
-#define INVALID_NUMBER_PRINT std::string("NAN")
-
-std::string SEPARATOR;
-
-int main( int argc, char * argv[] )
-{
-  itk::FloatingPointExceptions::Disable();
-
-  PARSE_ARGS;
-
-  std::ofstream ofs(outputFile.c_str());
-  if (ofs.fail())
-    {
-    std::cerr << "Output file doesn't exist: " <<  outputFile << std::endl;
-    return EXIT_FAILURE;
-    }
-
-  vtkNew<vtkPolyDataTensorToColor> math;
-  std::vector<std::string> operations;
-  operations.push_back(std::string("Trace"));
-  operations.push_back(std::string("RelativeAnisotropy"));
-  operations.push_back(std::string("FractionalAnisotropy"));
-  operations.push_back(std::string("LinearMeasurement"));
-  operations.push_back(std::string("PlanarMeasurement"));
-  operations.push_back(std::string("SphericalMeasurement"));
-  operations.push_back(std::string("MinEigenvalue"));
-  operations.push_back(std::string("MidEigenvalue"));
-  operations.push_back(std::string("MaxEigenvalue"));
-  std::vector<std::string> emptyOperationVector;
-  emptyOperationVector.push_back(std::string(""));
-
-  if (inputType == std::string("Fibers_Hierarchy") )
-    {
-    // get the model hierarchy id from the scene file
-    std::string::size_type loc;
-    std::string            inputFilename;
-    std::string            inputNodeID;
-
-    std::string sceneFilename;
-    std::string filename = FiberHierarchyNode[0];
-    loc = filename.find_last_of("#");
-    if (loc != std::string::npos)
-      {
-      sceneFilename = std::string(filename.begin(),
-                                  filename.begin() + loc);
-      loc++;
-
-      inputNodeID = std::string(filename.begin() + loc, filename.end());
-      }
-
-    // check for the model mrml file
-    if (sceneFilename.empty())
-      {
-      std::cerr << "No MRML scene file specified." << std::endl;
-      return EXIT_FAILURE;
-      }
-
-    // get the directory of the scene file
-    std::string rootDir
-      = vtksys::SystemTools::GetParentDirectory(sceneFilename.c_str());
-
-    vtkNew<vtkMRMLScene> modelScene;
-
-    // load the scene that Slicer will re-read
-    modelScene->SetURL(sceneFilename.c_str());
-
-    modelScene->RegisterNodeClass(vtkNew<vtkMRMLSceneViewNode>().GetPointer());
-    modelScene->RegisterNodeClass(vtkNew<vtkMRMLSceneViewStorageNode>().GetPointer());
-    modelScene->RegisterNodeClass(vtkNew<vtkMRMLCommandLineModuleNode>().GetPointer());
-    modelScene->RegisterNodeClass(vtkNew<vtkMRMLFiberBundleNode>().GetPointer());
-    modelScene->RegisterNodeClass(vtkNew<vtkMRMLFiberBundleLineDisplayNode>().GetPointer());
-    modelScene->RegisterNodeClass(vtkNew<vtkMRMLFiberBundleTubeDisplayNode>().GetPointer());
-    modelScene->RegisterNodeClass(vtkNew<vtkMRMLFiberBundleGlyphDisplayNode>().GetPointer());
-    modelScene->RegisterNodeClass(vtkNew<vtkMRMLFiberBundleStorageNode>().GetPointer());
-
-    // only try importing if the scene file exists
-    if (vtksys::SystemTools::FileExists(sceneFilename.c_str()))
-      {
-      modelScene->Import();
-      }
-    else
-      {
-      std::cout << "Model scene file doesn't exist: " <<  sceneFilename.c_str() << std::endl;
-      }
-
-    if (inputType == std::string("Fibers_Hierarchy"))
-      {
-      // make sure we have a model hierarchy node
-      vtkMRMLNode *node = modelScene->GetNodeByID(inputNodeID);
-      vtkSmartPointer<vtkMRMLModelHierarchyNode> topHierNode =
-         vtkMRMLModelHierarchyNode::SafeDownCast(node);
-      if (!topHierNode)
-        {
-        std::cerr << "Model hierachy node doesn't exist: " <<  inputNodeID.c_str() << std::endl;
-        return EXIT_FAILURE;
-        }
-
-      // get all the children nodes
-      std::vector< vtkMRMLHierarchyNode *> allChildren;
-      topHierNode->GetAllChildrenNodes(allChildren);
-
-      // and loop over them
-      for (unsigned int i = 0; i < allChildren.size(); ++i)
-        {
-        vtkMRMLDisplayableHierarchyNode *dispHierarchyNode = vtkMRMLDisplayableHierarchyNode::SafeDownCast(allChildren[i]);
-        if (dispHierarchyNode)
-          {
-          // get any associated node
-          vtkMRMLFiberBundleNode *fiberNode = vtkMRMLFiberBundleNode::SafeDownCast(
-              dispHierarchyNode->GetAssociatedNode());
-
-          if (fiberNode)
-            {
-            std::string id = std::string(fiberNode->GetName());
-
-            // concat path to parent
-            getPathFromParentToChild(topHierNode, dispHierarchyNode, id);
-
-            computeFiberStats(fiberNode->GetPolyData(), id);
-
-            computeScalarMeasurements(fiberNode->GetPolyData(), id, emptyOperationVector[0]);
-
-            for (unsigned int o = 0; o < operations.size(); o++)
-              {
-              computeTensorMeasurement(math.GetPointer(),
-                                       fiberNode->GetPolyDataConnection(),
-                                       id,
-                                       operations[o]);
-              } // for (unsigned int o = 0; o < operations.size(); o++)
-            } // if (fiberNode)
-          } // if (dispHierarchyNode)
-        } // for (unsigned int i = 0; i < allChildren.size(); ++i)
-      } // if (inputType == std::string("Fibers_Hierarchy"))
-    } //if (inputType == ... || ... )
-  else if (inputType == std::string("Fibers_File_Folder") )
-    {
-    // File based
-    if (InputDirectory.size() == 0)
-      {
-      std::cerr << "Input directory doesn't exist: " << std::endl;
-      return EXIT_FAILURE;
-      }
-
-    vtkNew<vtkGlobFileNames> gfnVTK;
-    gfnVTK->SetDirectory(InputDirectory.c_str());
-    gfnVTK->AddFileNames("*.vtk");
-    vtkStringArray *fileNamesVTK = gfnVTK->GetFileNames();
-
-    vtkNew<vtkGlobFileNames> gfnVTP;
-    gfnVTP->SetDirectory(InputDirectory.c_str());
-    gfnVTP->AddFileNames("*.vtp");
-    vtkStringArray *fileNamesVTP = gfnVTP->GetFileNames();
-
-    // Loop over polydatas
-    for (vtkIdType i = 0; i < fileNamesVTP->GetNumberOfValues(); i++)
-      {
-      vtkNew<vtkXMLPolyDataReader> readerVTP;
-      vtkStdString fileName = fileNamesVTP->GetValue(i);
-      readerVTP->SetFileName(fileName.c_str());
-      readerVTP->Update();
-      std::string id = fileName;
-
-      computeFiberStats(readerVTP->GetOutput(), id);
-
-      computeScalarMeasurements(readerVTP->GetOutput(), id, emptyOperationVector[0]);
-
-      if( !setTensors(readerVTP->GetOutput()) )
-        {
-        std::cout << argv[0] << " : No tensor data for file " << fileName << std::endl;
-        continue;
-        }
-
-      for (unsigned int o = 0; o < operations.size(); o++)
-        {
-        computeTensorMeasurement(math.GetPointer(),
-                                 readerVTP.GetPointer()->GetOutputPort(),
-                                 id,
-                                 operations[o]);
-        }
-      }
-    for (vtkIdType i = 0; i < fileNamesVTK->GetNumberOfValues(); i++)
-      {
-      vtkNew<vtkPolyDataReader> readerVTK;
-      vtkStdString fileName = fileNamesVTK->GetValue(i);
-      readerVTK->SetFileName(fileName.c_str());
-      readerVTK->Update();
-      std::string id = fileName;
-
-      computeFiberStats(readerVTK->GetOutput(), id);
-
-      computeScalarMeasurements(readerVTK->GetOutput(), id, emptyOperationVector[0]);
-
-      if( !setTensors(readerVTK->GetOutput()) )
-        {
-        std::cout << argv[0] << ": No tensor data for file " << fileName << std::endl;
-        continue;
-        }
-
-      for (unsigned int o = 0; o < operations.size(); o++)
-        {
-        computeTensorMeasurement(math.GetPointer(),
-                                 readerVTK.GetPointer()->GetOutputPort(),
-                                 id,
-                                 operations[o]);
-        }
-      }
-    } //if (inputType == std::string("Fibers File Folder") )
-
-  if (addClusters() == 0)
-    {
-    return EXIT_FAILURE;
-    }
-
-  if (outputSeparator == std::string("Tab"))
-    {
-    SEPARATOR = "\t";
-    }
-  else if (outputSeparator == std::string("Comma"))
-    {
-    SEPARATOR = ",";
-    }
-  else if (outputSeparator == std::string("Space"))
-    {
-    SEPARATOR = " ";
-    }
-
-  if (outputFormat == std::string("Row_Hierarchy"))
-    {
-    printFlat(ofs);
-    }
-  else
-    {
-    printTable(ofs, true, OutTable);
-    printTable(ofs, false, Clusters);
-    }
-
-  ofs.flush();
-  ofs.close();
-
-  return EXIT_SUCCESS;
-}
-
+//=============================================================================
+// Function definitions
 void getPathFromParentToChild(vtkMRMLHierarchyNode *parent,
                               vtkMRMLHierarchyNode *child,
                               std::string &path)
@@ -344,9 +113,14 @@ void getPathFromParentToChild(vtkMRMLHierarchyNode *parent,
     }
 }
 
-void computeFiberStats(vtkPolyData *poly,
+void computeFiberStats(vtkPDSP poly,
                        std::string &id)
 {
+  if (!poly) {
+    std::cerr << "computeFiberStats: missing polydata input for id: " << id << std::endl;
+    return;
+  }
+
   int npoints = poly->GetNumberOfPoints();
   int npolys = poly->GetNumberOfCells();
 
@@ -363,7 +137,7 @@ void computeFiberStats(vtkPolyData *poly,
    // }
 }
 
-void computeScalarMeasurements(vtkPolyData *poly,
+void computeScalarMeasurements(vtkPDSP poly,
                                std::string &id,
                                std::string &operation)
 {
@@ -375,7 +149,7 @@ void computeScalarMeasurements(vtkPolyData *poly,
     //return;
     }
 
-  // averagre measurement for each scalar array
+  // average measurement for each scalar array
   for (int i=0; i<poly->GetPointData()->GetNumberOfArrays(); i++)
     {
     vtkDataArray *arr = poly->GetPointData()->GetArray(i);
@@ -392,7 +166,7 @@ void computeScalarMeasurements(vtkPolyData *poly,
 
     double val;
     double sum = 0;
-    for (int n=0; n<npoints; n++)
+    for (int n=0; n < npoints; n++)
       {
       arr->GetTuple(n, &val);
       sum += val;
@@ -414,30 +188,21 @@ void computeScalarMeasurements(vtkPolyData *poly,
       }
       it->second[name] = sum;
     } //for (int i=0; i<poly->GetPointData()->GetNumberOfArrays(); i++)
+
 }
 
-int computeTensorMeasurement(vtkPolyDataTensorToColor *math,
-                             vtkAlgorithmOutput *input,
+int computeTensorMeasurement(vtkPDSP poly,
                              std::string &id,
                              std::string &operation)
 {
   //TODO loop over all tensors, use ExtractTensor
+  vtkNew<vtkPolyDataTensorToColor> math;
+
   vtkNew<vtkAssignAttribute> assignAttribute;
+  assignAttribute->SetInputData(poly);
+  math->SetInputConnection(0, assignAttribute->GetOutputPort());
 
-  assignAttribute->SetInputConnection(0, input );
-  math->SetInputConnection(0, assignAttribute->GetOutputPort() );
-
-  vtkPolyData *poly = vtkPolyData::SafeDownCast(assignAttribute->GetInput());
-
-  if (poly == 0)
-    {
-    std::cerr << "no polydata found" << std::endl;
-    return EXIT_FAILURE;
-    }
-
-  int numTensors = getNumberOfTensors(poly);
-
-  for (int i=0; i<numTensors; i++)
+  for (int i=0; i < getNumberOfTensors(poly); i++)
     {
     std::string name = getNthTensorName(i, poly);
 
@@ -501,6 +266,18 @@ int computeTensorMeasurement(vtkPolyDataTensorToColor *math,
     }
 
   return EXIT_SUCCESS;
+}
+
+int computeAllTensorMeasurements(vtkPDSP input,
+                                 std::string &id,
+                                 std::vector<std::string> operations)
+{
+  int result = EXIT_SUCCESS;
+  std::vector<std::string>::iterator op_iter = operations.begin();
+  for (; op_iter != operations.end(); op_iter++)
+    result = result & computeTensorMeasurement(input, id, *op_iter);
+
+  return result;
 }
 
 bool setTensors(vtkPolyData *poly)
@@ -742,7 +519,7 @@ int addClusters()
           itValues = itOutput->second.find(itNames->second);
           if (itValues == itOutput->second.end())
             {
-            std::cerr << "Fibers contain different number of scalars" << std::endl;
+            std::cerr << "Fibers contain different number of scalars, name: " << itNames->second << std::endl;
             return 0;
             }
 
@@ -950,4 +727,201 @@ void printCluster(const std::string &id,
         }
       }
     }
+}
+
+int main( int argc, char * argv[] )
+{
+  itk::FloatingPointExceptions::Disable();
+
+  PARSE_ARGS;
+
+  std::ofstream ofs(outputFile.c_str());
+  if (ofs.fail())
+    {
+    std::cerr << "Output file doesn't exist: " <<  outputFile << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  vtkNew<vtkPolyDataTensorToColor> math;
+  std::vector<std::string> operations;
+  operations.push_back(std::string("Trace"));
+  operations.push_back(std::string("RelativeAnisotropy"));
+  operations.push_back(std::string("FractionalAnisotropy"));
+  operations.push_back(std::string("LinearMeasurement"));
+  operations.push_back(std::string("PlanarMeasurement"));
+  operations.push_back(std::string("SphericalMeasurement"));
+  operations.push_back(std::string("MinEigenvalue"));
+  operations.push_back(std::string("MidEigenvalue"));
+  operations.push_back(std::string("MaxEigenvalue"));
+  std::string EMPTY_OP("");
+
+  if (inputType == std::string("Fibers_Hierarchy") )
+    {
+    // get the model hierarchy id from the scene file
+    std::string::size_type loc;
+    std::string            inputFilename;
+    std::string            inputNodeID;
+
+    std::string sceneFilename;
+    std::string filename = FiberHierarchyNode[0];
+    loc = filename.find_last_of("#");
+    if (loc != std::string::npos)
+      {
+      sceneFilename = std::string(filename.begin(),
+                                  filename.begin() + loc);
+      loc++;
+
+      inputNodeID = std::string(filename.begin() + loc, filename.end());
+      }
+
+    // check for the model mrml file
+    if (sceneFilename.empty())
+      {
+      std::cerr << "No MRML scene file specified." << std::endl;
+      return EXIT_FAILURE;
+      }
+
+    // get the directory of the scene file
+    std::string rootDir
+      = vtksys::SystemTools::GetParentDirectory(sceneFilename.c_str());
+
+    vtkNew <vtkMRMLScene> modelScene;
+    // load the scene that Slicer will re-read
+    modelScene->SetURL(sceneFilename.c_str());
+
+    modelScene->RegisterNodeClass(vtkNew<vtkMRMLSceneViewNode>().GetPointer());
+    modelScene->RegisterNodeClass(vtkNew<vtkMRMLSceneViewStorageNode>().GetPointer());
+    modelScene->RegisterNodeClass(vtkNew<vtkMRMLCommandLineModuleNode>().GetPointer());
+    modelScene->RegisterNodeClass(vtkNew<vtkMRMLFiberBundleNode>().GetPointer());
+    modelScene->RegisterNodeClass(vtkNew<vtkMRMLFiberBundleLineDisplayNode>().GetPointer());
+    modelScene->RegisterNodeClass(vtkNew<vtkMRMLFiberBundleTubeDisplayNode>().GetPointer());
+    modelScene->RegisterNodeClass(vtkNew<vtkMRMLFiberBundleGlyphDisplayNode>().GetPointer());
+    modelScene->RegisterNodeClass(vtkNew<vtkMRMLFiberBundleStorageNode>().GetPointer());
+
+    // only try importing if the scene file exists
+    if (vtksys::SystemTools::FileExists(sceneFilename.c_str()))
+      {
+      modelScene->Import();
+      }
+    else
+      {
+      std::cout << "Model scene file doesn't exist: " <<  sceneFilename.c_str() << std::endl;
+      }
+
+    if (inputType == std::string("Fibers_Hierarchy"))
+      {
+      // make sure we have a model hierarchy node
+      vtkMRMLNode *node = modelScene->GetNodeByID(inputNodeID);
+      vtkSmartPointer<vtkMRMLModelHierarchyNode> topHierNode =
+         vtkMRMLModelHierarchyNode::SafeDownCast(node);
+      if (!topHierNode)
+        {
+        std::cerr << "Model hierachy node doesn't exist: " <<  inputNodeID.c_str() << std::endl;
+        return EXIT_FAILURE;
+        }
+
+      // get all the children nodes
+      std::vector< vtkMRMLHierarchyNode *> allChildren;
+      topHierNode->GetAllChildrenNodes(allChildren);
+
+      // and loop over them
+      for (unsigned int i = 0; i < allChildren.size(); ++i)
+        {
+        vtkMRMLDisplayableHierarchyNode *dispHierarchyNode = vtkMRMLDisplayableHierarchyNode::SafeDownCast(allChildren[i]);
+        if (dispHierarchyNode)
+          {
+          // get any associated node
+          vtkMRMLFiberBundleNode *fiberNode = vtkMRMLFiberBundleNode::SafeDownCast(
+              dispHierarchyNode->GetAssociatedNode());
+
+          if (fiberNode)
+            {
+            std::string id = std::string(fiberNode->GetName());
+            vtkPDSP data = fiberNode->GetPolyData();
+            computeFiberStats(data, id);
+            computeScalarMeasurements(data, id, EMPTY_OP);
+            computeAllTensorMeasurements(data, id, operations);
+            } // if (fiberNode)
+          } // if (dispHierarchyNode)
+        } // for (unsigned int i = 0; i < allChildren.size(); ++i)
+      } // if (inputType == std::string("Fibers_Hierarchy"))
+    } //if (inputType == ... || ... )
+  else if (inputType == std::string("Fibers_File_Folder") )
+    {
+    // File based
+    if (InputDirectory.size() == 0)
+      {
+      std::cerr << "Input directory doesn't exist: " << std::endl;
+      return EXIT_FAILURE;
+      }
+
+    vtkNew<vtkGlobFileNames> glob;
+    glob->SetDirectory(InputDirectory.c_str());
+
+    // Loop over .vtk files
+    glob->AddFileNames("*.vtk");
+    vtkStringArray *fileNamesVTK = glob->GetFileNames();
+    for (vtkIdType i = 0; i < fileNamesVTK->GetNumberOfValues(); i++)
+      {
+      vtkNew<vtkPolyDataReader> reader;
+      std::string fileName = fileNamesVTK->GetValue(i);
+      reader->SetFileName(fileNamesVTK->GetValue(i));
+      reader->Update();
+
+      vtkPDSP data = reader->GetOutput();
+      computeFiberStats(data, fileName);
+      computeScalarMeasurements(data, fileName, EMPTY_OP);
+      computeAllTensorMeasurements(data, fileName, operations);
+      }
+
+    // Loop over .vtp files
+    glob->Reset();
+    glob->AddFileNames("*.vtp");
+    vtkStringArray *fileNamesVTP = glob->GetFileNames();
+    for (vtkIdType i = 0; i < fileNamesVTP->GetNumberOfValues(); i++)
+      {
+      vtkNew<vtkXMLPolyDataReader> reader;
+      std::string fileName = fileNamesVTP->GetValue(i);
+      reader->SetFileName(fileName.c_str());
+      reader->Update();
+
+      vtkPDSP data = reader->GetOutput();
+      computeFiberStats(data, fileName);
+      computeScalarMeasurements(data, fileName, EMPTY_OP);
+      computeAllTensorMeasurements(data, fileName, operations);
+      }
+    } //if (inputType == std::string("Fibers File Folder") )
+
+  if (addClusters() == 0)
+    {
+    return EXIT_FAILURE;
+    }
+
+  if (outputSeparator == std::string("Tab"))
+    {
+    SEPARATOR = "\t";
+    }
+  else if (outputSeparator == std::string("Comma"))
+    {
+    SEPARATOR = ",";
+    }
+  else if (outputSeparator == std::string("Space"))
+    {
+    SEPARATOR = " ";
+    }
+
+  if (outputFormat == std::string("Row_Hierarchy"))
+    {
+    printFlat(ofs);
+    }
+  else
+    {
+    printTable(ofs, true, OutTable);
+    printTable(ofs, false, Clusters);
+    }
+
+  ofs.flush();
+  ofs.close();
+
+  return EXIT_SUCCESS;
 }
