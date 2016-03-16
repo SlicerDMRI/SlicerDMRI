@@ -142,6 +142,7 @@ void computeScalarMeasurements(vtkPDSP poly,
                                std::string &operation)
 {
   vtkIdType npoints = poly->GetNumberOfPoints();
+  vtkIdType npoints_final = npoints;
   vtkIdType npolys = poly->GetNumberOfCells();
 
   if (npoints == 0 || npolys == 0)
@@ -169,11 +170,18 @@ void computeScalarMeasurements(vtkPDSP poly,
     for (int n=0; n < npoints; n++)
       {
       arr->GetTuple(n, &val);
+
+      if (vtkMath::IsNan(val))
+        {
+        npoints_final -= 1;
+        continue;
+        }
+
       sum += val;
       }
-    if (npoints)
+    if (npoints_final > 0)
       {
-      sum /= npoints;
+      sum /= npoints_final;
       }
     else
       {
@@ -187,6 +195,17 @@ void computeScalarMeasurements(vtkPDSP poly,
       it = OutTable.find(id);
       }
       it->second[name] = sum;
+
+    // record the number of NaNs for this measurement
+    std::string nanid = name + "." + INVALID_NUMBER_PRINT;
+    it = OutTable.find(id);
+    if (it == OutTable.end())
+      {
+      OutTable[id] = std::map<std::string, double>();
+      it = OutTable.find(id);
+      }
+    it->second[nanid] = npoints - npoints_final;
+
     } //for (int i=0; i<poly->GetPointData()->GetNumberOfArrays(); i++)
 
 }
@@ -531,7 +550,7 @@ int addClusters()
             }
           double clusterValue = itClusterValues->second;
           if (itValues != itOutput->second.end() && itNames->second != std::string("Num_Points") &&
-              itNames->second != std::string("Num_Fibers") )
+              itNames->second != std::string("Num_Fibers") && itNames->second.find("NAN") == std::string::npos)
             {
             if (!vtkMath::IsNan(itValues->second))
               {
@@ -552,8 +571,11 @@ int addClusters()
       for (itNames = names.begin(); itNames != names.end(); itNames++)
         {
         itClusterValues = itCluster->second.find(itNames->second);
-        if (itClusterValues != itCluster->second.end() && itNames->second != std::string("Num_Points") &&
-              itNames->second != std::string("Num_Fibers") && npointsCluster )
+        if (itClusterValues != itCluster->second.end() &&
+              (itNames->second != std::string("Num_Points")) &&
+              (itNames->second != std::string("Num_Fibers")) &&
+              (itNames->second.find("NAN") == std::string::npos) &&
+              npointsCluster)
           {
           double clusterValue = itClusterValues->second;
           itCluster->second[itNames->second] = clusterValue/npointsCluster;
@@ -837,6 +859,8 @@ int main( int argc, char * argv[] )
           if (fiberNode)
             {
             std::string id = std::string(fiberNode->GetName());
+            // concat hierarchy path to id
+            getPathFromParentToChild(topHierNode, dispHierarchyNode, id);
             vtkPDSP data = fiberNode->GetPolyData();
             computeFiberStats(data, id);
             computeScalarMeasurements(data, id, EMPTY_OP);
@@ -869,6 +893,11 @@ int main( int argc, char * argv[] )
       reader->Update();
 
       vtkPDSP data = reader->GetOutput();
+      if( !setTensors(data) )
+        {
+        std::cout << argv[0] << " : No tensor data for file " << fileName << std::endl;
+        continue;
+        }
       computeFiberStats(data, fileName);
       computeScalarMeasurements(data, fileName, EMPTY_OP);
       computeAllTensorMeasurements(data, fileName, operations);
@@ -886,6 +915,12 @@ int main( int argc, char * argv[] )
       reader->Update();
 
       vtkPDSP data = reader->GetOutput();
+      if( !setTensors(data) )
+        {
+        std::cout << argv[0] << " : No tensor data for file " << fileName << std::endl;
+        continue;
+        }
+
       computeFiberStats(data, fileName);
       computeScalarMeasurements(data, fileName, EMPTY_OP);
       computeAllTensorMeasurements(data, fileName, operations);
