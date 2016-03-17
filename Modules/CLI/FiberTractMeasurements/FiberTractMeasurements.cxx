@@ -38,9 +38,6 @@
 #include "FiberTractMeasurementsCLP.h"
 
 //=============================================================================
-// Typedef smartpointer and global helper.
-typedef vtkSmartPointer<vtkPolyData> vtkPDSP;
-
 // Maps to hold results
 std::map< std::string, std::map<std::string, double> > OutTable;
 std::map< std::string, std::string> ClusterNames;
@@ -49,16 +46,20 @@ std::map< std::string, std::map<std::string, double> > Clusters;
 #define INVALID_NUMBER_PRINT std::string("NAN")
 std::string SEPARATOR;
 
+// BUG, TODO: this is global because FA calc doesn't work (no scalars) when
+//      the PDTensorToColor is allocated inside function.
+vtkNew<vtkPolyDataTensorToColor> math;
+
 //=============================================================================
 // Function declarations
-void computeFiberStats(vtkPDSP input,
+void computeFiberStats(vtkSmartPointer<vtkPolyData> input,
                        std::string &id);
 
-void computeScalarMeasurements(vtkPDSP input,
+void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> input,
                                std::string &id,
                                std::string &operation);
 
-int computeTensorMeasurement(vtkPDSP input,
+int computeTensorMeasurement(vtkSmartPointer<vtkPolyData> input,
                              std::string &id,
                              std::string &operation);
 
@@ -106,6 +107,7 @@ void getPathFromParentToChild(vtkMRMLHierarchyNode *parent,
       }
     path = parentName + std::string(":") + path;
     ClusterNames[parentName] = parentName;
+
     if (strcmp(immediateParent->GetID(), parent->GetID()) != 0)
       {
       getPathFromParentToChild(parent, immediateParent, path);
@@ -113,7 +115,7 @@ void getPathFromParentToChild(vtkMRMLHierarchyNode *parent,
     }
 }
 
-void computeFiberStats(vtkPDSP poly,
+void computeFiberStats(vtkSmartPointer<vtkPolyData> poly,
                        std::string &id)
 {
   if (!poly) {
@@ -137,7 +139,7 @@ void computeFiberStats(vtkPDSP poly,
    // }
 }
 
-void computeScalarMeasurements(vtkPDSP poly,
+void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
                                std::string &id,
                                std::string &operation)
 {
@@ -210,7 +212,7 @@ void computeScalarMeasurements(vtkPDSP poly,
 
 }
 
-int computeTensorMeasurement(vtkPDSP poly,
+int computeTensorMeasurement(vtkSmartPointer<vtkPolyData> poly,
                              std::string &id,
                              std::string &operation)
 {
@@ -287,7 +289,7 @@ int computeTensorMeasurement(vtkPDSP poly,
   return EXIT_SUCCESS;
 }
 
-int computeAllTensorMeasurements(vtkPDSP input,
+int computeAllTensorMeasurements(vtkSmartPointer<vtkPolyData> input,
                                  std::string &id,
                                  std::vector<std::string> operations)
 {
@@ -861,7 +863,7 @@ int main( int argc, char * argv[] )
             std::string id = std::string(fiberNode->GetName());
             // concat hierarchy path to id
             getPathFromParentToChild(topHierNode, dispHierarchyNode, id);
-            vtkPDSP data = fiberNode->GetPolyData();
+            vtkSmartPointer<vtkPolyData> data = fiberNode->GetPolyData();
             computeFiberStats(data, id);
             computeScalarMeasurements(data, id, EMPTY_OP);
             computeAllTensorMeasurements(data, id, operations);
@@ -892,7 +894,7 @@ int main( int argc, char * argv[] )
       reader->SetFileName(fileNamesVTK->GetValue(i));
       reader->Update();
 
-      vtkPDSP data = reader->GetOutput();
+      vtkSmartPointer<vtkPolyData> data = reader->GetOutput();
       if( !setTensors(data) )
         {
         std::cout << argv[0] << " : No tensor data for file " << fileName << std::endl;
@@ -914,7 +916,7 @@ int main( int argc, char * argv[] )
       reader->SetFileName(fileName.c_str());
       reader->Update();
 
-      vtkPDSP data = reader->GetOutput();
+      vtkSmartPointer<vtkPolyData> data = reader->GetOutput();
       if( !setTensors(data) )
         {
         std::cout << argv[0] << " : No tensor data for file " << fileName << std::endl;
