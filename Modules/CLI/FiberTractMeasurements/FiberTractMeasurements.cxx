@@ -70,7 +70,8 @@ void getPathFromParentToChild(vtkMRMLHierarchyNode *parent,
 bool setTensors(vtkPolyData *poly);
 
 void printTable(std::ofstream &ofs, bool printHeader,
-                std::map< std::string, std::map<std::string, double> > &output);
+                std::map< std::string, std::map<std::string, double> > &output,
+                bool printAllStatistics=false);
 
 std::string getNthTensorName(int n, vtkPolyData *poly);
 
@@ -80,7 +81,7 @@ int getNumberOfTensors(vtkPolyData *poly);
 
 int addClusters();
 
-void printFlat(std::ofstream &ofs);
+void printFlat(std::ofstream &ofs, bool printAllStatistics=false);
 
 void printCluster(const std::string &id,
                   std::map< std::string, std::map<std::string, double> > &output,
@@ -373,7 +374,8 @@ std::map<std::string, std::string> getMeasureNames()
 }
 
 void printTable(std::ofstream &ofs, bool printHeader,
-                std::map< std::string, std::map<std::string, double> > &output)
+                std::map< std::string, std::map<std::string, double> > &output,
+                bool printAllStatistics)
 {
   std::map<std::string, std::string> names = getMeasureNames();
 
@@ -414,6 +416,21 @@ void printTable(std::ofstream &ofs, bool printHeader,
 
   for(it = output.begin(); it != output.end(); it++)
     {
+
+    // find if this cluster in any other cluster
+    bool topCluster = true;
+    std::map<std::string, std::string>::iterator itClusterNames1;
+    for (itClusterNames1 = ClusterNames.begin(); itClusterNames1!= ClusterNames.end(); itClusterNames1++)
+      {
+      if (isInCluster(it->first, itClusterNames1->first) )
+        {
+        topCluster = false;
+        break;
+        }
+      }
+    if (!printAllStatistics && !topCluster)
+      continue;
+
     std::cout << it->first;
     ofs << it->first;
 
@@ -585,8 +602,7 @@ int addClusters()
   return 1;
 }
 
-void printFlat(std::ofstream &ofs)
-{
+void printFlat(std::ofstream &ofs, bool printAllStatistics) {
   std::stringstream ids;
   std::stringstream measureNames;
   std::stringstream measureValues;
@@ -613,6 +629,11 @@ void printFlat(std::ofstream &ofs)
       // print it
       printCluster(itClusterNames->first, Clusters, names,
                    ids, measureNames, measureValues);
+
+      if (!printAllStatistics)
+        {
+        continue;
+        }
 
       // print all children clusters
       for (itClusterNames1 = ClusterNames.begin(); itClusterNames1!= ClusterNames.end(); itClusterNames1++)
@@ -785,7 +806,7 @@ int main( int argc, char * argv[] )
     std::string            inputNodeID;
 
     std::string sceneFilename;
-    std::string filename = FiberHierarchyNode[0];
+    std::string filename = FiberHierarchyNode;
     loc = filename.find_last_of("#");
     if (loc != std::string::npos)
       {
@@ -947,12 +968,16 @@ int main( int argc, char * argv[] )
 
   if (outputFormat == std::string("Row_Hierarchy"))
     {
-    printFlat(ofs);
+    printFlat(ofs, printAllStatistics);
     }
   else
     {
-    printTable(ofs, true, OutTable);
-    printTable(ofs, false, Clusters);
+    // By default we only print the specified cluster(s)
+    if (printAllStatistics)
+      printTable(ofs, true, OutTable, true);
+    printTable(ofs,
+               !printAllStatistics /* print header if we didn't print above */,
+               Clusters, printAllStatistics);
     }
 
   ofs.flush();

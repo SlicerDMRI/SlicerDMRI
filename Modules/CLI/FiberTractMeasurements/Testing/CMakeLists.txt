@@ -35,6 +35,18 @@ add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test
   )
 set_property(TEST ${testname} PROPERTY LABELS ${CLP})
 
+set(testname ${CLP}TestHierarchyAllStatistics)
+add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test>
+  ${CLP}Test
+    --inputtype Fibers_Hierarchy
+    --fiberHierarchy ${TEST_DATA}/fibers_hierarchy.mrml\#vtkMRMLModelHierarchyNode1
+    --outputfile ${TEMP}/fibermeasurementstestingoutputhierarchy_all.txt
+    --format Column_Hierarchy
+    --separator Tab
+    --printAllStatistics
+  )
+set_property(TEST ${testname} PROPERTY LABELS ${CLP})
+
 #-----------------------------------------------------------------------------
 add_executable(CompareTxtsMeasures CompareTxts.cxx)
 target_link_libraries(CompareTxtsMeasures ${CLP}Lib ${SlicerExecutionModel_EXTRA_EXECUTABLE_TARGET_LIBRARIES})
@@ -53,6 +65,14 @@ set(testname ${CLP}CompareTxtsHierarchy)
 add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:CompareTxtsMeasures>
   ${TEMP}/fibermeasurementstestingoutputhierarchy.txt
   ${BASELINE}/baseline_measurements_hierarchy.txt
+  )
+set_property(TEST ${testname} PROPERTY LABELS ${CLP})
+set_property(TEST ${testname} PROPERTY DEPENDS ${CLP}TestHierarchy)
+
+set(testname ${CLP}CompareTxtsHierarchyAllStatistics)
+add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:CompareTxtsMeasures>
+  ${TEMP}/fibermeasurementstestingoutputhierarchy_all.txt
+  ${BASELINE}/baseline_measurements_hierarchy_all.txt
   )
 set_property(TEST ${testname} PROPERTY LABELS ${CLP})
 set_property(TEST ${testname} PROPERTY DEPENDS ${CLP}TestHierarchy)
