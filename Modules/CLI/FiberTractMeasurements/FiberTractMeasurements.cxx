@@ -217,11 +217,9 @@ int computeTensorMeasurement(vtkSmartPointer<vtkPolyData> poly,
                              std::string &operation)
 {
   //TODO loop over all tensors, use ExtractTensor
-  vtkNew<vtkPolyDataTensorToColor> math;
-
   vtkNew<vtkAssignAttribute> assignAttribute;
   assignAttribute->SetInputData(poly);
-  math->SetInputConnection(0, assignAttribute->GetOutputPort());
+  math->SetInputConnection(assignAttribute->GetOutputPort());
 
   for (int i=0; i < getNumberOfTensors(poly); i++)
     {
@@ -280,7 +278,7 @@ int computeTensorMeasurement(vtkSmartPointer<vtkPolyData> poly,
 
     if (!math->GetOutput()->GetPointData() || !math->GetOutput()->GetPointData()->GetScalars())
       {
-      std::cout << "no scalars computed" << std::endl;
+      std::cout << "no scalars computed for cluster: \"" << id << "\" and op: \"" << operation << "\"" << std::endl;
       }
     std::string scalarName = name + std::string(".") + operation;
     computeScalarMeasurements(math->GetOutput(), id, scalarName);
