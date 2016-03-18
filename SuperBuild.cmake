@@ -58,6 +58,7 @@ ExternalProject_Add(${proj}
     -DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT}
     -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
     -DSlicer_DIR:PATH=${Slicer_DIR}
+    -DSlicer_USE_vtkTeem:BOOL=${MRML_USE_vtkTeem} # Note: keep in sync
   DEPENDS
     ${${proj}_DEPENDS}
   )

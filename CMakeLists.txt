@@ -23,6 +23,9 @@ project(SlicerDMRI)
 find_package(Slicer REQUIRED)
 include(${Slicer_USE_FILE})
 
+if(NOT ${Slicer_USE_vtkTeem})
+  message(FATAL_ERROR "SlicerDMRI requires Slicer_USE_vtkTeem")
+endif()
 #-----------------------------------------------------------------------------
 # SuperBuild setup
 option(${EXTENSION_NAME}_SUPERBUILD "Build ${EXTENSION_NAME} and the projects it depends on." ON)
