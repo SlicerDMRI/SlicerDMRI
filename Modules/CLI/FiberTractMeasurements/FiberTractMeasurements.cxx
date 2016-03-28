@@ -244,15 +244,15 @@ int computeTensorMeasurement(vtkSmartPointer<vtkPolyData> poly,
       {
       math->ColorGlyphsByFractionalAnisotropy();
       }
-    else if( operation == std::string("LinearMeasurement") || operation == std::string("LinearMeasure") )
+    else if( operation == std::string("LinearMeasure") )
       {
       math->ColorGlyphsByLinearMeasure();
       }
-    else if( operation == std::string("PlanarMeasurement") || operation == std::string("PlanarMeasure") )
+    else if( operation == std::string("PlanarMeasure") )
       {
       math->ColorGlyphsByPlanarMeasure();
       }
-    else if( operation == std::string("SphericalMeasurement") || operation == std::string("SphericalMeasure") )
+    else if( operation == std::string("SphericalMeasure") )
       {
       math->ColorGlyphsBySphericalMeasure();
       }
@@ -769,9 +769,9 @@ int main( int argc, char * argv[] )
   operations.push_back(std::string("Trace"));
   operations.push_back(std::string("RelativeAnisotropy"));
   operations.push_back(std::string("FractionalAnisotropy"));
-  operations.push_back(std::string("LinearMeasurement"));
-  operations.push_back(std::string("PlanarMeasurement"));
-  operations.push_back(std::string("SphericalMeasurement"));
+  operations.push_back(std::string("LinearMeasure"));
+  operations.push_back(std::string("PlanarMeasure"));
+  operations.push_back(std::string("SphericalMeasure"));
   operations.push_back(std::string("MinEigenvalue"));
   operations.push_back(std::string("MidEigenvalue"));
   operations.push_back(std::string("MaxEigenvalue"));
