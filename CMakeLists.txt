@@ -1,13 +1,6 @@
 cmake_minimum_required(VERSION 2.8.9)
 
-foreach(p
-  CMP0048 # CMake 3.0
-  )
-  if(POLICY ${p})
-    cmake_policy(SET ${p} NEW)
-  endif()
-endforeach()
-
+#-----------------------------------------------------------------------------
 set(EXTENSION_NAME SlicerDMRI)
 
 #-----------------------------------------------------------------------------
@@ -30,6 +23,9 @@ project(SlicerDMRI)
 find_package(Slicer REQUIRED)
 include(${Slicer_USE_FILE})
 
+if(NOT ${Slicer_USE_vtkTeem})
+  message(FATAL_ERROR "SlicerDMRI requires Slicer_USE_vtkTeem")
+endif()
 #-----------------------------------------------------------------------------
 # SuperBuild setup
 option(${EXTENSION_NAME}_SUPERBUILD "Build ${EXTENSION_NAME} and the projects it depends on." ON)

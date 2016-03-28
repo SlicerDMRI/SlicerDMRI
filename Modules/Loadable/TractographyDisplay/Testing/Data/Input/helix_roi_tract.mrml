@@ -30,7 +30,7 @@
 <ScriptedModule
  id="vtkMRMLScriptedModuleNode2" name="vtkMRMLScriptedModuleNode1" hideFromEditors="true" selectable="true"  ModuleName ="Editor" parameter0= "1 1"></ScriptedModule>
 <NRRDStorage
- id="vtkMRMLNRRDStorageNode1" name="vtkMRMLNRRDStorageNode1" hideFromEditors="true" selectable="true"  fileName="../../../../../../Libs/MRML/Core/Testing/TestData/helix-DTI.nhdr" useCompression="1" centerImage="0"></NRRDStorage>
+ id="vtkMRMLNRRDStorageNode1" name="vtkMRMLNRRDStorageNode1" hideFromEditors="true" selectable="true"  fileName="helix-DTI.nhdr" useCompression="1" centerImage="0"></NRRDStorage>
 <DiffusionTensorVolumeDisplay
  id="vtkMRMLDiffusionTensorVolumeDisplayNode1" name="vtkMRMLDiffusionTensorVolumeDisplayNode1" hideFromEditors="true" selectable="true"  color="0.5 0.5 0.5" ambient="0" diffuse="1" specular="0" power="1" opacity="1" visibility="true" clipping="false" backfaceCulling="true" scalarVisibility="false" vectorVisibility="false" tensorVisibility="false" scalarRange="0 100"  colorNodeRef="vtkMRMLColorTableNodeGrey" window="0.57996" level="0.28998" upperThreshold="0.579957" lowerThreshold="0" interpolate="1" autoWindowLevel="0" applyThreshold="0" autoThreshold="0" visualizationMode="0" diffusionTensorDisplayPropertiesNodeID="vtkMRMLDiffusionTensorDisplayPropertiesNode1"></DiffusionTensorVolumeDisplay>
 <DiffusionTensorDisplayProperties
@@ -38,7 +38,7 @@
 <DiffusionTensorVolume
  id="vtkMRMLDiffusionTensorVolumeNode1" name="helix-DTI.nhdr" hideFromEditors="false" selectable="true"  displayNodeRef="vtkMRMLDiffusionTensorVolumeDisplayNode1" storageNodeRef="vtkMRMLNRRDStorageNode1" ijkToRASDirections="1   -0   0 -0   1   -0 0 -0 1 " spacing="3.125 6.25 12.5" origin="-98.4375 -96.875 -93.75" measurementFrame="1   -0   0 -0   1   -0 0 -0 1 " order="2"></DiffusionTensorVolume>
 <NRRDStorage
- id="vtkMRMLVolumeArchetypeStorageNode1" name="vtkMRMLVolumeArchetypeStorageNode1" hideFromEditors="true" selectable="true"  fileName="../../../../../../Libs/MRML/Core/Testing/TestData/helix-roi-lable2.nrrd" useCompression="1" centerImage="0"></NRRDStorage>
+ id="vtkMRMLVolumeArchetypeStorageNode1" name="vtkMRMLVolumeArchetypeStorageNode1" hideFromEditors="true" selectable="true"  fileName="helix-roi-lable2.nrrd" useCompression="1" centerImage="0"></NRRDStorage>
 <LabelMapVolumeDisplay
  id="vtkMRMLLabelMapVolumeDisplayNode1"   name="vtkMRMLLabelMapVolumeDisplayNode1"   hideFromEditors="true"   selectable="true"    color="0.5 0.5 0.5"   ambient="0"   diffuse="1"   specular="0"   power="1"   opacity="1"   visibility="true"   clipping="false"   backfaceCulling="true"   scalarVisibility="false"   vectorVisibility="false"   tensorVisibility="false"   scalarRange="0 100"    colorNodeRef="vtkMRMLColorTableNodeLabels"  ></LabelMapVolumeDisplay>
 <Volume
