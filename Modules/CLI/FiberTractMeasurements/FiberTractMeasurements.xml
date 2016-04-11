@@ -21,7 +21,7 @@
       <element>Fibers_Hierarchy</element>
       <element>Fibers_File_Folder</element>
     </string-enumeration>
-    <geometry type="fiberbundle" aggregate="true" fileExtensions=".mrml" multiple="true">
+    <geometry type="fiberbundle" aggregate="true" fileExtensions=".mrml" multiple="false">
       <name>FiberHierarchyNode</name>
       <channel>input</channel>
       <label>Fibers Hierarchy</label>
@@ -63,5 +63,12 @@
       <element>Space</element>
       <element>Tab</element>
     </string-enumeration>
+    <boolean>
+      <name>printAllStatistics</name>
+      <longflag>--printAllStatistics</longflag>
+      <label>Print statistics for all clusters and children.</label>
+      <description><![CDATA[Print statistics for all clusters and children. In hierarchy mode, by default this module only prints statistics for specified cluster(s).]]></description>
+      <default>false</default>
+    </boolean>
   </parameters>
 </executable>
