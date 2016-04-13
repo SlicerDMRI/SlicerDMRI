@@ -44,7 +44,12 @@ std::map< std::string, std::string> ClusterNames;
 std::map< std::string, std::map<std::string, double> > Clusters;
 
 #define INVALID_NUMBER_PRINT std::string("NAN")
+#define EXCLUDED_NUMBER_PRINT std::string("Num_Clamp_Excluded")
 std::string SEPARATOR;
+
+typedef std::pair<size_t, size_t> Range;
+typedef std::map<std::string, Range> ClampedOp_t;
+static ClampedOp_t clamped_ops;
 
 // BUG, TODO: this is global because FA calc doesn't work (no scalars) when
 //      the PDTensorToColor is allocated inside function.
@@ -70,8 +75,7 @@ void getPathFromParentToChild(vtkMRMLHierarchyNode *parent,
 bool setTensors(vtkPolyData *poly);
 
 void printTable(std::ofstream &ofs, bool printHeader,
-                std::map< std::string, std::map<std::string, double> > &output,
-                bool printAllStatistics=false);
+                std::map< std::string, std::map<std::string, double> > &output);
 
 std::string getNthTensorName(int n, vtkPolyData *poly);
 
@@ -146,6 +150,7 @@ void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
 {
   vtkIdType npoints = poly->GetNumberOfPoints();
   vtkIdType npoints_final = npoints;
+  vtkIdType npoints_excluded = 0;
   vtkIdType npolys = poly->GetNumberOfCells();
 
   if (npoints == 0 || npolys == 0)
@@ -168,6 +173,21 @@ void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
       name = std::string(arr->GetName());
       }
 
+    // check whether this measurement should be clamped to specific range.
+    bool measuring_clamped = false;
+    double op_max = 0.0;
+    double op_min = 0.0;
+    ClampedOp_t::iterator op_iter;
+    for (op_iter = clamped_ops.begin(); op_iter != clamped_ops.end(); op_iter++)
+      {
+      if (name.find(op_iter->first) != std::string::npos)
+        {
+        measuring_clamped = true;
+        op_min = op_iter->second.first;
+        op_max = op_iter->second.second;
+        }
+      }
+
     double val;
     double sum = 0;
     for (int n=0; n < npoints; n++)
@@ -177,6 +197,12 @@ void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
       if (vtkMath::IsNan(val))
         {
         npoints_final -= 1;
+        continue;
+        }
+      if (measuring_clamped && (val < op_min || val > op_max))
+        {
+        npoints_final -= 1;
+        npoints_excluded += 1;
         continue;
         }
 
@@ -208,6 +234,19 @@ void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
       it = OutTable.find(id);
       }
     it->second[nanid] = npoints - npoints_final;
+
+    if (measuring_clamped)
+      {
+      // record aggregate count of excluded points outside of clamped range
+      std::string excluded_id = EXCLUDED_NUMBER_PRINT;
+      it = OutTable.find(id);
+      if (it == OutTable.end())
+        {
+        OutTable[id] = std::map<std::string, double>();
+        it = OutTable.find(id);
+        }
+      it->second[excluded_id] += npoints_excluded;
+      }
 
     } //for (int i=0; i<poly->GetPointData()->GetNumberOfArrays(); i++)
 
@@ -374,8 +413,7 @@ std::map<std::string, std::string> getMeasureNames()
 }
 
 void printTable(std::ofstream &ofs, bool printHeader,
-                std::map< std::string, std::map<std::string, double> > &output,
-                bool printAllStatistics)
+                std::map< std::string, std::map<std::string, double> > &output)
 {
   std::map<std::string, std::string> names = getMeasureNames();
 
@@ -428,8 +466,6 @@ void printTable(std::ofstream &ofs, bool printHeader,
         break;
         }
       }
-    if (!printAllStatistics && !topCluster)
-      continue;
 
     std::cout << it->first;
     ofs << it->first;
@@ -566,8 +602,11 @@ int addClusters()
             itClusterValues = itCluster->second.find(itNames->second);
             }
           double clusterValue = itClusterValues->second;
-          if (itValues != itOutput->second.end() && itNames->second != std::string("Num_Points") &&
-              itNames->second != std::string("Num_Fibers") && itNames->second.find("NAN") == std::string::npos)
+          if (itValues != itOutput->second.end() &&
+              itNames->second != std::string("Num_Points") &&
+              itNames->second != std::string("Num_Fibers") &&
+              itNames->second != EXCLUDED_NUMBER_PRINT &&
+              itNames->second.find("NAN") == std::string::npos)
             {
             if (!vtkMath::IsNan(itValues->second))
               {
@@ -591,6 +630,7 @@ int addClusters()
         if (itClusterValues != itCluster->second.end() &&
               (itNames->second != std::string("Num_Points")) &&
               (itNames->second != std::string("Num_Fibers")) &&
+              (itNames->second != EXCLUDED_NUMBER_PRINT) &&
               (itNames->second.find("NAN") == std::string::npos) &&
               npointsCluster)
           {
@@ -630,11 +670,6 @@ void printFlat(std::ofstream &ofs, bool printAllStatistics) {
       printCluster(itClusterNames->first, Clusters, names,
                    ids, measureNames, measureValues);
 
-      if (!printAllStatistics)
-        {
-        continue;
-        }
-
       // print all children clusters
       for (itClusterNames1 = ClusterNames.begin(); itClusterNames1!= ClusterNames.end(); itClusterNames1++)
         {
@@ -643,15 +678,18 @@ void printFlat(std::ofstream &ofs, bool printAllStatistics) {
           printCluster(itClusterNames1->first, Clusters, names,
                        ids, measureNames, measureValues);
           // print all fibers in this clusters
-          std::map< std::string, std::map<std::string, double> >::iterator it;
-          for(it = OutTable.begin(); it != OutTable.end(); it++)
+          if (printAllStatistics)
             {
-            if (isInCluster(it->first, itClusterNames1->first) )
+            std::map< std::string, std::map<std::string, double> >::iterator it;
+            for(it = OutTable.begin(); it != OutTable.end(); it++)
               {
-              printCluster(it->first, OutTable, names,
-                           ids, measureNames, measureValues);
-              }
-            } //for(it = OutTable.begin(); it != OutTable.end(); it++)
+              if (isInCluster(it->first, itClusterNames1->first) )
+                {
+                  printCluster(it->first, OutTable, names,
+                               ids, measureNames, measureValues);
+                }
+              } //for(it = OutTable.begin(); it != OutTable.end(); it++)
+            }
           }
         }
       } // if (topCluster)
@@ -690,45 +728,29 @@ void printCluster(const std::string &id,
   it = output.find(id);
   if (it != output.end())
     {
-    it2 = names.find(std::string("Num_Points"));
-    if (it2 != names.end())
+    typedef std::vector<std::string> AggNames_t;
+    char *agg_names_[] = { "Num_Points", "Num_Fibers", "Num_Clamp_Excluded" };
+    AggNames_t aggregate_names(agg_names_, std::end(agg_names_));
+    for (AggNames_t::iterator aggnames_iter  = aggregate_names.begin();
+                              aggnames_iter != aggregate_names.end();
+                              aggnames_iter++)
       {
-      it1 = it->second.find(std::string("Num_Points"));
-      if (it1 != it->second.end())
+      std::string aggname = *aggnames_iter;
+      it2 = names.find(aggname);
+      if (it2 != names.end())
         {
-        if (!ids.str().empty())
+        it1 = it->second.find(aggname);
+        if (it1 != it->second.end())
           {
-          ids <<  SEPARATOR;
-          measureNames <<  SEPARATOR;
-          measureValues <<  SEPARATOR;
-          }
-        ids << id;
-        measureNames << it2->second;
-
-        if (vtkMath::IsNan(it1->second))
-          {
-          measureValues << INVALID_NUMBER_PRINT;
-          }
-        else
-          {
-          measureValues << std::fixed << it1->second;
-          }
+          if (!ids.str().empty())
+            {
+            ids << SEPARATOR;
+            measureNames << SEPARATOR;
+            measureValues << SEPARATOR;
+            }
+          ids << id;
+          measureNames << it2->second;
         }
-      }
-    it2 = names.find(std::string("Num_Fibers"));
-    if (it2 != names.end())
-      {
-      it1 = it->second.find(std::string("Num_Fibers"));
-      if (it1 != it->second.end())
-        {
-        if (!ids.str().empty())
-          {
-          ids <<  SEPARATOR;
-          measureNames <<  SEPARATOR;
-          measureValues <<  SEPARATOR;
-          }
-        ids << id;
-        measureNames << it2->second;
 
         if (vtkMath::IsNan(it1->second))
           {
@@ -744,7 +766,8 @@ void printCluster(const std::string &id,
     for (it2 = names.begin(); it2 != names.end(); it2++)
       {
       if (it2->first != std::string("Num_Points") &&
-          it2->first != std::string("Num_Fibers"))
+          it2->first != std::string("Num_Fibers") &&
+          it2->first != EXCLUDED_NUMBER_PRINT)
         {
         it1 = it->second.find(it2->second);
         if (it1 != it->second.end())
@@ -797,6 +820,12 @@ int main( int argc, char * argv[] )
   operations.push_back(std::string("MidEigenvalue"));
   operations.push_back(std::string("MaxEigenvalue"));
   std::string EMPTY_OP("");
+
+  clamped_ops["FractionalAnisotropy"] = Range(0.0, 1.0);
+  clamped_ops["RelativeAnisotropy"]   = Range(0.0, std::sqrt(2));
+  clamped_ops["LinearMeasurement"]    = Range(0.0, 1.0);
+  clamped_ops["PlanarMeasurement"]    = Range(0.0, 1.0);
+  clamped_ops["SphericalMeasurement"] = Range(0.0, 1.0);
 
   if (inputType == std::string("Fibers_Hierarchy") )
     {
@@ -900,6 +929,9 @@ int main( int argc, char * argv[] )
       return EXIT_FAILURE;
       }
 
+    // override here, because we must always print individual statistics for folders
+    printAllStatistics = true;
+
     vtkNew<vtkGlobFileNames> glob;
     glob->SetDirectory(InputDirectory.c_str());
 
@@ -972,12 +1004,10 @@ int main( int argc, char * argv[] )
     }
   else
     {
-    // By default we only print the specified cluster(s)
+    // By default we only print the cluster(s)
     if (printAllStatistics)
-      printTable(ofs, true, OutTable, true);
-    printTable(ofs,
-               !printAllStatistics /* print header if we didn't print above */,
-               Clusters, printAllStatistics);
+      printTable(ofs, true, OutTable);
+    printTable(ofs, !printAllStatistics, Clusters);
     }
 
   ofs.flush();
