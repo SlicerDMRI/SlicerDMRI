@@ -602,8 +602,11 @@ int addClusters()
             itClusterValues = itCluster->second.find(itNames->second);
             }
           double clusterValue = itClusterValues->second;
-          if (itValues != itOutput->second.end() && itNames->second != std::string("Num_Points") &&
-              itNames->second != std::string("Num_Fibers") && itNames->second.find("NAN") == std::string::npos)
+          if (itValues != itOutput->second.end() &&
+              itNames->second != std::string("Num_Points") &&
+              itNames->second != std::string("Num_Fibers") &&
+              itNames->second != EXCLUDED_NUMBER_PRINT &&
+              itNames->second.find("NAN") == std::string::npos)
             {
             if (!vtkMath::IsNan(itValues->second))
               {
