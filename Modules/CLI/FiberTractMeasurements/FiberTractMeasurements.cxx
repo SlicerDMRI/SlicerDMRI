@@ -725,45 +725,29 @@ void printCluster(const std::string &id,
   it = output.find(id);
   if (it != output.end())
     {
-    it2 = names.find(std::string("Num_Points"));
-    if (it2 != names.end())
+    typedef std::vector<std::string> AggNames_t;
+    char *agg_names_[] = { "Num_Points", "Num_Fibers", "Num_Clamp_Excluded" };
+    AggNames_t aggregate_names(agg_names_, std::end(agg_names_));
+    for (AggNames_t::iterator aggnames_iter  = aggregate_names.begin();
+                              aggnames_iter != aggregate_names.end();
+                              aggnames_iter++)
       {
-      it1 = it->second.find(std::string("Num_Points"));
-      if (it1 != it->second.end())
+      std::string aggname = *aggnames_iter;
+      it2 = names.find(aggname);
+      if (it2 != names.end())
         {
-        if (!ids.str().empty())
+        it1 = it->second.find(aggname);
+        if (it1 != it->second.end())
           {
-          ids <<  SEPARATOR;
-          measureNames <<  SEPARATOR;
-          measureValues <<  SEPARATOR;
-          }
-        ids << id;
-        measureNames << it2->second;
-
-        if (vtkMath::IsNan(it1->second))
-          {
-          measureValues << INVALID_NUMBER_PRINT;
-          }
-        else
-          {
-          measureValues << std::fixed << it1->second;
-          }
+          if (!ids.str().empty())
+            {
+            ids << SEPARATOR;
+            measureNames << SEPARATOR;
+            measureValues << SEPARATOR;
+            }
+          ids << id;
+          measureNames << it2->second;
         }
-      }
-    it2 = names.find(std::string("Num_Fibers"));
-    if (it2 != names.end())
-      {
-      it1 = it->second.find(std::string("Num_Fibers"));
-      if (it1 != it->second.end())
-        {
-        if (!ids.str().empty())
-          {
-          ids <<  SEPARATOR;
-          measureNames <<  SEPARATOR;
-          measureValues <<  SEPARATOR;
-          }
-        ids << id;
-        measureNames << it2->second;
 
         if (vtkMath::IsNan(it1->second))
           {
@@ -779,7 +763,8 @@ void printCluster(const std::string &id,
     for (it2 = names.begin(); it2 != names.end(); it2++)
       {
       if (it2->first != std::string("Num_Points") &&
-          it2->first != std::string("Num_Fibers"))
+          it2->first != std::string("Num_Fibers") &&
+          it2->first != EXCLUDED_NUMBER_PRINT)
         {
         it1 = it->second.find(it2->second);
         if (it1 != it->second.end())
