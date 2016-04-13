@@ -75,8 +75,7 @@ void getPathFromParentToChild(vtkMRMLHierarchyNode *parent,
 bool setTensors(vtkPolyData *poly);
 
 void printTable(std::ofstream &ofs, bool printHeader,
-                std::map< std::string, std::map<std::string, double> > &output,
-                bool printAllStatistics=false);
+                std::map< std::string, std::map<std::string, double> > &output);
 
 std::string getNthTensorName(int n, vtkPolyData *poly);
 
@@ -414,8 +413,7 @@ std::map<std::string, std::string> getMeasureNames()
 }
 
 void printTable(std::ofstream &ofs, bool printHeader,
-                std::map< std::string, std::map<std::string, double> > &output,
-                bool printAllStatistics)
+                std::map< std::string, std::map<std::string, double> > &output)
 {
   std::map<std::string, std::string> names = getMeasureNames();
 
@@ -468,8 +466,6 @@ void printTable(std::ofstream &ofs, bool printHeader,
         break;
         }
       }
-    if (!printAllStatistics && !topCluster)
-      continue;
 
     std::cout << it->first;
     ofs << it->first;
@@ -671,11 +667,6 @@ void printFlat(std::ofstream &ofs, bool printAllStatistics) {
       printCluster(itClusterNames->first, Clusters, names,
                    ids, measureNames, measureValues);
 
-      if (!printAllStatistics)
-        {
-        continue;
-        }
-
       // print all children clusters
       for (itClusterNames1 = ClusterNames.begin(); itClusterNames1!= ClusterNames.end(); itClusterNames1++)
         {
@@ -684,15 +675,18 @@ void printFlat(std::ofstream &ofs, bool printAllStatistics) {
           printCluster(itClusterNames1->first, Clusters, names,
                        ids, measureNames, measureValues);
           // print all fibers in this clusters
-          std::map< std::string, std::map<std::string, double> >::iterator it;
-          for(it = OutTable.begin(); it != OutTable.end(); it++)
+          if (printAllStatistics)
             {
-            if (isInCluster(it->first, itClusterNames1->first) )
+            std::map< std::string, std::map<std::string, double> >::iterator it;
+            for(it = OutTable.begin(); it != OutTable.end(); it++)
               {
-              printCluster(it->first, OutTable, names,
-                           ids, measureNames, measureValues);
-              }
-            } //for(it = OutTable.begin(); it != OutTable.end(); it++)
+              if (isInCluster(it->first, itClusterNames1->first) )
+                {
+                  printCluster(it->first, OutTable, names,
+                               ids, measureNames, measureValues);
+                }
+              } //for(it = OutTable.begin(); it != OutTable.end(); it++)
+            }
           }
         }
       } // if (topCluster)
@@ -1022,12 +1016,10 @@ int main( int argc, char * argv[] )
     }
   else
     {
-    // By default we only print the specified cluster(s)
+    // By default we only print the cluster(s)
     if (printAllStatistics)
-      printTable(ofs, true, OutTable, true);
-    printTable(ofs,
-               !printAllStatistics /* print header if we didn't print above */,
-               Clusters, printAllStatistics);
+      printTable(ofs, true, OutTable);
+    printTable(ofs, !printAllStatistics, Clusters);
     }
 
   ofs.flush();
