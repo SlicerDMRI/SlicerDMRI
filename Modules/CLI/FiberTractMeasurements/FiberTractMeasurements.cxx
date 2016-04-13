@@ -1,3 +1,5 @@
+#include <algorithm>
+
 // vtkTeem includes
 #include <vtkDiffusionTensorMathematics.h>
 #include <vtkNRRDReader.h>
@@ -51,6 +53,9 @@ typedef std::pair<size_t, size_t> Range;
 typedef std::map<std::string, Range> ClampedOp_t;
 static ClampedOp_t clamped_ops;
 
+typedef std::vector<std::string> AggNames_t;
+AggNames_t aggregate_names;
+
 // BUG, TODO: this is global because FA calc doesn't work (no scalars) when
 //      the PDTensorToColor is allocated inside function.
 vtkNew<vtkPolyDataTensorToColor> math;
@@ -74,7 +79,7 @@ void getPathFromParentToChild(vtkMRMLHierarchyNode *parent,
 
 bool setTensors(vtkPolyData *poly);
 
-void printTable(std::ofstream &ofs, bool printHeader,
+void printTable(std::ostream &ofs, bool printHeader,
                 std::map< std::string, std::map<std::string, double> > &output);
 
 std::string getNthTensorName(int n, vtkPolyData *poly);
@@ -85,7 +90,7 @@ int getNumberOfTensors(vtkPolyData *poly);
 
 int addClusters();
 
-void printFlat(std::ofstream &ofs, bool printAllStatistics=false);
+void printFlat(std::ostream &ofs, bool printAllStatistics=false);
 
 void printCluster(const std::string &id,
                   std::map< std::string, std::map<std::string, double> > &output,
@@ -412,7 +417,7 @@ std::map<std::string, std::string> getMeasureNames()
   return names;
 }
 
-void printTable(std::ofstream &ofs, bool printHeader,
+void printTable(std::ostream &ofs, bool printHeader,
                 std::map< std::string, std::map<std::string, double> > &output)
 {
   std::map<std::string, std::string> names = getMeasureNames();
@@ -421,37 +426,33 @@ void printTable(std::ofstream &ofs, bool printHeader,
   std::map<std::string, double>::iterator it1;
   std::map<std::string, std::string>::iterator it2;
 
+  // print header, if necessary
   if (printHeader)
     {
-    std::cout << "Name";
     ofs << "Name";
 
-    it2 = names.find(std::string("Num_Points"));
-    if (it2 != names.end())
+    for (AggNames_t::iterator agg_iter  = aggregate_names.begin();
+                              agg_iter != aggregate_names.end();
+                              agg_iter++)
       {
-      std::cout << " " << SEPARATOR << " " << it2->second;
-      ofs << " " << SEPARATOR << " " << it2->second;
-      }
-    it2 = names.find(std::string("Num_Fibers"));
-    if (it2 != names.end())
-      {
-      std::cout << " " << SEPARATOR << " " << it2->second;
-      ofs << " " << SEPARATOR << " " << it2->second;
+      it2 = names.find(*agg_iter);
+      if (it2 != names.end())
+        {
+        ofs       << " " << SEPARATOR << " " << it2->second;
+        }
       }
 
     for (it2 = names.begin(); it2 != names.end(); it2++)
       {
-      if (it2->first != std::string("Num_Points") &&
-          it2->first != std::string("Num_Fibers"))
+      if (std::find(aggregate_names.begin(), aggregate_names.end(), it2->first) == aggregate_names.end())
         {
-        std::cout << " " << SEPARATOR << " " << it2->second;
-        ofs << " " << SEPARATOR << " " << it2->second;
+        ofs       << " " << SEPARATOR << " " << it2->second;
         }
       }
-    std::cout << std::endl;
     ofs << std::endl;
-    }
+    } // if (printHeader)
 
+  // print output measured values
   for(it = output.begin(); it != output.end(); it++)
     {
 
@@ -467,56 +468,37 @@ void printTable(std::ofstream &ofs, bool printHeader,
         }
       }
 
-    std::cout << it->first;
     ofs << it->first;
 
-    it2 = names.find(std::string("Num_Points"));
-    if (it2 != names.end())
+    // print metadata (# points, etc.)
+    for (AggNames_t::iterator agg_iter  = aggregate_names.begin();
+                              agg_iter != aggregate_names.end();
+                              agg_iter++)
       {
-      std::cout << " " << SEPARATOR << " ";
-      ofs << " " << SEPARATOR << " ";
-      it1 = it->second.find(std::string("Num_Points"));
-      if (it1 != it->second.end())
+      it2 = names.find(*agg_iter);
+      if (it2 != names.end())
         {
-        if (vtkMath::IsNan(it1->second))
+        ofs << " " << SEPARATOR << " ";
+        it1 = it->second.find(*agg_iter);
+        if (it1 != it->second.end())
           {
-          std::cout << INVALID_NUMBER_PRINT;
-          ofs << INVALID_NUMBER_PRINT;
-          }
-        else
-          {
-          std::cout << std::fixed << it1->second;
-          ofs << std::fixed << it1->second;
-          }
-        }
-      }
-    it2 = names.find(std::string("Num_Fibers"));
-    if (it2 != names.end())
-      {
-      std::cout << " " << SEPARATOR << " ";
-      ofs << " " << SEPARATOR << " ";
-      it1 = it->second.find(std::string("Num_Fibers"));
-      if (it1 != it->second.end())
-        {
-        if (vtkMath::IsNan(it1->second))
-          {
-          std::cout << INVALID_NUMBER_PRINT;
-          ofs << INVALID_NUMBER_PRINT;
-          }
-        else
-          {
-          std::cout << std::fixed << it1->second;
-          ofs << std::fixed << it1->second;
+          if (vtkMath::IsNan(it1->second))
+            {
+            ofs << INVALID_NUMBER_PRINT;
+            }
+          else
+            {
+            ofs << std::fixed << it1->second;
+            }
           }
         }
       }
 
+    // print actual values
     for (it2 = names.begin(); it2 != names.end(); it2++)
       {
-      if (it2->first != std::string("Num_Points") &&
-          it2->first != std::string("Num_Fibers"))
+      if (std::find(aggregate_names.begin(), aggregate_names.end(), it2->first) == aggregate_names.end())
         {
-        std::cout << " " << SEPARATOR << " ";
         ofs << " " << SEPARATOR << " ";
 
         it1 = it->second.find(it2->second);
@@ -524,18 +506,15 @@ void printTable(std::ofstream &ofs, bool printHeader,
           {
           if (vtkMath::IsNan(it1->second))
             {
-            std::cout << INVALID_NUMBER_PRINT;
             ofs << INVALID_NUMBER_PRINT;
             }
           else
             {
-            std::cout << std::fixed << it1->second;
             ofs << std::fixed << it1->second;
             }
           }
         }
       }
-    std::cout << std::endl;
     ofs << std::endl;
     }
 }
@@ -603,9 +582,7 @@ int addClusters()
             }
           double clusterValue = itClusterValues->second;
           if (itValues != itOutput->second.end() &&
-              itNames->second != std::string("Num_Points") &&
-              itNames->second != std::string("Num_Fibers") &&
-              itNames->second != EXCLUDED_NUMBER_PRINT &&
+              (std::find(aggregate_names.begin(), aggregate_names.end(), itNames->second) == aggregate_names.end()) &&
               itNames->second.find("NAN") == std::string::npos)
             {
             if (!vtkMath::IsNan(itValues->second))
@@ -628,11 +605,9 @@ int addClusters()
         {
         itClusterValues = itCluster->second.find(itNames->second);
         if (itClusterValues != itCluster->second.end() &&
-              (itNames->second != std::string("Num_Points")) &&
-              (itNames->second != std::string("Num_Fibers")) &&
-              (itNames->second != EXCLUDED_NUMBER_PRINT) &&
-              (itNames->second.find("NAN") == std::string::npos) &&
-              npointsCluster)
+            (std::find(aggregate_names.begin(), aggregate_names.end(), itNames->second) == aggregate_names.end()) &&
+            (itNames->second.find("NAN") == std::string::npos) &&
+            npointsCluster)
           {
           double clusterValue = itClusterValues->second;
           itCluster->second[itNames->second] = clusterValue/npointsCluster;
@@ -642,7 +617,7 @@ int addClusters()
   return 1;
 }
 
-void printFlat(std::ofstream &ofs, bool printAllStatistics) {
+void printFlat(std::ostream &ofs, bool printAllStatistics) {
   std::stringstream ids;
   std::stringstream measureNames;
   std::stringstream measureValues;
@@ -728,9 +703,6 @@ void printCluster(const std::string &id,
   it = output.find(id);
   if (it != output.end())
     {
-    typedef std::vector<std::string> AggNames_t;
-    char *agg_names_[] = { "Num_Points", "Num_Fibers", "Num_Clamp_Excluded" };
-    AggNames_t aggregate_names(agg_names_, std::end(agg_names_));
     for (AggNames_t::iterator aggnames_iter  = aggregate_names.begin();
                               aggnames_iter != aggregate_names.end();
                               aggnames_iter++)
@@ -765,9 +737,7 @@ void printCluster(const std::string &id,
 
     for (it2 = names.begin(); it2 != names.end(); it2++)
       {
-      if (it2->first != std::string("Num_Points") &&
-          it2->first != std::string("Num_Fibers") &&
-          it2->first != EXCLUDED_NUMBER_PRINT)
+      if (std::find(aggregate_names.begin(), aggregate_names.end(), it2->first) == aggregate_names.end())
         {
         it1 = it->second.find(it2->second);
         if (it1 != it->second.end())
@@ -801,7 +771,8 @@ int main( int argc, char * argv[] )
 
   PARSE_ARGS;
 
-  std::ofstream ofs(outputFile.c_str());
+  std::ostringstream ofs;
+  std::ofstream outputfilestream(outputFile.c_str());
   if (ofs.fail())
     {
     std::cerr << "Output file doesn't exist: " <<  outputFile << std::endl;
@@ -826,6 +797,10 @@ int main( int argc, char * argv[] )
   clamped_ops["LinearMeasurement"]    = Range(0.0, 1.0);
   clamped_ops["PlanarMeasurement"]    = Range(0.0, 1.0);
   clamped_ops["SphericalMeasurement"] = Range(0.0, 1.0);
+
+  aggregate_names.push_back("Num_Points");
+  aggregate_names.push_back("Num_Fibers");
+  aggregate_names.push_back(EXCLUDED_NUMBER_PRINT);
 
   if (inputType == std::string("Fibers_Hierarchy") )
     {
@@ -1011,7 +986,13 @@ int main( int argc, char * argv[] )
     }
 
   ofs.flush();
-  ofs.close();
+
+  // print to stdout
+  std::cout << ofs.str();
+  // print to file
+  outputfilestream << ofs.str();
+  outputfilestream.flush();
+  outputfilestream.close();
 
   return EXIT_SUCCESS;
 }
