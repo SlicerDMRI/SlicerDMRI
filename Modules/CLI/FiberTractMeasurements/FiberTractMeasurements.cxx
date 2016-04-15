@@ -211,6 +211,12 @@ void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
         continue;
         }
 
+      if (operation.find(std::string("FractionalAnisotropy")) != std::string::npos && val >= 1)
+        {
+        npoints_final -= 1;
+        continue;
+        }
+        
       sum += val;
       }
     if (npoints_final > 0)
