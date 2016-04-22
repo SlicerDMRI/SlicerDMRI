@@ -1,5 +1,7 @@
 
 #-----------------------------------------------------------------------------
+set(BASELINE ${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline)
+set(DATADIR ${CMAKE_CURRENT_SOURCE_DIR}/../Data)
 set(CLP ${MODULE_NAME})
 
 #-----------------------------------------------------------------------------
@@ -19,7 +21,9 @@ set_target_properties(${CLP}Test PROPERTIES FOLDER ${${CLP}_TARGETS_FOLDER})
 
 set(testname ${CLP}Test)
 add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test>
-  ${testname}
+  --compare ${BASELINE}/helix-Baseline.nrrd ${TEMP}/${testname}_baseline.nhdr
+  --compare ${BASELINE}/helix-DTI.nhdr ${TEMP}/${testname}_dti.nhdr
+${testname}
     -m ${MRML_TEST_DATA}/helix-DWI-otsu-no_islands-05.nrrd
     ${MRML_TEST_DATA}/helix-DWI.nhdr
     ${TEMP}/${testname}_dti.nhdr
