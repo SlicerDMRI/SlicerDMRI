@@ -502,16 +502,15 @@ void printTable(std::ostream &ofs, bool printHeader,
         ofs << " " << SEPARATOR << " ";
 
         it1 = it->second.find(it2->second);
-        if (it1 != it->second.end())
+        if (it1 != it->second.end() &&
+            vtkMath::IsNan(it1->second) == false)
           {
-          if (vtkMath::IsNan(it1->second))
-            {
-            ofs << INVALID_NUMBER_PRINT;
-            }
-          else
-            {
             ofs << std::fixed << it1->second;
-            }
+          }
+        else
+        // if value is missing or NAN, print NAN
+          {
+            ofs << INVALID_NUMBER_PRINT;
           }
         }
       }
