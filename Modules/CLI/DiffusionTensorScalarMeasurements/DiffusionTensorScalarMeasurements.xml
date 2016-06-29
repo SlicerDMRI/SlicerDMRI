@@ -6,7 +6,7 @@
   <version>0.1.0.$Revision: 1892 $(alpha)</version>
   <documentation-url>http://wiki.slicer.org/slicerWiki/index.php/Documentation/Nightly/Modules/DiffusionTensorScalarMeasurements</documentation-url>
   <license/>
-  <contributor>Raul San Jose (SPL, BWH)</contributor>
+  <contributor>Raul San Jose, Lauren O'Donnell, Demian Wassermann, Isaiah Norton, Alex Yarmarkovich (all SPL, BWH)</contributor>
   <acknowledgements><![CDATA[LMI]]></acknowledgements>
   <parameters>
     <label>IO</label>
