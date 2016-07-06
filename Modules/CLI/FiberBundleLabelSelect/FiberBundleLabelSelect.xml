@@ -4,7 +4,7 @@
   Diffusion.Tractography
   </category>
   <title>Fiber Bundle Label Select</title>
-  <description><![CDATA[Fiber bundle label select allows a user to select tracts passing or not passing through single or multiple labels. (Selection region label maps may be created with the Editor module or other segmentation tools)]]>
+  <description><![CDATA[Fiber bundle label select allows a user to select tracts passing or not passing through single or multiple labels. (Selection region label maps may be created with the Editor module or other segmentation tools.)]]>
   </description>
   <version>1.1.0.$Revision: 1892 $(alpha)</version>
   <documentation-url>http://wiki.slicer.org/slicerWiki/index.php/Documentation/Nightly/Modules/FiberBundleLabelSelect</documentation-url>
@@ -20,7 +20,7 @@
       <label>Selection Region Label Map</label>
       <channel>input</channel>
       <index>0</index>
-      <description>Label map volume defining selection region.</description>
+      <description>Label map volume defining selection region</description>
     </image>
     <geometry type = "fiberbundle">
       <name>InputFibers</name>
@@ -31,10 +31,10 @@
     </geometry>
     <geometry type = "fiberbundle" reference="InputFibers">
       <name>OutputFibers</name>
-      <label>Output Fiber Bundle for region-based selection.</label>
+      <label>Output Fiber Bundle</label>
       <channel>output</channel>
       <index>2</index>
-      <description>Selected tractography result</description>
+      <description>Selected tractography result from region-based selection.</description>
     </geometry>
   </parameters>
   
@@ -51,9 +51,7 @@
     <string-enumeration>
       <name>PassOperation</name>
       <label>Inclusion label combination logic</label>
-      <description>
-          <![CDATA[AND: Fiber must pass through all specified labels.<br>OR: Fiber must pass through any specified label (at least one).]]>
-      </description>
+      <description><![CDATA[AND: Fiber must pass through all specified labels.<br>OR: Fiber must pass through any specified label (at least one).]]></description>
       <flag>-i</flag>
       <longflag>--includeoperation</longflag>
       <default>OR</default>
@@ -73,9 +71,7 @@
     <string-enumeration>
       <name>NoPassOperation</name>
       <label>Exclusion label combination logic</label>
-      <description>
-          <![CDATA[AND: Any fiber passing through all specified labels is excluded.<br>OR: Fibers passing through any specified label (at least one) are excluded.]]>
-      </description>
+      <description><![CDATA[AND: Any fiber passing through all specified labels is excluded.<br>OR: Fibers passing through any specified label (at least one) are excluded.]]></description>
       <flag>-e</flag>
       <longflag>--excludeoperation</longflag>
       <default>OR</default>
