@@ -3,9 +3,7 @@
   <category>
   Diffusion.Tractography
   </category>
-  <title>
-  Fiber Bundle Label Select
-  </title>
+  <title>Fiber Bundle Label Select</title>
   <description><![CDATA[Fiber bundle label select allows a user to select tracts passing or not passing through a single or multiple labels. (selection region(s) label maps may be created wit h the Editor module or other segmentation tools)]]>
   </description>
   <version>1.1.0.$Revision: 1892 $(alpha)</version>
