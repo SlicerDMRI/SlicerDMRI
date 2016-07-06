@@ -2,12 +2,12 @@
 <executable>
   <category>Diffusion.Tractography</category>
   <title>Fiber Tract Scalar Measurements</title>
-  <description><![CDATA[Compute a set of different scalar measurements from a directory of fibers]]></description>
+  <description><![CDATA[Compute whole-fiber scalar measurements from a directory of VTK fiber bundle files. Files must have tensors stored in as cell data Slicer tensor convention.]]></description>
   <version>1.1.0.$Revision: 2016</version>
   <documentation-url>http://wiki.slicer.org/slicerWiki/index.php/Documentation/Nightly/Modules/DiffusionTensorMathematics</documentation-url>
   <license/>
-  <contributor>Alex Yarmarkovich, Fan Zhang, Lauren O'Donnell</contributor>
-  <acknowledgements><![CDATA[SPL, LMI, BWH, USYD]]></acknowledgements>
+  <contributor>Alex Yarmarkovich, Fan Zhang, Lauren O'Donnell (SPL, LMI, BWH, SlicerDMRI)</contributor>
+  <acknowledgements><![CDATA[The SlicerDMRI developers gratefully acknowledge funding for this project provided by NIH NCI ITCR U01CA199459 (Open Source Diffusion MRI Technology For Brain Cancer Research), NIH P41EB015898 (National Center for Image-Guided Therapy) and NIH P41EB015902 (Neuroimaging Analysis Center), as well as the National Alliance for Medical Image Computing (NA-MIC), funded by the National Institutes of Health through the NIH Roadmap for Medical Research, Grant U54 EB005149.]]></acknowledgements>
   <parameters>
     <label>IO</label>
     <description><![CDATA[Input/output parameters]]></description>

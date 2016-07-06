@@ -7,7 +7,7 @@
   <documentation-url>http://wiki.slicer.org/slicerWiki/index.php/Documentation/Nightly/Modules/DWIToDTIEstimation</documentation-url>
   <license>3D Slicer Contribution and Software License Agreement</license>
   <contributor>Raul San Jose, Lauren O'Donnell, Demian Wassermann, Isaiah Norton, Alex Yarmarkovich (SPL, LMI, BWH, SlicerDMRI)</contributor>
-  <acknowledgements><![CDATA[This module is based on the estimation functionality provided by the Teem library.<br><br> The SlicerDMRI developers gratefully acknowledge funding for this project provided by NIH NCI ITCR U01CA199459 (Open Source Diffusion MRI Technology For Brain Cancer Research), NIH P41EB015898 (National Center for Image-Guided Therapy) and NIH P41EB015902 (Neuroimaging Analysis Center), as well as the National Alliance for Medical Image Computing (NA-MIC), funded by the National Institutes of Health through the NIH Roadmap for Medical Research, Grant U54 EB005149. ]]></acknowledgements>
+  <acknowledgements><![CDATA[This module is based on the estimation functionality provided by the Teem library.<br><br> The SlicerDMRI developers gratefully acknowledge funding for this project provided by NIH NCI ITCR U01CA199459 (Open Source Diffusion MRI Technology For Brain Cancer Research), NIH P41EB015898 (National Center for Image-Guided Therapy) and NIH P41EB015902 (Neuroimaging Analysis Center), as well as the National Alliance for Medical Image Computing (NA-MIC), funded by the National Institutes of Health through the NIH Roadmap for Medical Research, Grant U54 EB005149.]]></acknowledgements>
   <parameters>
     <label>IO</label>
     <description><![CDATA[Input/output parameters]]></description>
