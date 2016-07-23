@@ -112,3 +112,14 @@ QStringList qSlicerTractographyDisplayModule::contributors()const
   moduleContributors << QString("Julien Finet (Kitware)");
   return moduleContributors;
 }
+
+//-----------------------------------------------------------------------------
+QStringList qSlicerTractographyDisplayModule::associatedNodeTypes() const
+{
+  return QStringList()
+    << "vtkMRMLFiberBundleNode"
+    << "vtkMRMLFiberBundleDisplayNode"
+    << "vtkMRMLFiberBundleGlyphDisplayNode"
+    << "vtkMRMLFiberBundleTubeDisplayNode"
+    << "vtkMRMLFiberBundleLineDisplayNode";
+}
