@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <executable>
-  <category>Diffusion.Diffusion Weighted Images</category>
-  <title>DWI to DTI Estimation</title>
+  <category>Diffusion.Process</category>
+  <title>Diffusion Tensor Estimation</title>
   <description><![CDATA[Estimates the diffusion tensor model from diffusion weighted images.<br><br>There are two estimation methods available: least squares and weighted least squares. Least squares is the traditional method for tensor estimation and the fastest one. Weighted least squares takes into account the noise characteristics of the MRI images to weight the DWI samples based on their intensity magnitude.]]></description>
   <version>0.1.0.$Revision: 1892 $(alpha)</version>
   <documentation-url>http://wiki.slicer.org/slicerWiki/index.php/Documentation/Nightly/Modules/DWIToDTIEstimation</documentation-url>

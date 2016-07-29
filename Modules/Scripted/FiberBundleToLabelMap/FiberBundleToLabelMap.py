@@ -9,8 +9,8 @@ import vtk, qt, ctk, slicer, numpy
 class FiberBundleToLabelMap:
   def __init__(self, parent):
     import string
-    parent.title = "Fiber Bundle to Label Map"
-    parent.categories = ["Diffusion.Tractography"]
+    parent.title = "Tractography to Mask Image"
+    parent.categories = ["Diffusion.Utilities"]
     parent.dependencies = []
     parent.contributors = ["Steve Pieper (Isomics)"] # replace with "Firstname Lastname (Org)"
     parent.helpText = string.Template("""

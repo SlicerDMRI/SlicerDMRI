@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <executable>
-  <category>Diffusion.Diffusion Tensor Images</category>
-  <title>Diffusion Tensor Scalar Measurements</title>
+  <category>Diffusion.Quantify</category>
+  <title>Diffusion Tensor Scalar Maps</title>
   <description><![CDATA[Compute scalar measures from a diffusion tensor dataset. Available measurements include fractional anisotropy, trace, and more.]]></description>
   <version>0.1.0.$Revision: 1892 $(alpha)</version>
   <documentation-url>http://wiki.slicer.org/slicerWiki/index.php/Documentation/Nightly/Modules/DiffusionTensorScalarMeasurements</documentation-url>
