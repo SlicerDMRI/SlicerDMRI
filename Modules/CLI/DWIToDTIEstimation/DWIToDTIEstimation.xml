@@ -22,7 +22,7 @@
       <name>inputMaskVolume</name>
       <flag>m</flag>
       <longflag>mask</longflag>
-      <label>Diffusion Tensor Mask</label>
+      <label>Input Brain Mask</label>
       <channel>input</channel>
       <description><![CDATA[Brain mask to restrict tensor computation region [optional]]]></description>
     </image>

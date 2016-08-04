@@ -23,7 +23,7 @@ set(testname ${CLP}Test)
 add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test>
   --compare ${BASELINE}/helix-Baseline.nrrd ${TEMP}/${testname}_baseline.nhdr
   --compare ${BASELINE}/helix-DTI.nhdr ${TEMP}/${testname}_dti.nhdr
-${testname}
+    ${testname}
     -m ${MRML_TEST_DATA}/helix-DWI-otsu-no_islands-05.nrrd
     ${MRML_TEST_DATA}/helix-DWI.nhdr
     ${TEMP}/${testname}_dti.nhdr
