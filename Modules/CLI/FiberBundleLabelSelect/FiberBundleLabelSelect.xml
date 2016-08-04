@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <executable>
-  <category>
-  Diffusion.Tractography
-  </category>
-  <title>Fiber Bundle Label Select</title>
+  <category>Diffusion.Utilities.Tractography CLIs</category>
+  <title>Tractography ROI Selection</title>
   <description><![CDATA[Fiber bundle label select allows a user to select tracts passing or not passing through single or multiple labels. (Selection region label maps may be created with the Editor module or other segmentation tools.)]]>
   </description>
   <version>1.1.0.$Revision: 1892 $(alpha)</version>

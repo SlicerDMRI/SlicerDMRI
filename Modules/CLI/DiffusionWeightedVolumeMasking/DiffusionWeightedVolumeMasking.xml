@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <executable>
-  <category>Diffusion.Diffusion Weighted Images</category>
-  <title>Diffusion Weighted Volume Masking</title>
+  <category>Diffusion.Process</category>
+  <title>Diffusion Brain Masking</title>
   <description><![CDATA[<p>Creates a brain mask from a diffusion weighted image volume. The mask can be used during diffusion tensor estimation or tractography seeding.</p><p>The brain mask is computed by averaging all baseline (non-diffusion-weighted) images, applying the Otsu thresholding algorithm to segment tissue voxels, and then removing small unconnected regions.</p>]]></description>
   <version>0.1.0.$Revision: 1892 $(alpha)</version>
   <documentation-url>http://wiki.slicer.org/slicerWiki/index.php/Documentation/Nightly/Modules/DiffusionWeightedMasking</documentation-url>
@@ -18,7 +18,7 @@
       <index>0</index>
       <description><![CDATA[Input DWI volume]]></description>
     </image>
-    <image type="scalar" reference="inputVolume">
+    <image reference="inputVolume">
       <name>outputBaseline</name>
       <label>Output Baseline Volume</label>
       <channel>output</channel>

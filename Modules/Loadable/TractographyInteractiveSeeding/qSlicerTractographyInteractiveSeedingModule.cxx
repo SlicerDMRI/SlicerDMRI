@@ -32,7 +32,7 @@ vtkMRMLAbstractLogic* qSlicerTractographyInteractiveSeedingModule::createLogic()
 //-----------------------------------------------------------------------------
 QStringList qSlicerTractographyInteractiveSeedingModule::categories()const
 {
-  return QStringList() << "Diffusion.Diffusion Tensor Images";
+  return QStringList() << "Diffusion.Tractography";
 }
 
 //-----------------------------------------------------------------------------

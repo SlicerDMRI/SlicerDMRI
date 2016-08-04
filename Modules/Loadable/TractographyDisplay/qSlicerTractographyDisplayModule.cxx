@@ -71,7 +71,7 @@ void qSlicerTractographyDisplayModule::setup()
 //-----------------------------------------------------------------------------
 QStringList qSlicerTractographyDisplayModule::categories() const
 {
-  return QStringList() << "Diffusion";
+  return QStringList() << "Diffusion.Tractography";
 }
 
 //-----------------------------------------------------------------------------

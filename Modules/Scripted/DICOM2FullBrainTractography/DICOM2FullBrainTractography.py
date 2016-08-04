@@ -7,7 +7,7 @@ import DICOM2FullBrainTractographyLib
 class DICOM2FullBrainTractography:
   def __init__(self, parent):
     parent.title = "DWI to Full Brain Tractography"
-    parent.categories = ["Diffusion"]
+    parent.categories = ["Diffusion.Utilities"]
     parent.contributors = ["Demian Wassermann (SPL)"]
     parent.helpText = """
     Example of scripted loadable extension.
