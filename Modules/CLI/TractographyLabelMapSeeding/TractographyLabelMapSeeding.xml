@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <executable>
-  <category>Diffusion.Utilities.Tractography CLIs</category>
+  <category>Diffusion.Tractography.Region-based</category>
   <title>Tractography ROI Seeding</title>
   <description><![CDATA[Seed tractography from a Diffusion Tensor Image (DTI) within a region defined by a label map.]]></description>
   <version>0.1.0.$Revision: 1892 $(alpha)</version>
