@@ -21,7 +21,7 @@
       <element>Fibers_Hierarchy</element>
       <element>Fibers_File_Folder</element>
     </string-enumeration>
-    <geometry type="fiberbundle" aggregate="true" fileExtensions=".mrml" multiple="false">
+    <geometry type="fiberbundle" aggregate="true" fileExtensions=".mrml" multiple="true">
       <name>FiberHierarchyNode</name>
       <channel>input</channel>
       <label>Fibers Hierarchy</label>

@@ -809,7 +809,7 @@ int main( int argc, char * argv[] )
     std::string            inputNodeID;
 
     std::string sceneFilename;
-    std::string filename = FiberHierarchyNode;
+    std::string filename = FiberHierarchyNode[0];
     loc = filename.find_last_of("#");
     if (loc != std::string::npos)
       {
