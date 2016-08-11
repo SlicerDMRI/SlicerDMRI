@@ -13,6 +13,7 @@ include_directories(
 add_executable(${CLP}Test ${CLP}Test.cxx)
 add_dependencies(${CLP}Test ${CLP})
 target_link_libraries(${CLP}Test
+  ${CLP}Lib
   ${${MODULE_NAME}_TARGET_LIBRARIES}
   ${SlicerExecutionModel_EXTRA_EXECUTABLE_TARGET_LIBRARIES}
   )
