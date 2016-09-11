@@ -7,28 +7,22 @@ set(${KIT}_EXPORT_DIRECTIVE "VTK_SLICER_${MODULE_NAME_UPPER}_MODULE_MRML_EXPORT"
 set(${KIT}_INCLUDE_DIRECTORIES
   )
 
-if(MRML_USE_vtkTeem)
-  list(APPEND ${KIT}_INCLUDE_DIRECTORIES ${vtkTeem_INCLUDE_DIRS})
-endif()
+list(APPEND ${KIT}_INCLUDE_DIRECTORIES ${vtkTeem_INCLUDE_DIRS})
 
 set(${KIT}_SRCS
   vtkMRMLFiberBundleDisplayNode.cxx
   vtkMRMLFiberBundleDisplayNode.h
+  vtkMRMLFiberBundleGlyphDisplayNode.cxx
+  vtkMRMLFiberBundleGlyphDisplayNode.h
+  vtkMRMLFiberBundleLineDisplayNode.cxx
+  vtkMRMLFiberBundleLineDisplayNode.h
+  vtkMRMLFiberBundleNode.cxx
+  vtkMRMLFiberBundleNode.h
+  vtkMRMLFiberBundleStorageNode.cxx
+  vtkMRMLFiberBundleStorageNode.h
+  vtkMRMLFiberBundleTubeDisplayNode.cxx
+  vtkMRMLFiberBundleTubeDisplayNode.h
   )
-if(MRML_USE_vtkTeem)
-  list(APPEND ${KIT}_SRCS
-    vtkMRMLFiberBundleGlyphDisplayNode.cxx
-    vtkMRMLFiberBundleGlyphDisplayNode.h
-    vtkMRMLFiberBundleLineDisplayNode.cxx
-    vtkMRMLFiberBundleLineDisplayNode.h
-    vtkMRMLFiberBundleNode.cxx
-    vtkMRMLFiberBundleNode.h
-    vtkMRMLFiberBundleStorageNode.cxx
-    vtkMRMLFiberBundleStorageNode.h
-    vtkMRMLFiberBundleTubeDisplayNode.cxx
-    vtkMRMLFiberBundleTubeDisplayNode.h
-    )
-endif()
 
 #find_package(VTK REQUIRED)
 #include(${VTK_USE_FILE})
@@ -37,10 +31,8 @@ set(${KIT}_TARGET_LIBRARIES
   ${MRML_LIBRARIES}
   ${VTK_LIBRARIES}
    vtkSlicerAnnotationsModuleMRML
-  )
-if(MRML_USE_vtkTeem)
-  list(APPEND ${KIT}_TARGET_LIBRARIES vtkTeem)
-endif()
+   vtkTeem
+   )
 
 #-----------------------------------------------------------------------------
 SlicerMacroBuildModuleMRML(

@@ -1,28 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <executable>
-  <category>Diffusion.Tractography</category>
-  <title>Fiber Tract Scalar Measurements</title>
-  <description><![CDATA[Compute a set of different scalar measurements from a directory of fibers]]></description>
-  <version>0.1.0.$Revision: 2014</version>
+  <category>Diffusion.Quantify</category>
+  <title>Tractography Measurements</title>
+  <description><![CDATA[Compute whole-fiber scalar measurements from a directory of VTK fiber bundle files. Files must have tensors stored in as cell data Slicer tensor convention.]]></description>
+  <version>1.1.0.$Revision: 2016</version>
   <documentation-url>http://wiki.slicer.org/slicerWiki/index.php/Documentation/Nightly/Modules/DiffusionTensorMathematics</documentation-url>
-  <license/>
-  <contributor>Alex Yarmarkovich (SPL, BWH)</contributor>
-  <acknowledgements><![CDATA[LMI]]></acknowledgements>
+  <license>3D Slicer Contribution and Software License Agreement</license>
+  <contributor>Alex Yarmarkovich, Fan Zhang, Lauren O'Donnell (SPL, LMI, BWH, SlicerDMRI)</contributor>
+  <acknowledgements><![CDATA[The SlicerDMRI developers gratefully acknowledge funding for this project provided by NIH NCI ITCR U01CA199459 (Open Source Diffusion MRI Technology For Brain Cancer Research), NIH P41EB015898 (National Center for Image-Guided Therapy) and NIH P41EB015902 (Neuroimaging Analysis Center), as well as the National Alliance for Medical Image Computing (NA-MIC), funded by the National Institutes of Health through the NIH Roadmap for Medical Research, Grant U54 EB005149.]]></acknowledgements>
   <parameters>
     <label>IO</label>
     <description><![CDATA[Input/output parameters]]></description>
-
     <string-enumeration>
       <name>inputType</name>
       <flag>i</flag>
       <longflag>--inputtype</longflag>
-      <description><![CDATA[Type of input: hierarchy, all fibers in the scene, or vtk polydata directory]]></description>
+      <description><![CDATA[Type of input: MRML Hierarchy, or directory containing VTK polydata files.]]></description>
       <label>Select Input Type</label>
       <default>Fibers_Hierarchy</default>
       <element>Fibers_Hierarchy</element>
       <element>Fibers_File_Folder</element>
     </string-enumeration>
-
     <geometry type="fiberbundle" aggregate="true" fileExtensions=".mrml" multiple="true">
       <name>FiberHierarchyNode</name>
       <channel>input</channel>
@@ -30,7 +28,6 @@
       <longflag>--fiberHierarchy</longflag>
       <description><![CDATA[Fibers top hierarchy node]]></description>
     </geometry>
-
     <directory>
       <name>InputDirectory</name>
       <label>Fibers File Folder</label>
@@ -49,7 +46,7 @@
       <name>outputFormat</name>
       <flag>f</flag>
       <longflag>--format</longflag>
-      <description><![CDATA[Outout format: hierarchy along column or row.]]></description>
+      <description><![CDATA[Output format: print statistics along column vs. row.]]></description>
       <label>Select Output Format</label>
       <default>Row_Hierarchy</default>
       <element>Row_Hierarchy</element>
@@ -59,12 +56,19 @@
       <name>outputSeparator</name>
       <flag>s</flag>
       <longflag>--separator</longflag>
-      <description><![CDATA[Outout file field separator.]]></description>
+      <description><![CDATA[Output file field separator (Comma, Space, or Tab).]]></description>
       <label>Output Field Separator</label>
       <default>Tab</default>
       <element>Comma</element>
       <element>Space</element>
       <element>Tab</element>
     </string-enumeration>
+    <boolean>
+      <name>printAllStatistics</name>
+      <longflag>--printAllStatistics</longflag>
+      <label>Print statistics for all clusters and children.</label>
+      <description><![CDATA[Print statistics for all clusters and children. In hierarchy mode, by default this module only prints statistics for specified cluster(s).]]></description>
+      <default>false</default>
+    </boolean>
   </parameters>
 </executable>

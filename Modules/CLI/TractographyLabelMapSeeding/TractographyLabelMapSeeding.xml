@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <executable>
-  <category>Diffusion.Diffusion Tensor Images</category>
-  <title>Tractography Label Map Seeding</title>
-  <description><![CDATA[Seed tracts on a Diffusion Tensor Image (DT) from a label map]]></description>
+  <category>Diffusion.Tractography.Region-based</category>
+  <title>Tractography ROI Seeding</title>
+  <description><![CDATA[Seed tractography from a Diffusion Tensor Image (DTI) within a region defined by a label map.]]></description>
   <version>0.1.0.$Revision: 1892 $(alpha)</version>
   <documentation-url>http://wiki.slicer.org/slicerWiki/index.php/Documentation/Nightly/Modules/Seeding</documentation-url>
-  <license>slicer3</license>
-  <contributor>Raul San Jose (SPL, BWH), Demian Wassermann (SPL, BWH)</contributor>
-  <acknowledgements><![CDATA[Laboratory of Mathematics in Imaging. This work is part of the National Alliance for Medical Image Computing (NAMIC), funded by the National Institutes of Health through the NIH Roadmap for Medical Research, Grant U54 EB005149.]]></acknowledgements>
+  <license>3D Slicer Contribution and Software License Agreement</license>
+  <contributor>Raul San Jose, Demian Wassermann, Lauren O'Donnell (SPL, LMI, BWH, SlicerDMRI)</contributor>
+  <acknowledgements><![CDATA[The SlicerDMRI developers gratefully acknowledge funding for this project provided by NIH NCI ITCR U01CA199459 (Open Source Diffusion MRI Technology For Brain Cancer Research), NIH P41EB015898 (National Center for Image-Guided Therapy) and NIH P41EB015902 (Neuroimaging Analysis Center), as well as the National Alliance for Medical Image Computing (NA-MIC), funded by the National Institutes of Health through the NIH Roadmap for Medical Research, Grant U54 EB005149.]]></acknowledgements>
   <parameters>
     <label>IO</label>
     <description><![CDATA[Input/output parameters]]></description>
@@ -16,14 +16,14 @@
       <label>Input DTI Volume</label>
       <channel>input</channel>
       <index>0</index>
-      <description><![CDATA[Input DTI volume]]></description>
+      <description><![CDATA[DTI volume in which to seed (generate) tractography.]]></description>
     </image>
     <image type="label">
       <name>InputROI</name>
       <label>Input Label Map</label>
       <flag>-a</flag>
       <longflag>--inputroi</longflag>
-      <description><![CDATA[Label map with seeding ROIs]]></description>
+      <description><![CDATA[Label map defining region for seeding tractography.]]></description>
       <channel>input</channel>
     </image>
     <geometry type="fiberbundle" reference="InputVolume">
@@ -35,7 +35,7 @@
     </geometry>
   </parameters>
   <parameters>
-    <label>Seed Placement Options</label>
+    <label>Seeding Options</label>
     <description><![CDATA[Options for seed placement]]></description>
     <boolean>
       <name>UseIndexSpace</name>

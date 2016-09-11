@@ -1,62 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <executable>
-  <category>
-  Diffusion.Tractography
-  </category>
-  <title>
-  FiberBundleLabelSelect
-  </title>
-  <description>
-Fiber bundle label select allows a user to select tracts passing or not passing through a single or multiple labels. The label is defined as a labelmap and has to be provided by the user. One approach to generate the labeled volume is by means of the Editor module.
+  <category>Diffusion.Tractography.Region-based</category>
+  <title>Tractography ROI Selection</title>
+  <description><![CDATA[Fiber bundle label select allows a user to select tracts passing or not passing through single or multiple labels. (Selection region label maps may be created with the Editor module or other segmentation tools.)]]>
   </description>
   <version>1.1.0.$Revision: 1892 $(alpha)</version>
   <documentation-url>http://wiki.slicer.org/slicerWiki/index.php/Documentation/Nightly/Modules/FiberBundleLabelSelect</documentation-url>
-  <license></license>
-  <contributor>Demian Wassermann, Fan Zhang, Lauren O'Donnell</contributor>
-  <acknowledgements>BWH, NCIGT/LMI</acknowledgements>
+  <license>3D Slicer Contribution and Software License Agreement</license>
+  <contributor>Demian Wassermann, Fan Zhang, Lauren O'Donnell (SPL, LMI, BWH, SlicerDMRI)</contributor>
+  <acknowledgements><![CDATA[The SlicerDMRI developers gratefully acknowledge funding for this project provided by NIH NCI ITCR U01CA199459 (Open Source Diffusion MRI Technology For Brain Cancer Research), NIH P41EB015898 (National Center for Image-Guided Therapy) and NIH P41EB015902 (Neuroimaging Analysis Center), as well as the National Alliance for Medical Image Computing (NA-MIC), funded by the National Institutes of Health through the NIH Roadmap for Medical Research, Grant U54 EB005149.]]></acknowledgements>
 
   <parameters>
     <label>IO</label>
     <description>Input/output parameters</description>
     <image type ="label">
       <name>InputLabel_A</name>
-      <label>Input Label Map</label>
+      <label>Selection Region Label Map</label>
       <channel>input</channel>
       <index>0</index>
-      <description>Label map volume</description>
+      <description>Label map volume defining selection region</description>
     </image>
     <geometry type = "fiberbundle">
       <name>InputFibers</name>
       <label>Input Fiber Bundle</label>
       <channel>input</channel>
       <index>1</index>
-      <description>Input tractography</description>
+      <description>Input tractography for region-based selection.</description>
     </geometry>
     <geometry type = "fiberbundle" reference="InputFibers">
       <name>OutputFibers</name>
       <label>Output Fiber Bundle</label>
       <channel>output</channel>
       <index>2</index>
-      <description>Selected tractography result</description>
+      <description>Selected tractography result from region-based selection.</description>
     </geometry>
   </parameters>
   
   <parameters>
-    <label>Label regions definition</label>
-    <description>Selection of label/s</description>
-    
+    <label>Tract selection region labels</label>
     <integer-vector>
       <name>PassLabel</name>
-      <label> Labels to include </label>
+      <label>Inclusion labels (comma-separated)</label>
       <flag>-p</flag>
       <longflag>--pass</longflag>
-      <description>Comma separated list of label values that defines pass region.</description>
+      <description>Comma-separated list of label values defining inclusion region. Fibers passing through these labels will be retained.</description>
     </integer-vector>
 
     <string-enumeration>
       <name>PassOperation</name>
-      <label> Combine include labels</label>
-      <description>And or Or logical operation used to combine include labels</description>
+      <label>Inclusion label combination logic</label>
+      <description><![CDATA[AND: Fiber must pass through all specified labels.<br>OR: Fiber must pass through any specified label (at least one).]]></description>
       <flag>-i</flag>
       <longflag>--includeoperation</longflag>
       <default>OR</default>
@@ -66,17 +59,17 @@ Fiber bundle label select allows a user to select tracts passing or not passing 
 
    <integer-vector>
       <name>NotPassLabel</name>
-      <label> Labels to exclude</label>
+      <label>Exclusion labels (comma-separated)</label>
       <flag>-n</flag>
       <longflag>--nopass</longflag>
-      <description>Comma separated list of label values that defines no pass region.</description>
+      <description>Comma-separated list of label values defining exclusion region. Fibers passing through these labels will be removed.</description>
       <default></default>
     </integer-vector>
 
     <string-enumeration>
       <name>NoPassOperation</name>
-      <label> Combine exclude labels</label>
-      <description>And or Or logical operation used to combine exclude labels</description>
+      <label>Exclusion label combination logic</label>
+      <description><![CDATA[AND: Any fiber passing through all specified labels is excluded.<br>OR: Fibers passing through any specified label (at least one) are excluded.]]></description>
       <flag>-e</flag>
       <longflag>--excludeoperation</longflag>
       <default>OR</default>
@@ -84,5 +77,5 @@ Fiber bundle label select allows a user to select tracts passing or not passing 
       <element>AND</element>
     </string-enumeration>
 
-  </parameters>  
+  </parameters>
 </executable>

@@ -71,7 +71,7 @@ void qSlicerTractographyDisplayModule::setup()
 //-----------------------------------------------------------------------------
 QStringList qSlicerTractographyDisplayModule::categories() const
 {
-  return QStringList() << "Diffusion";
+  return QStringList() << "Diffusion.Tractography";
 }
 
 //-----------------------------------------------------------------------------
@@ -111,4 +111,15 @@ QStringList qSlicerTractographyDisplayModule::contributors()const
   QStringList moduleContributors;
   moduleContributors << QString("Julien Finet (Kitware)");
   return moduleContributors;
+}
+
+//-----------------------------------------------------------------------------
+QStringList qSlicerTractographyDisplayModule::associatedNodeTypes() const
+{
+  return QStringList()
+    << "vtkMRMLFiberBundleNode"
+    << "vtkMRMLFiberBundleDisplayNode"
+    << "vtkMRMLFiberBundleGlyphDisplayNode"
+    << "vtkMRMLFiberBundleTubeDisplayNode"
+    << "vtkMRMLFiberBundleLineDisplayNode";
 }
