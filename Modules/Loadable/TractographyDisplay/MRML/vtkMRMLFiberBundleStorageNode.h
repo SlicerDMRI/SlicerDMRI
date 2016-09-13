@@ -47,15 +47,8 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleStorag
   /// Initialize all the supported write file types
   virtual void InitializeSupportedWriteFileTypes();
 
-  ///
-  /// Return a default file extension for writting
-  virtual const char* GetDefaultWriteFileExtension()
-    {
-    return "vtk";
-    };
-
 protected:
-  vtkMRMLFiberBundleStorageNode(){};
+  vtkMRMLFiberBundleStorageNode();
   ~vtkMRMLFiberBundleStorageNode(){};
   vtkMRMLFiberBundleStorageNode(const vtkMRMLFiberBundleStorageNode&);
   void operator=(const vtkMRMLFiberBundleStorageNode&);

@@ -22,6 +22,12 @@ Version:   $Revision: 1.2 $
 vtkMRMLNodeNewMacro(vtkMRMLFiberBundleStorageNode);
 
 //----------------------------------------------------------------------------
+vtkMRMLFiberBundleStorageNode::vtkMRMLFiberBundleStorageNode()
+{
+  this->DefaultWriteFileExtension = "vtk";
+}
+
+//----------------------------------------------------------------------------
 int vtkMRMLFiberBundleStorageNode::SupportedFileType(const char *fileName)
 {
   return this->Superclass::SupportedFileType(fileName);
