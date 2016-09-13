@@ -39,6 +39,7 @@ endif()
 # Extension modules
 add_subdirectory("Modules/Loadable/TractographyDisplay")
 add_subdirectory("Modules/Loadable/TractographyInteractiveSeeding")
+add_subdirectory("Modules/Loadable/TractIO")
 
 add_subdirectory("Modules/CLI/DWIToDTIEstimation")
 add_subdirectory("Modules/CLI/DiffusionWeightedVolumeMasking")

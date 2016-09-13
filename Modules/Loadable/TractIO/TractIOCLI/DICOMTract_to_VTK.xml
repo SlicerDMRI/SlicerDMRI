@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<executable>
+  <category>Diffusion.Import and Export</category>
+  <title>Tractography DICOM Load</title>
+  <index>1</index>
+  <description><![CDATA[<p>I/O routines for tractography DICOM and TrackVis format</p>]]></description>
+  <version>1.0</version>
+  <documentation-url>http://slicerdmri.github.io/</documentation-url>
+  <license>slicer3</license>
+  <contributor>Isaiah Norton (BWH)</contributor>
+  <acknowledgements><![CDATA[This work is funded by the National Institutes of Health through the National Cancer Institute Information Technology for Cancer Research program, Grant CA199459]]></acknowledgements>
+
+  <parameters>
+    <label>IO</label>
+    <description><![CDATA[Input/output parameters]]></description>
+    <file>
+        <name>input_track_dicom</name>
+        <label>DICOM Track File</label>
+        <channel>input</channel>
+        <longflag>--input_track_dicom</longflag>
+        <description><![CDATA[Input path to DICOM tractography file]]></description>
+    </file>
+    <geometry type="fiberbundle" reference="InputVolume">
+      <name>output_vtk</name>
+      <label>Output Fiber Bundle</label>
+      <channel>output</channel>
+      <longflag>--output_vtk</longflag>
+      <description><![CDATA[Tractography result]]></description>
+    </geometry>
+  </parameters>
+
+  <parameters advanced="true">
+    <label>Debug</label>
+    <boolean>
+      <name>debugSwitch</name>
+      <label>Debug</label>
+      <flag>d</flag>
+      <default>false</default>
+    </boolean>
+  </parameters>
+
+ </executable>
