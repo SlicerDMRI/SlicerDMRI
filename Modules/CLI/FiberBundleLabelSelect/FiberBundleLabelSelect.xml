@@ -78,4 +78,19 @@
     </string-enumeration>
 
   </parameters>
+
+  <parameters advanced="true">
+    <label>Advanced Settings</label>
+    <description><![CDATA[Advanced settings]]></description>
+    
+    <double>
+      <name>SamplingDistance</name>
+      <flag>-d</flag>
+      <longflag>--sampling_distance</longflag>
+      <description><![CDATA[Sampling Distance]]></description>
+      <label>Sampling distance (mm)</label>
+      <default>0.3</default>
+    </double>
+  </parameters>
+
 </executable>
