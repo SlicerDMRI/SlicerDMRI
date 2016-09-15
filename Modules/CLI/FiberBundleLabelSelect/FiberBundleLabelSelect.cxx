@@ -43,10 +43,6 @@
 #include <algorithm>
 #include <string>
 
-// Added for sampling
-#include <vtkSelection.h>
-#include <vtkSelectionNode.h>
-#include <vtkExtractSelectedPolyDataIds.h>
 #include <vtkPolyDataPointSampler.h>
 
 int main( int argc, char * argv[] )
@@ -144,7 +140,7 @@ int main( int argc, char * argv[] )
   vtkIdType numPts = inPts->GetNumberOfPoints();
   vtkCellArray *inLines = input->GetLines();
   vtkIdType numLines = inLines->GetNumberOfCells();
-  vtkIdType npts=0, *pts=NULL;
+  vtkIdType npts=0, sampledNpts=0, *pts=NULL;
 
   if ( !inPts || numPts  < 1 || !inLines || numLines < 1 )
     {
@@ -158,46 +154,31 @@ int main( int argc, char * argv[] )
   double p[3];
 
   unsigned int label;
-
-  vtkSelection* selection = vtkSelection::New();
-  vtkSelectionNode* selectionNode = vtkSelectionNode::New();  
-  selectionNode->GetProperties()->Set(vtkSelectionNode::CONTENT_TYPE(), vtkSelectionNode::INDICES);
-  selectionNode->GetProperties()->Set(vtkSelectionNode::FIELD_TYPE(), vtkSelectionNode::CELL);
-
-  vtkExtractSelectedPolyDataIds* extractor = vtkExtractSelectedPolyDataIds::New();
-  extractor->SetInputData(0, input);
-
+  
+  // Fiber points sampling 
   vtkPolyDataPointSampler *resampler = vtkPolyDataPointSampler::New();
   resampler->GenerateEdgePointsOn();
   resampler->GenerateVertexPointsOff();
   resampler->GenerateInteriorPointsOff();
   resampler->GenerateVerticesOff();
-  resampler->SetDistance(0.1);
 
+  std::cout << " Sampling Distance: " << SamplingDistance << std::endl;
+  resampler->SetDistance(SamplingDistance);
+
+  vtkPolyData* tmpPd; 
+  vtkIdList* tmpCellPtIds;
+  vtkPoints* tmpPoints; 
+  vtkCellArray* tmpLines;
+  vtkPoints* sampledCellPts;
+  
   std::cout << " Total number of fibers before selection: " << numLines << std::endl;
 
   int *labelDims = imageCastLabel_A->GetOutput()->GetDimensions();
   // Check lines
   vtkIdType inCellId;
-  vtkSmartPointer<vtkIdTypeArray> cellIdsAr;
-  vtkPoints *cellPts;
-  for (inCellId=0; inCellId < numLines; inCellId++)
+  for (inCellId=0, inLines->InitTraversal();
+       inLines->GetNextCell(npts,pts); inCellId++)
     {
-    cellIdsAr = vtkSmartPointer<vtkIdTypeArray>::New();
-    cellIdsAr->InsertNextValue( inCellId );
-
-    // resampling points in cell
-    selectionNode->SetSelectionList(cellIdsAr);
-    selection->AddNode(selectionNode);
-    selection->Modified();
-    extractor->SetInputData(1, selection);
-    extractor->Update();
-    resampler->SetInputConnection(extractor->GetOutputPort());
-    resampler->Update();
-
-    cellPts = resampler->GetOutput()->GetPoints();
-    npts = resampler->GetOutput()->GetNumberOfPoints();
-
     if (npts < 2)
       {
       addLines.push_back(false);
@@ -211,19 +192,48 @@ int main( int argc, char * argv[] )
       passAll.push_back(false);
       }
 
+    // Create a new polydata that only contains the line and the points on it 
+    tmpPd = vtkPolyData::New();
+    tmpPoints = vtkPoints::New();
+    tmpCellPtIds = vtkIdList::New();
+    tmpLines = vtkCellArray::New();
+    for (j=0; j < npts; j++)
+      {
+      inPts->GetPoint(pts[j],p);
+      vtkIdType dx = tmpPoints->InsertNextPoint(p);
+      tmpCellPtIds->InsertNextId(dx);
+      }
+    tmpLines->InsertNextCell(tmpCellPtIds);                  
+ 
+    tmpPd->SetLines(tmpLines);
+    tmpPd->SetPoints(tmpPoints);
+
+    // Resample the poits on polydata
+    resampler->SetInputData(tmpPd);
+    resampler->Update();
+
+    sampledCellPts = resampler->GetOutput()->GetPoints();
+    sampledNpts = resampler->GetOutput()->GetNumberOfPoints();
+
+    // Clean memory
+    tmpPd->Delete();
+    tmpPoints->Delete();
+    tmpCellPtIds->Delete();
+    tmpLines->Delete();
+
     double pIJK[3];
     int pt[3];
     short *inPtr;
     bool addLine = false;
     bool pass = false;
     bool nopass = false;
-    for (j=0; j < npts; j++)
+    for (j=0; j < sampledNpts; j++)
       {
-      cellPts->GetPoint(j, p);
+      sampledCellPts->GetPoint(j, p);
       trans->TransformPoint(p,pIJK);
-      pt[0]= (int) floor(pIJK[0]);
-      pt[1]= (int) floor(pIJK[1]);
-      pt[2]= (int) floor(pIJK[2]);
+      pt[0]= (int) round(pIJK[0]);
+      pt[1]= (int) round(pIJK[1]);
+      pt[2]= (int) round(pIJK[2]);
       if (pt[0] < 0 || pt[1] < 0 || pt[2] < 0 ||
           pt[0] >= labelDims[0] || pt[1] >= labelDims[1] || pt[2] >= labelDims[2])
         {
@@ -300,10 +310,6 @@ int main( int argc, char * argv[] )
     } //for (inCellId=0, inLines->InitTraversal();
 
   resampler->Delete();
-  extractor->Delete();
-  selection->Delete();
-  selectionNode->Delete();
-
   std::cout << " Total number of fibers after selection: " << numNewCells << std::endl;
 
   //Preallocate PolyData elements
