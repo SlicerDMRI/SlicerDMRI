@@ -85,7 +85,7 @@
     <description><![CDATA[Parameters for the tractography method]]></description>
     <double>
       <name>MinimumLength</name>
-      <label>Minimum Path Length</label>
+      <label>Minimum Length</label>
       <flag>-l</flag>
       <longflag>--minimumlength</longflag>
       <description><![CDATA[Minimum length of the fibers (in mm)]]></description>

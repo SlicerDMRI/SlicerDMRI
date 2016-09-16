@@ -74,7 +74,7 @@
        <widget class="QComboBox" name="PresetsComboBox">
         <item>
          <property name="text">
-          <string>Slicer4 Interctive Seeding Defaults</string>
+           <string>Slicer4 Interactive Seeding Defaults</string>
          </property>
         </item>
         <item>
@@ -523,7 +523,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_9">
         <property name="text">
-         <string>Minimum Path Length</string>
+         <string>Minimum Length</string>
         </property>
        </widget>
       </item>
@@ -549,7 +549,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="MaximumPathSpinBoxLabel">
         <property name="text">
-         <string>Maximum Path Length</string>
+         <string>Maximum Length</string>
         </property>
        </widget>
       </item>

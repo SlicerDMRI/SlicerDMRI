@@ -32,10 +32,10 @@
       <description><![CDATA[Type of scalar measurement to perform]]></description>
       <label>Scalar Measurement</label>
       <default>FractionalAnisotropy</default>
+      <element>FractionalAnisotropy</element>
       <element>Trace</element>
       <element>Determinant</element>
       <element>RelativeAnisotropy</element>
-      <element>FractionalAnisotropy</element>
       <element>Mode</element>
       <element>LinearMeasure</element>
       <element>PlanarMeasure</element>
