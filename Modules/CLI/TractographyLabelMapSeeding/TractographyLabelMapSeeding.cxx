@@ -199,15 +199,6 @@ int main( int argc, char * argv[] )
 
     // 4. Set Tractography specific parameters
 
-    if( WriteToFile )
-      {
-      seed->SetFileDirectoryName(OutputDirectory.c_str() );
-      if( FilePrefix.length() > 0 )
-        {
-        seed->SetFilePrefix(FilePrefix.c_str() );
-        }
-      }
-
     if( UseIndexSpace )
       {
       seed->SetIsotropicSeeding(0);
@@ -250,32 +241,30 @@ int main( int argc, char * argv[] )
     seed->SeedStreamlinesInROI();
 
     // Save result
-    if ( !WriteToFile )
-      {
-      // 6. Extra5ct PolyData in RAS
-      vtkNew<vtkPolyData> outFibers;
-      seed->TransformStreamlinesToRASAndAppendToPolyData(outFibers.GetPointer());
 
-      std::string fileExtension = vtksys::SystemTools::LowerCase( vtksys::SystemTools::GetFilenameLastExtension(OutputFibers.c_str()) );
-      if (fileExtension == ".vtk")
-        {
-          vtkNew<vtkPolyDataWriter> writer;
-          writer->SetFileName(OutputFibers.c_str());
-          writer->SetFileTypeToBinary();
-          writer->SetInputData(outFibers.GetPointer());
-          writer->Write();
-        }
-      else
-        {
-        if (fileExtension != ".vtp")
-          {
-          cerr << "Extension not recognize, saving the information in VTP format" << endl;
-          }
-        vtkNew<vtkXMLPolyDataWriter> writer;
-        writer->SetFileName(OutputFibers.c_str() );
+    // 6. Extract PolyData in RAS
+    vtkNew<vtkPolyData> outFibers;
+    seed->TransformStreamlinesToRASAndAppendToPolyData(outFibers.GetPointer());
+
+    std::string fileExtension = vtksys::SystemTools::LowerCase( vtksys::SystemTools::GetFilenameLastExtension(OutputFibers.c_str()) );
+    if (fileExtension == ".vtk")
+      {
+        vtkNew<vtkPolyDataWriter> writer;
+        writer->SetFileName(OutputFibers.c_str());
+        writer->SetFileTypeToBinary();
         writer->SetInputData(outFibers.GetPointer());
         writer->Write();
+      }
+    else
+      {
+      if (fileExtension != ".vtp")
+        {
+        cerr << "Extension not recognize, saving the information in VTP format" << endl;
         }
+      vtkNew<vtkXMLPolyDataWriter> writer;
+      writer->SetFileName(OutputFibers.c_str() );
+      writer->SetInputData(outFibers.GetPointer());
+      writer->Write();
       }
   }
   catch( ... )
