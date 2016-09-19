@@ -242,7 +242,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label_10">
             <property name="text">
-             <string>Fiducial Region Size</string>
+             <string>Fiducial Region Size (mm)</string>
             </property>
            </widget>
           </item>
@@ -256,9 +256,6 @@
             </property>
             <property name="value" stdset="0">
              <double>2.500000000000000</double>
-            </property>
-            <property name="suffix" stdset="0">
-             <string>mm</string>
             </property>
            </widget>
           </item>
@@ -282,9 +279,6 @@
             </property>
             <property name="value" stdset="0">
              <double>1.000000000000000</double>
-            </property>
-            <property name="suffix" stdset="0">
-             <string>mm</string>
             </property>
            </widget>
           </item>
@@ -370,7 +364,7 @@
           <item row="2" column="0">
            <widget class="QLabel" name="SeedSpacingLevel">
             <property name="text">
-             <string>Seed Spacing</string>
+             <string>Seed Spacing (mm)</string>
             </property>
            </widget>
           </item>
@@ -387,9 +381,6 @@
             </property>
             <property name="value" stdset="0">
              <double>2.000000000000000</double>
-            </property>
-            <property name="suffix" stdset="0">
-             <string/>
             </property>
            </widget>
           </item>
@@ -523,7 +514,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_9">
         <property name="text">
-         <string>Minimum Length</string>
+         <string>Minimum Length (mm)</string>
         </property>
        </widget>
       </item>
@@ -538,9 +529,6 @@
         <property name="value" stdset="0">
          <double>10.000000000000000</double>
         </property>
-        <property name="suffix" stdset="0">
-         <string>mm</string>
-        </property>
         <property name="quantity" stdset="0">
          <string>length</string>
         </property>
@@ -549,7 +537,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="MaximumPathSpinBoxLabel">
         <property name="text">
-         <string>Maximum Length</string>
+         <string>Maximum Length (mm)</string>
         </property>
        </widget>
       </item>
@@ -563,9 +551,6 @@
         </property>
         <property name="value" stdset="0">
          <double>800.000000000000000</double>
-        </property>
-        <property name="suffix" stdset="0">
-         <string>mm</string>
         </property>
         <property name="quantity" stdset="0">
          <string>length</string>
@@ -642,7 +627,7 @@
       <item row="5" column="0">
        <widget class="QLabel" name="label_8">
         <property name="text">
-         <string>Integration Step Length</string>
+         <string>Integration Step Length (mm)</string>
         </property>
        </widget>
       </item>
@@ -659,9 +644,6 @@
         </property>
         <property name="value" stdset="0">
          <double>0.500000000000000</double>
-        </property>
-        <property name="suffix" stdset="0">
-         <string>mm</string>
         </property>
         <property name="quantity" stdset="0">
          <string>length</string>
