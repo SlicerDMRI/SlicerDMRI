@@ -36,6 +36,15 @@ if(${EXTENSION_NAME}_SUPERBUILD)
 endif()
 
 #-----------------------------------------------------------------------------
+# Set variables for testing local build, if not defined
+if (NOT DEFINED TEMP)
+  set(TEMP "${CMAKE_BINARY_DIR}/Testing/Temporary")
+endif()
+if (NOT DEFINED MRML_TEST_DATA)
+  set(MRML_TEST_DATA "${Slicer_CMAKE_DIR}/../Libs/MRML/Core/Testing/TestData")
+endif()
+
+#-----------------------------------------------------------------------------
 # Extension modules
 add_subdirectory("Modules/Loadable/TractographyDisplay")
 add_subdirectory("Modules/Loadable/TractographyInteractiveSeeding")

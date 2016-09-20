@@ -11,8 +11,6 @@ set_target_properties(${CLP}Test PROPERTIES LABELS ${CLP})
 set_target_properties(${CLP}Test PROPERTIES FOLDER ${${CLP}_TARGETS_FOLDER})
 
 #-----------------------------------------------------------------------------
-set(MRML_TEST_DATA "${Slicer_CMAKE_DIR}/../Libs/MRML/Core/Testing/TestData") # TODO fix hack
-set(TEMP "${CMAKE_BINARY_DIR}/Testing/Temporary")
 get_filename_component(BASELINE ${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline ABSOLUTE)
 
 #-----------------------------------------------------------------------------
