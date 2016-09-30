@@ -1,4 +1,4 @@
-project(vtkTeem)
+project(vtkDMRI)
 
 #-----------------------------------------------------------------------------
 cmake_minimum_required(VERSION 2.8.4)
@@ -16,12 +16,6 @@ endif()
 # --------------------------------------------------------------------------
 
 #
-# VTK
-#
-#find_package(VTK REQUIRED)
-#include(${VTK_USE_FILE})
-
-#
 # Teem
 #
 find_package(Teem REQUIRED NO_MODULE)
@@ -32,47 +26,17 @@ if(${Teem_VERSION_MAJOR}.${Teem_VERSION_MINOR}.${Teem_VERSION_PATCH} VERSION_LES
 endif()
 include(${Teem_USE_FILE})
 
-# XXX Teem 1.11.0 or Teem >= 4168 - This variable won't be needed anymore.
-#     See http://sourceforge.net/p/teem/code/4168/
-set(Teem_LIBRARIES teem)
-
-# --------------------------------------------------------------------------
-# Configure headers
-# --------------------------------------------------------------------------
-set(configure_header_file vtkTeemConfigure.h)
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/${configure_header_file}.in
-  ${CMAKE_CURRENT_BINARY_DIR}/${configure_header_file}
-  )
-
-# --------------------------------------------------------------------------
-# Install headers
-# --------------------------------------------------------------------------
-if(NOT DEFINED ${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT)
-  set(${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT ON)
-endif()
-if(NOT ${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT)
-  file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.(h|txx)")
-  install(
-    FILES ${headers} ${CMAKE_CURRENT_BINARY_DIR}/${configure_header_file}
-    DESTINATION include/${PROJECT_NAME} COMPONENT Development)
-endif()
-
 # --------------------------------------------------------------------------
 # Sources
 # --------------------------------------------------------------------------
 set(vtkTeem_SRCS
-  vtkDiffusionTensorMathematics.cxx
   vtkTeemEstimateDiffusionTensor.cxx
-  vtkDiffusionTensorGlyph.cxx
   vtkPolyDataTensorToColor.cxx
   vtkPolyDataColorLinesByOrientation.cxx
   vtkBSplineInterpolateImageFunction.cxx
   vtkHyperPointandArray.cxx
   vtkHyperStreamlineDTMRI.cxx
   vtkHyperStreamlineTeem.cxx
-  vtkNRRDReader.cxx
-  vtkNRRDWriter.cxx
   vtkPreciseHyperStreamline.cxx
   vtkPreciseHyperStreamlinePoints.cxx
   vtkSeedTracts.cxx
@@ -84,10 +48,6 @@ set(vtkTeem_SRCS
   )
 
 # Abstract/pure virtual classes
-
-#set_source_files_properties(
-#  ABSTRACT
-#  )
 
 # Helper classes
 
@@ -112,10 +72,6 @@ set(lib_name ${PROJECT_NAME})
 
 set(srcs ${vtkTeem_SRCS})
 add_library(${lib_name} ${srcs})
-
-# Teem vtkNRRDReader overwrites VTK vtkNrrdReader
-set(VTK_WRAP_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${VTK_INCLUDE_DIRS}
-    CACHE INTERNAL "VTK wrap include dirs" FORCE)
 
 set(libs
   ${Teem_LIBRARIES}
@@ -195,11 +151,3 @@ endif()
 # --------------------------------------------------------------------------
 set(${PROJECT_NAME}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
   CACHE INTERNAL "${PROJECT_NAME} include dirs" FORCE)
-
-# --------------------------------------------------------------------------
-# Configure support file
-# --------------------------------------------------------------------------
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkTeemConfig.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/vtkTeemConfig.cmake
-  )
