@@ -13,6 +13,7 @@ set(MODULE_EXPORT_DIRECTIVE "Q_SLICER_QTMODULES_${MODULE_NAME_UPPER}_EXPORT")
 
 # Additional includes - Current_{source,binary} and Slicer_{Libs,Base} already included
 set(MODULE_INCLUDE_DIRECTORIES
+  ${vtkDMRI_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/Logic
   ${CMAKE_CURRENT_BINARY_DIR}/Logic
   )
@@ -34,6 +35,7 @@ set(MODULE_UI_SRCS
   )
 
 set(MODULE_TARGET_LIBRARIES
+  vtkDMRI
   vtkSlicer${MODULE_NAME}ModuleLogic
   vtkSlicerAnnotationsModuleMRML
   )

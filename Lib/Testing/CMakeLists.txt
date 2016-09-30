@@ -1,4 +1,4 @@
-set(KIT vtkTeem)
+set(KIT vtkDMRI)
 
 create_test_sourcelist(Tests ${KIT}CxxTests.cxx
   vtkDiffusionTensorMathematicsTest1.cxx

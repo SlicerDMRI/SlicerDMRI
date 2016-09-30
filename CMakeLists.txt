@@ -45,6 +45,9 @@ if (NOT DEFINED MRML_TEST_DATA)
 endif()
 
 #-----------------------------------------------------------------------------
+# Common library
+add_subdirectory("Lib")
+
 # Extension modules
 add_subdirectory("Modules/Loadable/TractographyDisplay")
 add_subdirectory("Modules/Loadable/TractographyInteractiveSeeding")

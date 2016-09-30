@@ -19,17 +19,12 @@ endif()
 # Teem
 #
 find_package(Teem REQUIRED NO_MODULE)
-# XXX Since no TeemConfigVersion.cmake is configured, let's check the version explicitly
-if(${Teem_VERSION_MAJOR}.${Teem_VERSION_MINOR}.${Teem_VERSION_PATCH} VERSION_LESS 1.10)
-  message(FATAL_ERROR
-    "Could not find a configuration file for package \"Teem\" that is compatible with requested version \"1.10\".")
-endif()
 include(${Teem_USE_FILE})
 
 # --------------------------------------------------------------------------
 # Sources
 # --------------------------------------------------------------------------
-set(vtkTeem_SRCS
+set(vtkDMRI_SRCS
   vtkTeemEstimateDiffusionTensor.cxx
   vtkPolyDataTensorToColor.cxx
   vtkPolyDataColorLinesByOrientation.cxx
@@ -63,17 +58,19 @@ set(include_dirs
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
   )
-include_directories(BEFORE ${include_dirs})
+include_directories(BEFORE ${include_dirs} ${vtkTeem_INCLUDE_DIRS})
 
 # --------------------------------------------------------------------------
 # Build library
 # --------------------------------------------------------------------------
 set(lib_name ${PROJECT_NAME})
 
-set(srcs ${vtkTeem_SRCS})
+set(srcs ${vtkDMRI_SRCS})
+
 add_library(${lib_name} ${srcs})
 
 set(libs
+  vtkTeem
   ${Teem_LIBRARIES}
   ${VTK_LIBRARIES}
   )
@@ -126,7 +123,7 @@ if(VTK_WRAP_PYTHON)
 
   vtkMacroKitPythonWrap(
     KIT_NAME ${lib_name}
-    KIT_SRCS ${vtkTeem_SRCS}
+    KIT_SRCS ${vtkDMRI_SRCS}
     KIT_INSTALL_BIN_DIR ${${PROJECT_NAME}_INSTALL_BIN_DIR}
     KIT_INSTALL_LIB_DIR ${${PROJECT_NAME}_INSTALL_LIB_DIR}
     )
