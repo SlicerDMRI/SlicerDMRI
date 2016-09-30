@@ -7,7 +7,7 @@ set(${KIT}_EXPORT_DIRECTIVE "VTK_SLICER_${MODULE_NAME_UPPER}_MODULE_MRML_EXPORT"
 set(${KIT}_INCLUDE_DIRECTORIES
   )
 
-list(APPEND ${KIT}_INCLUDE_DIRECTORIES ${vtkTeem_INCLUDE_DIRS})
+list(APPEND ${KIT}_INCLUDE_DIRECTORIES ${vtkTeem_INCLUDE_DIRS} ${vtkDMRI_INCLUDE_DIRS})
 
 set(${KIT}_SRCS
   vtkMRMLFiberBundleDisplayNode.cxx
@@ -24,10 +24,8 @@ set(${KIT}_SRCS
   vtkMRMLFiberBundleTubeDisplayNode.h
   )
 
-#find_package(VTK REQUIRED)
-#include(${VTK_USE_FILE})
-
 set(${KIT}_TARGET_LIBRARIES
+  vtkDMRI
   ${MRML_LIBRARIES}
   ${VTK_LIBRARIES}
    vtkSlicerAnnotationsModuleMRML

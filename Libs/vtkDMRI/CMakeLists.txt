@@ -1,4 +1,4 @@
-project(vtkTeem)
+project(vtkDMRI)
 
 #-----------------------------------------------------------------------------
 cmake_minimum_required(VERSION 2.8.4)
@@ -19,43 +19,12 @@ endif()
 # Teem
 #
 find_package(Teem REQUIRED NO_MODULE)
-# XXX Since no TeemConfigVersion.cmake is configured, let's check the version explicitly
-if(${Teem_VERSION_MAJOR}.${Teem_VERSION_MINOR}.${Teem_VERSION_PATCH} VERSION_LESS 1.10)
-  message(FATAL_ERROR
-    "Could not find a configuration file for package \"Teem\" that is compatible with requested version \"1.10\".")
-endif()
 include(${Teem_USE_FILE})
-
-# XXX Teem 1.11.0 or Teem >= 4168 - This variable won't be needed anymore.
-#     See http://sourceforge.net/p/teem/code/4168/
-set(Teem_LIBRARIES teem)
-
-# --------------------------------------------------------------------------
-# Configure headers
-# --------------------------------------------------------------------------
-set(configure_header_file vtkTeemConfigure.h)
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/${configure_header_file}.in
-  ${CMAKE_CURRENT_BINARY_DIR}/${configure_header_file}
-  )
-
-# --------------------------------------------------------------------------
-# Install headers
-# --------------------------------------------------------------------------
-if(NOT DEFINED ${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT)
-  set(${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT ON)
-endif()
-if(NOT ${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT)
-  file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.(h|txx)")
-  install(
-    FILES ${headers} ${CMAKE_CURRENT_BINARY_DIR}/${configure_header_file}
-    DESTINATION include/${PROJECT_NAME} COMPONENT Development)
-endif()
 
 # --------------------------------------------------------------------------
 # Sources
 # --------------------------------------------------------------------------
-set(vtkTeem_SRCS
+set(vtkDMRI_SRCS
   vtkTeemEstimateDiffusionTensor.cxx
   vtkPolyDataTensorToColor.cxx
   vtkPolyDataColorLinesByOrientation.cxx
@@ -73,12 +42,12 @@ set(vtkTeem_SRCS
   )
 
 # Helper classes
-
 set_source_files_properties(
   vtkHyperPointandArray.cxx
   vtkTractographyPointAndArray.cxx
   WRAP_EXCLUDE
   )
+
 # --------------------------------------------------------------------------
 # Include dirs
 # --------------------------------------------------------------------------
@@ -86,21 +55,19 @@ set(include_dirs
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
   )
-include_directories(BEFORE ${include_dirs})
+include_directories(BEFORE ${include_dirs} ${vtkTeem_INCLUDE_DIRS})
 
 # --------------------------------------------------------------------------
 # Build library
 # --------------------------------------------------------------------------
 set(lib_name ${PROJECT_NAME})
 
-set(srcs ${vtkTeem_SRCS})
+set(srcs ${vtkDMRI_SRCS})
+
 add_library(${lib_name} ${srcs})
 
-# Teem vtkNRRDReader overwrites VTK vtkNrrdReader
-set(VTK_WRAP_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${VTK_INCLUDE_DIRS}
-    CACHE INTERNAL "VTK wrap include dirs" FORCE)
-
 set(libs
+  vtkTeem
   ${Teem_LIBRARIES}
   ${VTK_LIBRARIES}
   )
@@ -153,7 +120,7 @@ if(VTK_WRAP_PYTHON)
 
   vtkMacroKitPythonWrap(
     KIT_NAME ${lib_name}
-    KIT_SRCS ${vtkTeem_SRCS}
+    KIT_SRCS ${vtkDMRI_SRCS}
     KIT_INSTALL_BIN_DIR ${${PROJECT_NAME}_INSTALL_BIN_DIR}
     KIT_INSTALL_LIB_DIR ${${PROJECT_NAME}_INSTALL_LIB_DIR}
     )
@@ -167,22 +134,7 @@ if(VTK_WRAP_PYTHON)
 endif()
 
 # --------------------------------------------------------------------------
-# Testing (requires some of the examples)
-# --------------------------------------------------------------------------
-if(BUILD_TESTING)
-  add_subdirectory(Testing)
-endif()
-
-# --------------------------------------------------------------------------
 # Set INCLUDE_DIRS variable
 # --------------------------------------------------------------------------
 set(${PROJECT_NAME}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
   CACHE INTERNAL "${PROJECT_NAME} include dirs" FORCE)
-
-# --------------------------------------------------------------------------
-# Configure support file
-# --------------------------------------------------------------------------
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkTeemConfig.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/vtkTeemConfig.cmake
-  )

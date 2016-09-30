@@ -11,6 +11,8 @@
 // vtkTeem includes
 #include <vtkNRRDReader.h>
 #include <vtkNRRDWriter.h>
+
+// vtkDMRI includes
 #include <vtkTeemEstimateDiffusionTensor.h>
 #include <vtkTensorMask.h>
 
