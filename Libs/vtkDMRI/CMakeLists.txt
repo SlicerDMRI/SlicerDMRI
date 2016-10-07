@@ -16,12 +16,6 @@ endif()
 # --------------------------------------------------------------------------
 
 #
-# VTK
-#
-#find_package(VTK REQUIRED)
-#include(${VTK_USE_FILE})
-
-#
 # Teem
 #
 find_package(Teem REQUIRED NO_MODULE)
@@ -62,17 +56,13 @@ endif()
 # Sources
 # --------------------------------------------------------------------------
 set(vtkTeem_SRCS
-  vtkDiffusionTensorMathematics.cxx
   vtkTeemEstimateDiffusionTensor.cxx
-  vtkDiffusionTensorGlyph.cxx
   vtkPolyDataTensorToColor.cxx
   vtkPolyDataColorLinesByOrientation.cxx
   vtkBSplineInterpolateImageFunction.cxx
   vtkHyperPointandArray.cxx
   vtkHyperStreamlineDTMRI.cxx
   vtkHyperStreamlineTeem.cxx
-  vtkNRRDReader.cxx
-  vtkNRRDWriter.cxx
   vtkPreciseHyperStreamline.cxx
   vtkPreciseHyperStreamlinePoints.cxx
   vtkSeedTracts.cxx
@@ -80,14 +70,7 @@ set(vtkTeem_SRCS
   vtkTractographyPointAndArray.cxx
   vtkTensorMask.cxx
   vtkTensorRotate.cxx
-  vtkImageLabelCombine.cxx
   )
-
-# Abstract/pure virtual classes
-
-#set_source_files_properties(
-#  ABSTRACT
-#  )
 
 # Helper classes
 
