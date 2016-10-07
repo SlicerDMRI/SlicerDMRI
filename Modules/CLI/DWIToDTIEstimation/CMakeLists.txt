@@ -15,7 +15,7 @@ include(${SlicerExecutionModel_USE_FILE})
 
 #-----------------------------------------------------------------------------
 set(${MODULE_NAME}_TARGET_LIBRARIES
-  # ${VTK_LIBRARIES} # Not needed: All dependencies are transitively satisfied by other targets
+  vtkDMRI
   vtkTeem
   MRMLCore
   )
@@ -26,6 +26,7 @@ SEMMacroBuildCLI(
   LOGO_HEADER ${Slicer_SOURCE_DIR}/Resources/ITKLogo.h
   TARGET_LIBRARIES ${${MODULE_NAME}_TARGET_LIBRARIES}
   INCLUDE_DIRECTORIES
+    ${vtkDMRI_INCLUDE_DIRS}
     ${vtkITK_INCLUDE_DIRS}
     ${vtkTeem_INCLUDE_DIRS}
     ${MRMLCore_INCLUDE_DIRS}

@@ -1,5 +1,7 @@
-// Slicer includes
+// SEM CLI generated header
 #include "TractographyLabelMapSeedingCLP.h"
+
+// vtkDMRI includes
 #include "vtkDiffusionTensorMathematics.h"
 #include "vtkSeedTracts.h"
 
