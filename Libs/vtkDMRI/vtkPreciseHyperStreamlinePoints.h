@@ -17,12 +17,12 @@
 
 #include <vtkVersion.h>
 
-#include "vtkTeemConfigure.h"
+#include "vtkDMRIConfigure.h"
 
 #include "vtkPreciseHyperStreamline.h"
 #include "vtkPoints.h"
 
-class VTK_Teem_EXPORT vtkPreciseHyperStreamlinePoints : public vtkPreciseHyperStreamline
+class vtkDMRI_EXPORT vtkPreciseHyperStreamlinePoints : public vtkPreciseHyperStreamline
 {
 public:
   static vtkPreciseHyperStreamlinePoints *New();

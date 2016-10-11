@@ -15,7 +15,7 @@
 #ifndef __vtkHyperStreamlineDTMRI_h
 #define __vtkHyperStreamlineDTMRI_h
 
-#include "vtkTeemConfigure.h"
+#include "vtkDMRIConfigure.h"
 #include "vtkHyperStreamline.h"
 #include "vtkDiffusionTensorMathematics.h" /// for VTK_TENS_FRACTIONAL_ANISOTROPY
 #include "vtkTractographyPointAndArray.h"
@@ -42,7 +42,7 @@
 ///
 /// \sa vtkTensorGlyph
 /// \sa vtkStreamer
-class VTK_Teem_EXPORT vtkHyperStreamlineDTMRI : public vtkHyperStreamline
+class vtkDMRI_EXPORT vtkHyperStreamlineDTMRI : public vtkHyperStreamline
 {
 public:
   vtkTypeMacro(vtkHyperStreamlineDTMRI,vtkHyperStreamline);

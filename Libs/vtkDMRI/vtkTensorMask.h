@@ -18,7 +18,7 @@
 #include "vtkObject.h"
 #include "vtkObjectFactory.h"
 
-#include "vtkTeemConfigure.h"
+#include "vtkDMRIConfigure.h"
 
 #include "vtkImageMask.h"
 #include "vtkThreadedImageAlgorithm.h"
@@ -34,7 +34,7 @@
 /// The two inputs should have the same "WholeExtent".
 /// The mask input should be unsigned char, and the image scalar type
 /// is the same as the output scalar type.
-class VTK_Teem_EXPORT vtkTensorMask : public vtkImageMask
+class vtkDMRI_EXPORT vtkTensorMask : public vtkImageMask
 {
 public:
 

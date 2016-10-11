@@ -19,14 +19,14 @@
 #define VTK_INTEGRATE_MEDIUM_EIGENVECTOR 1
 #define VTK_INTEGRATE_MINOR_EIGENVECTOR  2
 
-#include "vtkTeemConfigure.h"
+#include "vtkDMRIConfigure.h"
 
 #include "vtkImplicitFunction.h"
 #include "vtkFunctionSet.h"
 #include "vtkImageData.h"
 
 /// \brief Wrapper class around itk::BSplineInterpolateImageFunction.
-class VTK_Teem_EXPORT vtkTensorImplicitFunctionToFunctionSet : public vtkFunctionSet
+class vtkDMRI_EXPORT vtkTensorImplicitFunctionToFunctionSet : public vtkFunctionSet
 {
 public:
   static vtkTensorImplicitFunctionToFunctionSet *New();

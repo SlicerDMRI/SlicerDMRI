@@ -15,7 +15,7 @@
 #ifndef __vtkImageSetTensorComponents_h
 #define __vtkImageSetTensorComponents_h
 
-#include "vtkTeemConfigure.h"
+#include "vtkDMRIConfigure.h"
 
 #include "vtkThreadedImageAlgorithm.h"
 

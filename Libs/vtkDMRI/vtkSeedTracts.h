@@ -18,7 +18,7 @@
 #include "vtkObject.h"
 #include "vtkObjectFactory.h"
 
-#include "vtkTeemConfigure.h"
+#include "vtkDMRIConfigure.h"
 
 #include "vtkImageData.h"
 #include <vtkAlgorithmOutput.h>
@@ -38,7 +38,7 @@
 
 /// Individual streamlines can be started at a point, or
 /// many can be started inside a region of interest.
-class VTK_Teem_EXPORT vtkSeedTracts : public vtkObject
+class vtkDMRI_EXPORT vtkSeedTracts : public vtkObject
 {
 public:
   static vtkSeedTracts *New();

@@ -15,7 +15,7 @@
 #ifndef __vtkImageGetTensorComponents_h
 #define __vtkImageGetTensorComponents_h
 
-#include "vtkTeemConfigure.h"
+#include "vtkDMRIConfigure.h"
 
 #include "vtkThreadedImageAlgorithm.h"
 
@@ -28,7 +28,7 @@
 /// 3 5 6
 ///
 /// \sa vtkImageSetTensorComponents
-class VTK_Teem_EXPORT vtkImageGetTensorComponents : public vtkThreadedImageAlgorithm
+class vtkDMRI_EXPORT vtkImageGetTensorComponents : public vtkThreadedImageAlgorithm
 {
 public:
   static vtkImageGetTensorComponents *New();

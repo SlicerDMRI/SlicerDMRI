@@ -14,7 +14,7 @@
 #ifndef __vtkHyperPointandArray_h
 #define __vtkHyperPointandArray_h
 
-#include "vtkTeemConfigure.h"
+#include "vtkDMRIConfigure.h"
 
 #include "vtkSystemIncludes.h"
 #include "vtkHyperStreamline.h"
@@ -25,7 +25,7 @@
 
 //
 /// Special classes for manipulating data
-class VTK_Teem_EXPORT vtkHyperPoint { //;prevent man page generation
+class vtkDMRI_EXPORT vtkHyperPoint { //;prevent man page generation
 public:
     vtkHyperPoint(); /// method sets up storage
     vtkHyperPoint &operator=(const vtkHyperPoint& hp); //for resizing
@@ -43,7 +43,7 @@ public:
     double   D;       /// distance travelled so far
 };
 
-class VTK_Teem_EXPORT vtkHyperArray { //;prevent man page generation
+class vtkDMRI_EXPORT vtkHyperArray { //;prevent man page generation
 public:
   vtkHyperArray();
   ~vtkHyperArray()

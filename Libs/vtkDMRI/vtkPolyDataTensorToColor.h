@@ -17,7 +17,7 @@
 #define __vtkPolyDataTensorToColor_h
 
 #include "vtkPolyDataAlgorithm.h"
-#include "vtkTeemConfigure.h"
+#include "vtkDMRIConfigure.h"
 
 #include "vtkTensorGlyph.h"
 
@@ -29,7 +29,7 @@
 /// 3) between a particular value. The output of the filter is polygonal data.
 ///
 /// \sa vtkThreshold
-class VTK_Teem_EXPORT vtkPolyDataTensorToColor : public vtkPolyDataAlgorithm
+class vtkDMRI_EXPORT vtkPolyDataTensorToColor : public vtkPolyDataAlgorithm
 {
 public:
   static vtkPolyDataTensorToColor *New();

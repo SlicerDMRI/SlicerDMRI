@@ -15,7 +15,7 @@
 #define __vtkPreciseHyperArray_h
 
 #include "vtkPreciseHyperPoint.h"
-class VTK_Teem_EXPORT vtkPreciseHyperArray { //;prevent man page generation
+class vtkDMRI_EXPORT vtkPreciseHyperArray { //;prevent man page generation
 public:
   vtkPreciseHyperArray();
   ~vtkPreciseHyperArray()

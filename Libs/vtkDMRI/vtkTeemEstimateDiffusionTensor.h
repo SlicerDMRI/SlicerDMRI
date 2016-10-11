@@ -15,7 +15,7 @@
 #ifndef __vtkTeemEstimateDiffusionTensor_h
 #define __vtkTeemEstimateDiffusionTensor_h
 
-#include "vtkTeemConfigure.h"
+#include "vtkDMRIConfigure.h"
 #include "vtkThreadedImageAlgorithm.h"
 #include "vtkDoubleArray.h"
 #include "vtkTransform.h"
@@ -28,7 +28,7 @@
 
 #include "teem/ten.h"
 
-class VTK_Teem_EXPORT vtkTeemEstimateDiffusionTensor : public vtkThreadedImageAlgorithm
+class vtkDMRI_EXPORT vtkTeemEstimateDiffusionTensor : public vtkThreadedImageAlgorithm
 {
  public:
   static vtkTeemEstimateDiffusionTensor *New();
