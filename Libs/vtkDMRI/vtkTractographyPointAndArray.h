@@ -17,14 +17,14 @@
 
 #include "vtkSystemIncludes.h"
 #include "vtkHyperStreamline.h"
-#include "vtkTeemConfigure.h"
+#include "vtkDMRIConfigure.h"
 
 /// copied directly from vtkTractographyStreamline.
 /// this class was defined in the vtkTractographyStreamline.cxx file.
 
 //
 /// Special classes for manipulating data
-class VTK_Teem_EXPORT vtkTractographyPoint { //;prevent man page generation
+class vtkDMRI_EXPORT vtkTractographyPoint { //;prevent man page generation
 public:
     vtkTractographyPoint(); /// method sets up storage
     vtkTractographyPoint &operator=(const vtkTractographyPoint& hp); //for resizing
@@ -46,7 +46,7 @@ public:
     double   T2[3];
 };
 
-class VTK_Teem_EXPORT vtkTractographyArray { //;prevent man page generation
+class vtkDMRI_EXPORT vtkTractographyArray { //;prevent man page generation
 public:
   vtkTractographyArray();
   ~vtkTractographyArray()

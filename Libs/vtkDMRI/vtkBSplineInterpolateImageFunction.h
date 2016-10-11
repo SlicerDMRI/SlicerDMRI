@@ -16,7 +16,7 @@
 #define __vtkBSplineInterpolateImageFunction_h
 
 #include "vtkImplicitFunction.h"
-#include "vtkTeemConfigure.h"
+#include "vtkDMRIConfigure.h"
 
 // STD includes
 #include <vector>  /// for the buffer
@@ -35,7 +35,7 @@ class vtkImageData;
 ///
 /// This class should be rewritten to properly take into account the ImageData. This is
 /// not a regular SetInput (not ref count). Also mtime of image is not taken into account...
-class  VTK_Teem_EXPORT vtkBSplineInterpolateImageFunction : public vtkImplicitFunction
+class  vtkDMRI_EXPORT vtkBSplineInterpolateImageFunction : public vtkImplicitFunction
 {
  public:
   static vtkBSplineInterpolateImageFunction *New();

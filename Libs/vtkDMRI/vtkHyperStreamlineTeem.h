@@ -1,7 +1,7 @@
 #ifndef __vtkHyperStreamlineTeem_h
 #define __vtkHyperStreamlineTeem_h
 
-#include "vtkTeemConfigure.h"
+#include "vtkDMRIConfigure.h"
 
 #include "vtkHyperStreamline.h"
 #include "vtkHyperStreamlineDTMRI.h"
@@ -16,7 +16,7 @@
 #include "teem/ten.h"
 #include "teem/nrrd.h"
 
-class VTK_Teem_EXPORT vtkHyperStreamlineTeem : public vtkHyperStreamlineDTMRI
+class vtkDMRI_EXPORT vtkHyperStreamlineTeem : public vtkHyperStreamlineDTMRI
 {
 
  public:

@@ -12,7 +12,7 @@
 
 =========================================================================auto=*/
 
-// vtkTeem includes
+// vtkDMRI includes
 #include "vtkSeedTracts.h"
 
 // VTK includes
@@ -510,7 +510,7 @@ void vtkSeedTracts::SeedStreamlinesInROI()
 
   // make sure we are creating objects with points
   this->UseVtkHyperStreamlinePoints();
- 
+
   double spacing[3];
 
   vtkImageData* inputTensorField = vtkImageData::SafeDownCast(this->InputTensorFieldConnection->GetProducer()->GetOutputDataObject(0));
@@ -1123,7 +1123,7 @@ void vtkSeedTracts::SeedStreamlinesFromROIIntersectWithROI2()
                             }
                           // transform model
                           transformer->SetInputConnection(newStreamline->GetOutputPort());
-                          
+
                           // Save the model to disk
                           writer->SetInputConnection(transformer->GetOutputPort());
                           writer->SetFileType(2);

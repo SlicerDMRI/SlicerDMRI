@@ -15,7 +15,7 @@
 #ifndef __vtkPreciseHyperStreamline_h
 #define __vtkPreciseHyperStreamline_h
 
-#include "vtkTeemConfigure.h"
+#include "vtkDMRIConfigure.h"
 
 #include "vtkPolyDataAlgorithm.h"
 #include "vtkInitialValueProblemSolver.h" /// to get the function set
@@ -61,7 +61,7 @@ class vtkPreciseHyperArray;
 ///
 /// \sa vtkTensorGlyph
 /// \sa vtkStreamer
-class VTK_Teem_EXPORT vtkPreciseHyperStreamline : public vtkPolyDataAlgorithm
+class vtkDMRI_EXPORT vtkPreciseHyperStreamline : public vtkPolyDataAlgorithm
 {
  public:
   vtkTypeMacro(vtkPreciseHyperStreamline,vtkPolyDataAlgorithm);

@@ -17,10 +17,10 @@
 #define __vtkPolyDataColorLinesByOrientation_h
 
 #include "vtkPolyDataAlgorithm.h"
-#include "vtkTeemConfigure.h"
+#include "vtkDMRIConfigure.h"
 
 /// \brief Colors the lines in the polydata by their mean orientation.
-class VTK_Teem_EXPORT vtkPolyDataColorLinesByOrientation : public vtkPolyDataAlgorithm
+class vtkDMRI_EXPORT vtkPolyDataColorLinesByOrientation : public vtkPolyDataAlgorithm
 {
 public:
   static vtkPolyDataColorLinesByOrientation *New();

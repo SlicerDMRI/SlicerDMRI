@@ -15,7 +15,7 @@
 #ifndef __vtkTensorRotate_h
 #define __vtkTensorRotate_h
 
-#include "vtkTeemConfigure.h"
+#include "vtkDMRIConfigure.h"
 #include "vtkThreadedImageAlgorithm.h"
 #include "vtkTransform.h"
 #include <vtkVersion.h>
@@ -29,7 +29,7 @@ class vtkImageData;
 ///
 /// \warning The filter will always output floating point (loose precision)
 /// explicit use of vtkFloatArray.
-class VTK_Teem_EXPORT vtkTensorRotate : public vtkThreadedImageAlgorithm
+class vtkDMRI_EXPORT vtkTensorRotate : public vtkThreadedImageAlgorithm
 {
 public:
   static vtkTensorRotate *New();
