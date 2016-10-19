@@ -36,7 +36,7 @@ set(MODULE_UI_SRCS
 
 set(MODULE_TARGET_LIBRARIES
   vtkDMRI
-  vtkSlicer${MODULE_NAME}ModuleLogic
+  vtkIntxSeedingLogic
   vtkSlicerAnnotationsModuleMRML
   )
 

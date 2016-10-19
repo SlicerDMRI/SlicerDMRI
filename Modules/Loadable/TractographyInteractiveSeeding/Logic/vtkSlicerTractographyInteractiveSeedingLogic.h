@@ -25,7 +25,7 @@
 #include <cstdlib>
 
 #include "vtkSlicerModuleLogic.h"
-#include "vtkSlicerTractographyInteractiveSeedingModuleLogicExport.h"
+#include "vtkIntxSeedingLogicExport.h"
 
 class vtkMRMLTractographyInteractiveSeedingNode;
 class vtkMRMLDiffusionTensorVolumeNode;
