@@ -22,7 +22,7 @@
 #define __vtkMRMLTractographyDisplayDisplayableManager_h
 
 // Tractography includes
-#include "vtkSlicerTractographyDisplayModuleMRMLDisplayableManagerExport.h"
+#include "vtkTractographyDisplayMRMLDMExport.h"
 
 class vtkMRMLFiberBundleDisplayNode;
 class vtkMRMLFiberBundleNode;

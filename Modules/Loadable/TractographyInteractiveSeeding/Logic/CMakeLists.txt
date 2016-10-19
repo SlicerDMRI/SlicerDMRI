@@ -1,4 +1,4 @@
-project(vtkSlicer${MODULE_NAME}ModuleLogic)
+project(vtkIntxSeedingLogic)
 
 set(KIT ${PROJECT_NAME})
 

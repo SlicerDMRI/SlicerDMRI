@@ -25,7 +25,7 @@
 #include <vtkMatrix4x4.h>
 #include <vtkTransform.h>
 
-#include "vtkSlicerTractographyInteractiveSeedingModuleLogicExport.h"
+#include "vtkIntxSeedingLogicExport.h"
 
 class vtkImageData;
 
