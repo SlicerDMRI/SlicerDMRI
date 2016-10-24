@@ -50,7 +50,7 @@ add_subdirectory("Libs/vtkDMRI")
 
 # Extension modules
 add_subdirectory("Modules/Loadable/TractographyDisplay")
-add_subdirectory("Modules/Loadable/TractographyInteractiveSeeding")
+add_subdirectory("Modules/Loadable/InteractiveSeeding")
 
 add_subdirectory("Modules/CLI/DWIToDTIEstimation")
 add_subdirectory("Modules/CLI/DiffusionWeightedVolumeMasking")
@@ -62,9 +62,7 @@ add_subdirectory("Modules/CLI/FiberBundleLabelSelect")
 add_subdirectory("Modules/Scripted/DICOM2FullBrainTractography")
 add_subdirectory("Modules/Scripted/FiberBundleToLabelMap")
 
-if (${SlicerDMRI_ENABLE_TRACTIO})
-  add_subdirectory("Modules/Loadable/TractIO")
-endif()
+add_subdirectory("Modules/Loadable/TractIO")
 
 #-----------------------------------------------------------------------------
 set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_BINARY_DIR};${EXTENSION_NAME};ALL;/")
