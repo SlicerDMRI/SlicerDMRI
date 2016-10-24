@@ -8,7 +8,7 @@ string(TOUPPER ${MODULE_NAME} MODULE_NAME_UPPER)
 
 #-----------------------------------------------------------------------------
 # DICOM Browser Tractography Plugin
-
+if(false)
     set(MODULE_PYTHON_SCRIPTS
       DICOMTractographyPlugin.py
     )
@@ -19,6 +19,7 @@ string(TOUPPER ${MODULE_NAME} MODULE_NAME_UPPER)
       SCRIPTS ${MODULE_PYTHON_SCRIPTS}
       RESOURCES ${MODULE_PYTHON_RESOURCES}
     )
+endif()
 
 #-----------------------------------------------------------------------------
 if(Slicer_BUILD_CLI_SUPPORT AND Slicer_BUILD_CLI)
