@@ -34,7 +34,7 @@ class vtkMRMLFiberBundleNode;
 #include <vector>
 
 /// \ingroup Slicer_QtModules_Tractography
-class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRMLDISPLAYABLEMANAGER_EXPORT vtkMRMLTractographyDisplayDisplayableManager
+class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRMLDM_EXPORT vtkMRMLTractographyDisplayDisplayableManager
   : public vtkMRMLAbstractThreeDViewDisplayableManager
 {
 public:
