@@ -135,7 +135,7 @@ extract_tracks(TrcTractographyResults *trackdataset)
   for (; iter != tracksets.end(); iter++)
     {
     vtkSmartPointer<vtkPolyData> track = trackset_to_vtk(*iter);
-    if (track.Get() == nullptr)
+    if (track.Get() == NULL)
       {
       std::cerr << "no track found" << std::endl;
       continue;
