@@ -13,7 +13,7 @@ find_package(DCMTK REQUIRED)
 #-----------------------------------------------------------------------------
 SEMMacroBuildCLI(
   NAME VTK_to_DICOMTract
-  LOGO_HEADER ${Slicer_SOURCE_DIR}/Resources/NAMICLogo.h
+  LOGO_HEADER ${Slicer_ACTUAL_SOURCE_DIR}/Resources/NAMICLogo.h
   TARGET_LIBRARIES
     ModuleDescriptionParser ${ITK_LIBRARIES} MRMLCore ${VTK_LIBRARIES}
   INCLUDE_DIRECTORIES
@@ -26,7 +26,7 @@ SEMMacroBuildCLI(
 #-----------------------------------------------------------------------------
 SEMMacroBuildCLI(
   NAME DICOMTract_to_VTK
-  LOGO_HEADER ${Slicer_SOURCE_DIR}/Resources/NAMICLogo.h
+  LOGO_HEADER ${Slicer_ACTUAL_SOURCE_DIR}/Resources/NAMICLogo.h
   TARGET_LIBRARIES
     ModuleDescriptionParser ${ITK_LIBRARIES} MRMLCore ${VTK_LIBRARIES}
   INCLUDE_DIRECTORIES

@@ -26,6 +26,10 @@ include(${Slicer_USE_FILE})
 if(NOT ${Slicer_USE_vtkTeem})
   message(FATAL_ERROR "SlicerDMRI requires Slicer_USE_vtkTeem")
 endif()
+
+get_filename_component(Slicer_ACTUAL_SOURCE_DIR "${Slicer_CMAKE_DIR}/../"
+                       ABSOLUTE CACHE)
+
 #-----------------------------------------------------------------------------
 # SuperBuild setup
 option(${EXTENSION_NAME}_SUPERBUILD "Build ${EXTENSION_NAME} and the projects it depends on." ON)
@@ -62,7 +66,9 @@ add_subdirectory("Modules/CLI/FiberBundleLabelSelect")
 add_subdirectory("Modules/Scripted/DICOM2FullBrainTractography")
 add_subdirectory("Modules/Scripted/FiberBundleToLabelMap")
 
-add_subdirectory("Modules/Loadable/TractIO")
+if (${SlicerDMRI_ENABLE_TRACTIO})
+  add_subdirectory("Modules/Loadable/TractIO")
+endif()
 
 #-----------------------------------------------------------------------------
 set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_BINARY_DIR};${EXTENSION_NAME};ALL;/")

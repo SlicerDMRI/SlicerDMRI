@@ -13,7 +13,7 @@ include(${SlicerExecutionModel_USE_FILE})
 #-----------------------------------------------------------------------------
 SEMMacroBuildCLI(
   NAME ${MODULE_NAME}
-  LOGO_HEADER ${Slicer_SOURCE_DIR}/Resources/ITKLogo.h
+  LOGO_HEADER ${Slicer_ACTUAL_SOURCE_DIR}/Resources/ITKLogo.h
   TARGET_LIBRARIES vtkDMRI vtkTeem SlicerBaseLogic ${VTK_LIBRARIES}
   INCLUDE_DIRECTORIES
     ${vtkDMRI_INCLUDE_DIRS}
