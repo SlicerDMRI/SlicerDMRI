@@ -126,17 +126,17 @@ public slots:
   /// Set use index space
   void setUseIndexSpace(int value);
 
-  /// Set use index space
-  void setWriteFibers(int value);
-
-  /// Set otput file directory
-  void setDirectory(const QString &value);
-
-  /// Set otput file prefix
-  void setFilePrefix(const QString &value);
-
   /// Update widget GUI from parameter node
   void updateWidgetFromMRML();
+
+  /// Apply one-shot update
+  void updateOnce();
+
+  /// Click interactive checkbox button
+  void clickEnableInteractiveSeeding();
+
+  /// Set interactive enable checkbox
+  void toggleEnableInteractiveSeeding(Qt::CheckState);
 
 protected:
 
