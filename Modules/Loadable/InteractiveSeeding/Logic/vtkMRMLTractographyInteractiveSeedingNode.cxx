@@ -44,7 +44,7 @@ vtkMRMLTractographyInteractiveSeedingNode::vtkMRMLTractographyInteractiveSeeding
    this->SeedSelectedFiducials = 0;
    this->ROILabels = 0;
    this->RandomGrid = 0;
-   this->UseIndexSpace = 0;
+   this->UseIndexSpace = 1;
    this->SeedSpacing = 2.0;
    this->DisplayMode = 1;
    this->EnableSeeding = 1;
