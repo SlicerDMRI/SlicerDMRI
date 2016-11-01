@@ -144,13 +144,14 @@
   </parameters>
 
   <parameters advanced="true">
+    <label>Advanced</label>
     <boolean>
       <name>UseIndexSpace</name>
       <label>Use Index Space</label>
       <flag>-x</flag>
       <longflag>--useindexspace</longflag>
       <description><![CDATA[Seed at IJK voxel grid]]></description>
-      <default>false</default>
+      <default>true</default>
     </boolean>
 
     <double>
