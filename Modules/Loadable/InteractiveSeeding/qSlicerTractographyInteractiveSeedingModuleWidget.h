@@ -108,8 +108,8 @@ public slots:
   /// Set max number of seeds
   void setMaxNumberSeeds(int value);
 
-  /// Set linear measure start threshold
-  void setLinearMeasureStart(double value);
+  /// Set [ThresholdMode] start threshold
+  void setStartThreshold(double value);
 
   /// Set RPO label from Qt widgjet
   void setROILabels();

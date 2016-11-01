@@ -68,19 +68,19 @@ public:
 
   ///
   /// Type of anisotropy used to stop tractography.
-  vtkGetMacro(StoppingMode,int);
-  vtkSetMacro(StoppingMode,int);
-  void SetStoppingModeToFractionalAnisotropy()
-    {this->SetStoppingMode(vtkDiffusionTensorMathematics::VTK_TENS_FRACTIONAL_ANISOTROPY);};
-  void SetStoppingModeToLinearMeasure()
-    {this->SetStoppingMode(vtkDiffusionTensorMathematics::VTK_TENS_LINEAR_MEASURE);};
-  void SetStoppingModeToPlanarMeasure()
-    {this->SetStoppingMode(vtkDiffusionTensorMathematics::VTK_TENS_PLANAR_MEASURE);};
-  void SetStoppingModeToSphericalMeasure()
-    {this->SetStoppingMode(vtkDiffusionTensorMathematics::VTK_TENS_SPHERICAL_MEASURE);};
+  vtkGetMacro(ThresholdMode,int);
+  vtkSetMacro(ThresholdMode,int);
+  void SetThresholdModeToFractionalAnisotropy()
+    {this->SetThresholdMode(vtkDiffusionTensorMathematics::VTK_TENS_FRACTIONAL_ANISOTROPY);};
+  void SetThresholdModeToLinearMeasure()
+    {this->SetThresholdMode(vtkDiffusionTensorMathematics::VTK_TENS_LINEAR_MEASURE);};
+  void SetThresholdModeToPlanarMeasure()
+    {this->SetThresholdMode(vtkDiffusionTensorMathematics::VTK_TENS_PLANAR_MEASURE);};
+  void SetThresholdModeToSphericalMeasure()
+    {this->SetThresholdMode(vtkDiffusionTensorMathematics::VTK_TENS_SPHERICAL_MEASURE);};
 
 
-  /// If StoppingMode criterion becomes smaller than this number,
+  /// If ThresholdMode criterion becomes smaller than this number,
   /// tracking stops.
   vtkGetMacro(StoppingThreshold,double);
   vtkSetMacro(StoppingThreshold,double);
@@ -111,7 +111,7 @@ protected:
   void BuildLinesForTwoTrajectories(vtkDataSet *input, vtkPolyData *output);
 
   double RadiusOfCurvature;
-  int StoppingMode;
+  int ThresholdMode;
   double StoppingThreshold;
 
   int OutputTensors;

@@ -31,7 +31,8 @@ vtkMRMLNodeNewMacro(vtkMRMLTractographyInteractiveSeedingNode);
 //----------------------------------------------------------------------------
 vtkMRMLTractographyInteractiveSeedingNode::vtkMRMLTractographyInteractiveSeedingNode()
 {
-   this->StoppingMode = 0; //FA
+   this->ThresholdMode = 0; //FA
+   this->StartThreshold = 0.3;
    this->StoppingValue = 0.25;
    this->StoppingCurvature = 0.7;
    this->IntegrationStep = 0.5;
@@ -44,7 +45,6 @@ vtkMRMLTractographyInteractiveSeedingNode::vtkMRMLTractographyInteractiveSeeding
    this->ROILabels = 0;
    this->RandomGrid = 0;
    this->UseIndexSpace = 0;
-   this->LinearMeasureStart = 0.3;
    this->SeedSpacing = 2.0;
    this->DisplayMode = 1;
    this->EnableSeeding = 1;
@@ -87,8 +87,8 @@ void vtkMRMLTractographyInteractiveSeedingNode::WriteXML(ostream& of, int nInden
   }
   {
     std::stringstream ss;
-    ss << this->StoppingMode;
-    of << indent << " StoppingMode=\"" << ss.str() << "\"";
+    ss << this->ThresholdMode;
+    of << indent << " ThresholdMode=\"" << ss.str() << "\"";
   }
   {
     std::stringstream ss;
@@ -146,7 +146,7 @@ void vtkMRMLTractographyInteractiveSeedingNode::WriteXML(ostream& of, int nInden
 
   {
     std::stringstream ss;
-    ss << this->LinearMeasureStart;
+    ss << this->StartThreshold;
     of << indent << " linearMeasureStart=\"" << ss.str() << "\"";
   }
 
@@ -220,11 +220,11 @@ void vtkMRMLTractographyInteractiveSeedingNode::ReadXMLAttributes(const char** a
       ss << attValue;
       ss >> this->StoppingValue;
       }
-    else if (!strcmp(attName, "StoppingMode"))
+    else if (!strcmp(attName, "ThresholdMode"))
       {
       std::stringstream ss;
       ss << attValue;
-      ss >> this->StoppingMode;
+      ss >> this->ThresholdMode;
       }
     else if (!strcmp(attName, "StoppingCurvature"))
       {
@@ -311,7 +311,7 @@ void vtkMRMLTractographyInteractiveSeedingNode::ReadXMLAttributes(const char** a
       {
       std::stringstream ss;
       ss << attValue;
-      ss >> this->LinearMeasureStart;
+      ss >> this->StartThreshold;
       }
     else if (!strcmp(attName, "seedSpacing"))
       {
@@ -386,7 +386,7 @@ void vtkMRMLTractographyInteractiveSeedingNode::Copy(vtkMRMLNode *anode)
   vtkMRMLTractographyInteractiveSeedingNode *node = (vtkMRMLTractographyInteractiveSeedingNode *) anode;
 
   this->SetStoppingValue(node->StoppingValue);
-  this->SetStoppingMode(node->StoppingMode);
+  this->SetThresholdMode(node->ThresholdMode);
   this->SetStoppingCurvature(node->StoppingCurvature);
   this->SetIntegrationStep(node->IntegrationStep);
   this->SetMinimumPathLength(node->MinimumPathLength);
@@ -398,7 +398,7 @@ void vtkMRMLTractographyInteractiveSeedingNode::Copy(vtkMRMLNode *anode)
   this->SetROILabels(node->ROILabels);
   this->SetRandomGrid(node->RandomGrid);
   this->SetUseIndexSpace(node->UseIndexSpace);
-  this->SetLinearMeasureStart(node->LinearMeasureStart);
+  this->SetStartThreshold(node->StartThreshold);
   this->SetSeedSpacing(node->SeedSpacing);
   this->SetDisplayMode(node->DisplayMode);
   this->SetEnableSeeding(node->EnableSeeding);
@@ -418,8 +418,9 @@ void vtkMRMLTractographyInteractiveSeedingNode::PrintSelf(ostream& os, vtkIndent
 
   vtkMRMLNode::PrintSelf(os,indent);
 
+  os << indent << "ThresholdMode:   " << this->ThresholdMode << "\n";
+  os << indent << "StartThreshold:   " << this->StartThreshold << "\n";
   os << indent << "StoppingValue:   " << this->StoppingValue << "\n";
-  os << indent << "StoppingMode:   " << this->StoppingMode << "\n";
   os << indent << "StoppingCurvature:   " << this->StoppingCurvature << "\n";
   os << indent << "IntegrationStep:   " << this->IntegrationStep << "\n";
   os << indent << "MinimumPathLength:   " << this->MinimumPathLength << "\n";
@@ -431,7 +432,6 @@ void vtkMRMLTractographyInteractiveSeedingNode::PrintSelf(ostream& os, vtkIndent
   os << indent << "ROILabels:   " << this->ROILabelsToString() << "\n";
   os << indent << "RandomGrid:   " << this->RandomGrid << "\n";
   os << indent << "UseIndexSpace:   " << this->UseIndexSpace << "\n";
-  os << indent << "LinearMeasureStart:   " << this->LinearMeasureStart << "\n";
   os << indent << "SeedSpacing:   " << this->SeedSpacing << "\n";
   os << indent << "DisplayMode:   " << this->DisplayMode << "\n";
   os << indent << "EnableSeeding:   " << this->EnableSeeding << "\n";

@@ -47,7 +47,7 @@ vtkHyperStreamlineDTMRI::vtkHyperStreamlineDTMRI()
 
   this->IntegrationEigenvector = VTK_INTEGRATE_MAJOR_EIGENVECTOR;
 
-  this->StoppingMode = vtkDiffusionTensorMathematics::VTK_TENS_LINEAR_MEASURE;
+  this->ThresholdMode = vtkDiffusionTensorMathematics::VTK_TENS_LINEAR_MEASURE;
   this->StoppingThreshold=0.15;
 
   this->OutputTensors = 0;
@@ -486,7 +486,7 @@ vtkPolyData *output = vtkPolyData::SafeDownCast(
         FixVectors(sPtr->V, sNext->V, iv, ix, iy);
 
         // compute invariants at final position
-        switch (this->GetStoppingMode()) {
+        switch (this->GetThresholdMode()) {
         case vtkDiffusionTensorMathematics::VTK_TENS_FRACTIONAL_ANISOTROPY:
             stop = vtkDiffusionTensorMathematics::FractionalAnisotropy(sNext->W);
             break;
