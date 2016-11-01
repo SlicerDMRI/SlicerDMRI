@@ -278,9 +278,9 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::setup()
                 SIGNAL(valueChanged(int)),
                 SLOT(setMaxNumberSeeds(int)));
 
-  QObject::connect(d->LinearMeasureStartSlider,
+  QObject::connect(d->StartThresholdSlider,
                 SIGNAL(valueChanged(double)),
-                SLOT(setLinearMeasureStart(double)));
+                SLOT(setStartThreshold(double)));
 
   QObject::connect(d->ROILabelInput,
                 SIGNAL(textChanged(const QString &)),
@@ -386,7 +386,7 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::setParametersPreset(int 
     }
   if (index == 0) //Slicer4 Interctive Seeding Defaults
     {
-     this->TractographyInteractiveSeedingNode->SetStoppingMode(0); //FA
+     this->TractographyInteractiveSeedingNode->SetThresholdMode(0); //FA
      this->TractographyInteractiveSeedingNode->SetStoppingValue(0.25);
      this->TractographyInteractiveSeedingNode->SetStoppingCurvature(0.7);
      this->TractographyInteractiveSeedingNode->SetIntegrationStep(0.5);
@@ -397,12 +397,12 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::setParametersPreset(int 
      this->TractographyInteractiveSeedingNode->SetMaxNumberOfSeeds(100);
      this->TractographyInteractiveSeedingNode->SetRandomGrid(0);
      this->TractographyInteractiveSeedingNode->SetUseIndexSpace(0);
-     this->TractographyInteractiveSeedingNode->SetLinearMeasureStart(0.3);
+     this->TractographyInteractiveSeedingNode->SetStartThreshold(0.3);
      this->TractographyInteractiveSeedingNode->SetSeedSpacing(2.0);
     }
   else if (index == 1) //Slicer3 Fiducial Seeding Defaults
     {
-     this->TractographyInteractiveSeedingNode->SetStoppingMode(1); //LM
+     this->TractographyInteractiveSeedingNode->SetThresholdMode(1); //LM
      this->TractographyInteractiveSeedingNode->SetStoppingValue(0.25);
      this->TractographyInteractiveSeedingNode->SetStoppingCurvature(0.7);
      this->TractographyInteractiveSeedingNode->SetIntegrationStep(0.5);
@@ -413,12 +413,12 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::setParametersPreset(int 
      this->TractographyInteractiveSeedingNode->SetMaxNumberOfSeeds(100);
      this->TractographyInteractiveSeedingNode->SetRandomGrid(0);
      this->TractographyInteractiveSeedingNode->SetUseIndexSpace(0);
-     this->TractographyInteractiveSeedingNode->SetLinearMeasureStart(0.3);
+     this->TractographyInteractiveSeedingNode->SetStartThreshold(0.3);
      this->TractographyInteractiveSeedingNode->SetSeedSpacing(2.0);
     }
   else if (index == 2) //Slicer3 Labelmap Seeding Defaults
     {
-     this->TractographyInteractiveSeedingNode->SetStoppingMode(1); // LM
+     this->TractographyInteractiveSeedingNode->SetThresholdMode(1); // LM
      this->TractographyInteractiveSeedingNode->SetStoppingValue(0.1);
      this->TractographyInteractiveSeedingNode->SetStoppingCurvature(0.8);
      this->TractographyInteractiveSeedingNode->SetIntegrationStep(0.5);
@@ -429,7 +429,7 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::setParametersPreset(int 
      this->TractographyInteractiveSeedingNode->SetMaxNumberOfSeeds(100);
      this->TractographyInteractiveSeedingNode->SetRandomGrid(0);
      this->TractographyInteractiveSeedingNode->SetUseIndexSpace(0);
-     this->TractographyInteractiveSeedingNode->SetLinearMeasureStart(0.3);
+     this->TractographyInteractiveSeedingNode->SetStartThreshold(0.3);
      this->TractographyInteractiveSeedingNode->SetSeedSpacing(2.0);
     }
   this->updateWidgetFromMRML();
@@ -629,13 +629,13 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::updateWidgetFromMRML()
     d->FiducialStepSpinBox->setValue(paramNode->GetSeedingRegionStep());
     d->SeedSelectedCheckBox->setChecked(paramNode->GetSeedSelectedFiducials()==1);
     d->StoppingCurvatureSpinBox->setValue(paramNode->GetStoppingCurvature());
-    d->StoppingCriteriaComboBox->setCurrentIndex(paramNode->GetStoppingMode());
+    d->StoppingCriteriaComboBox->setCurrentIndex(paramNode->GetThresholdMode());
     d->StoppingValueSpinBox->setValue(paramNode->GetStoppingValue());
     d->DisplayTracksComboBox->setCurrentIndex(paramNode->GetDisplayMode());
     d->ROILabelInput->setText(paramNode->ROILabelsToString().c_str());
     d->RandomGridCheckBox->setChecked(paramNode->GetRandomGrid());
     d->UseIndexSpaceCheckBox->setChecked(paramNode->GetUseIndexSpace());
-    d->LinearMeasureStartSlider->setValue(paramNode->GetLinearMeasureStart());
+    d->StartThresholdSlider->setValue(paramNode->GetStartThreshold());
     d->SeedSpacingSlider->setValue(paramNode->GetSeedSpacing());
 
     d->ParameterNodeSelector->setCurrentNode(
@@ -719,7 +719,7 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::setStoppingCriteria(int 
 {
   if (this->TractographyInteractiveSeedingNode)
     {
-    this->TractographyInteractiveSeedingNode->SetStoppingMode(value);
+    this->TractographyInteractiveSeedingNode->SetThresholdMode(value);
     }
 }
 //-----------------------------------------------------------------------------
@@ -798,11 +798,11 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::setRandomGrid(int value)
     }
 }
 //-----------------------------------------------------------------------------
-void qSlicerTractographyInteractiveSeedingModuleWidget::setLinearMeasureStart(double value)
+void qSlicerTractographyInteractiveSeedingModuleWidget::setStartThreshold(double value)
 {
   if (this->TractographyInteractiveSeedingNode)
     {
-    this->TractographyInteractiveSeedingNode->SetLinearMeasureStart(value);
+    this->TractographyInteractiveSeedingNode->SetStartThreshold(value);
     }
 }
 

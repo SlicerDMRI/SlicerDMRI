@@ -81,11 +81,11 @@
       </constraints>
     </double>
     <string-enumeration>
-      <name>StoppingMode</name>
+      <name>ThresholdMode</name>
       <label>Stopping Criteria</label>
-      <description><![CDATA[Tensor measurement used to stop the tractography]]></description>
+      <description><![CDATA[Tensor measurement used to start and stop the tractography]]></description>
       <flag>-f</flag>
-      <longflag>--stoppingmode</longflag>
+      <longflag>--thresholdmode</longflag>
       <default>FractionalAnisotropy</default>
       <element>LinearMeasure</element>
       <element>FractionalAnisotropy</element>

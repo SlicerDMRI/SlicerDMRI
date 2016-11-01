@@ -85,21 +85,21 @@ int main( int argc, char * argv[] )
     } else { // If the mask does not exist, create one
       math->SetInputConnection(reader->GetOutputPort());
 
-      if( StoppingMode == std::string("LinearMeasurement") || StoppingMode == std::string("LinearMeasure") )
+      if( ThresholdMode == std::string("LinearMeasurement") || ThresholdMode == std::string("LinearMeasure") )
         {
         math->SetOperationToLinearMeasure();
         }
-      else if( StoppingMode == std::string("PlanarMeasurement") || StoppingMode == std::string("PlanarMeasure") )
+      else if( ThresholdMode == std::string("PlanarMeasurement") || ThresholdMode == std::string("PlanarMeasure") )
         {
         math->SetOperationToPlanarMeasure();
         }
-      else if( StoppingMode == std::string("FractionalAnisotropy") )
+      else if( ThresholdMode == std::string("FractionalAnisotropy") )
         {
         math->SetOperationToFractionalAnisotropy();
         }
       else
         {
-        std::cerr << "Mode " << StoppingMode << " is not supported" << endl;
+        std::cerr << "Mode " << ThresholdMode << " is not supported" << endl;
         return EXIT_FAILURE;
         }
 
@@ -216,21 +216,21 @@ int main( int argc, char * argv[] )
     vtkNew<vtkHyperStreamlineDTMRI> streamer;
     seed->SetVtkHyperStreamlinePointsSettings(streamer.GetPointer());
 
-    if( StoppingMode == std::string("LinearMeasurement") || StoppingMode == std::string("LinearMeasure") )
+    if( ThresholdMode == std::string("LinearMeasurement") || ThresholdMode == std::string("LinearMeasure") )
       {
-      streamer->SetStoppingModeToLinearMeasure();
+      streamer->SetThresholdModeToLinearMeasure();
       }
-    else if( StoppingMode == std::string("PlanarMeasurement") || StoppingMode == std::string("PlanarMeasure") )
+    else if( ThresholdMode == std::string("PlanarMeasurement") || ThresholdMode == std::string("PlanarMeasure") )
       {
-      streamer->SetStoppingModeToPlanarMeasure();
+      streamer->SetThresholdModeToPlanarMeasure();
       }
-    else if( StoppingMode == std::string("FractionalAnisotropy") )
+    else if( ThresholdMode == std::string("FractionalAnisotropy") )
       {
-      streamer->SetStoppingModeToFractionalAnisotropy();
+      streamer->SetThresholdModeToFractionalAnisotropy();
       }
     else
       {
-      std::cerr << "Mode " << StoppingMode << " is not supported" << endl;
+      std::cerr << "Mode " << ThresholdMode << " is not supported" << endl;
       return EXIT_FAILURE;
       }
 

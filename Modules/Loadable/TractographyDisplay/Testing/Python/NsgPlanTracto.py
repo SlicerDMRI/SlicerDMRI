@@ -316,7 +316,7 @@ class NeurosurgicalPlanningTutorialTractographySelfTestLogic:
     parameters['UseIndexSpace'] = 1
     parameters['StoppingValue'] = 0.15
     parameters['ROIlabel'] = 293
-    parameters['StoppingMode'] = 'FractionalAnisotropy'
+    parameters['ThresholdMode'] = 'FractionalAnisotropy'
     # defaults
     # parameters['ClTh'] = 0.3
     # parameters['MinimumLength'] = 20

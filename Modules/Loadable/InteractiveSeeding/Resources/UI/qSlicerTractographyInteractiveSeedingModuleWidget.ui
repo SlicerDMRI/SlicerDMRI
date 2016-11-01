@@ -583,7 +583,7 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QLabel" name="LinearMeasureLabel">
+         <widget class="QLabel" name="StartThresholdLabel">
           <property name="toolTip">
            <string>Minimum starting value to begin seeding, based on &quot;Threshold Type&quot; selection in Tractography Parameters.</string>
           </property>
@@ -596,7 +596,7 @@
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="ctkSliderWidget" name="LinearMeasureStartSlider">
+         <widget class="ctkSliderWidget" name="StartThresholdSlider">
           <property name="toolTip">
            <string>Minimum starting value to begin seeding, based on &quot;Threshold Type&quot; selection in Tractography Parameters.</string>
           </property>
