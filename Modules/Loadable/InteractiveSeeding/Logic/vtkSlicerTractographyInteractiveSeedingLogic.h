@@ -97,6 +97,8 @@ public:
 
   int IsObservedNode(vtkMRMLNode *node);
 
+  void UpdateOnce();
+
 protected:
   vtkSlicerTractographyInteractiveSeedingLogic();
   ~vtkSlicerTractographyInteractiveSeedingLogic();

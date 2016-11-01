@@ -714,6 +714,20 @@ void vtkSlicerTractographyInteractiveSeedingLogic
 
   this->AddMRMLNodesObservers();
 
+  this->UpdateOnce();
+}
+
+//----------------------------------------------------------------------------
+void vtkSlicerTractographyInteractiveSeedingLogic
+::UpdateOnce()
+{
+  vtkMRMLTractographyInteractiveSeedingNode* snode = this->TractographyInteractiveSeedingNode;
+
+  if (snode == NULL)
+    {
+    return;
+    }
+
   vtkMRMLDiffusionTensorVolumeNode *volumeNode =
     vtkMRMLDiffusionTensorVolumeNode::SafeDownCast(
       this->GetMRMLScene()->GetNodeByID(snode->GetInputVolumeRef()));
