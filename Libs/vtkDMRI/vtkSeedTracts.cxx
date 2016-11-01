@@ -658,16 +658,7 @@ void vtkSeedTracts::SeedStreamlinesInROI()
                       // compute eigensystem
                       //vtkMath::Jacobi(m, w, v);
                       vtkDiffusionTensorMathematics::TeemEigenSolver(m,w,v);
-                      double cl = 0.0;
-                      if (this->VtkHyperStreamlinePointsSettings->GetThresholdMode() ==
-                          vtkDiffusionTensorMathematics::VTK_TENS_FRACTIONAL_ANISOTROPY)
-                        {
-                        cl = vtkDiffusionTensorMathematics::FractionalAnisotropy(w);
-                        }
-                      else // vtkDiffusionTensorMathematics::VTK_TENS_LINEAR_MEASURE
-                        {
-                        cl = vtkDiffusionTensorMathematics::LinearMeasure(w);
-                        }
+                      double cl = vtkDiffusionTensorMathematics::LinearMeasure(w);
                       if (cl < this->StartingThreshold)
                         {
                         continue;
