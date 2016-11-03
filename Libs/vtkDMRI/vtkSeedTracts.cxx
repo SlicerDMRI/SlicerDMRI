@@ -317,7 +317,7 @@ void vtkSeedTracts::UpdateHyperStreamlinePointsSettings( vtkHyperStreamlineDTMRI
   currHSP->SetStoppingThreshold(this->VtkHyperStreamlinePointsSettings->GetStoppingThreshold());
 
   // Stopping Mode
-  currHSP->SetStoppingMode(this->VtkHyperStreamlinePointsSettings->GetStoppingMode());
+  currHSP->SetThresholdMode(this->VtkHyperStreamlinePointsSettings->GetThresholdMode());
 
 
   // Eigenvector to integrate
@@ -355,7 +355,7 @@ void vtkSeedTracts::UpdateHyperStreamlineTeemSettings( vtkHyperStreamlineTeem *c
   currHST->SetStoppingThreshold(this->VtkHyperStreamlineTeemSettings->GetStoppingThreshold());
 
   // Stopping Mode
-  currHST->SetStoppingMode(this->VtkHyperStreamlineTeemSettings->GetStoppingMode());
+  currHST->SetThresholdMode(this->VtkHyperStreamlineTeemSettings->GetThresholdMode());
 
 
   // Eigenvector to integrate

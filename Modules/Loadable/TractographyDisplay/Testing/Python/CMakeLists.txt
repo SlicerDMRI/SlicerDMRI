@@ -14,7 +14,11 @@ set(UNITTEST_LIB_PATHS "--additional-module-paths;${CMAKE_BINARY_DIR}/${Slicer_Q
 slicer_add_python_unittest(SCRIPT NsgPlanTracto.py
                            SLICER_ARGS ${UNITTEST_LIB_PATHS})
 
-slicer_add_python_unittest(SCRIPT DTINotReproducibleIssue3977.py)
-slicer_add_python_unittest(SCRIPT fiber_visibility_crash2438.py)
-slicer_add_python_unittest(SCRIPT test_tractography_display.py)
-slicer_add_python_unittest(SCRIPT SlicerMRBTest.py)
+slicer_add_python_unittest(SCRIPT DTINotReproducibleIssue3977.py
+                           SLICER_ARGS ${UNITTEST_LIB_PATHS})
+slicer_add_python_unittest(SCRIPT fiber_visibility_crash2438.py
+                           SLICER_ARGS ${UNITTEST_LIB_PATHS})
+slicer_add_python_unittest(SCRIPT test_tractography_display.py
+                           SLICER_ARGS ${UNITTEST_LIB_PATHS})
+slicer_add_python_unittest(SCRIPT SlicerMRBTest.py
+                           SLICER_ARGS ${UNITTEST_LIB_PATHS})
