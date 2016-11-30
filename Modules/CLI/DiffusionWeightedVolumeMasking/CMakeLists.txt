@@ -26,6 +26,7 @@ SEMMacroBuildCLI(
   NAME ${MODULE_NAME}
   LOGO_HEADER ${Slicer_ACTUAL_SOURCE_DIR}/Resources/ITKLogo.h
   INCLUDE_DIRECTORIES
+    ${Slicer_ACTUAL_SOURCE_DIR}
     ${ITK_SOURCE_PATH}/Modules/Bridge/VTK/include
     ${ITK_SOURCE_PATH}/Modules/Bridge/VtkGlue/include
     ${vtkITK_INCLUDE_DIRS}

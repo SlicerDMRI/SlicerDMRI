@@ -1,3 +1,11 @@
+// VTK includes
+#include <vtkMath.h>
+#include <vtkNew.h>
+#include <vtkVersion.h>
+
+// vtkTeem includes
+#include <Libs/vtkTeem/vtkNRRDReader.h>
+#include <Libs/vtkTeem/vtkNRRDWriter.h>
 
 // DWIToDTIEstimation includes
 #include "DWIToDTIEstimationCLP.h"
@@ -8,18 +16,9 @@
 // vtkITK includes
 #include <vtkITKNewOtsuThresholdImageFilter.h>
 
-// vtkTeem includes
-#include <vtkNRRDReader.h>
-#include <vtkNRRDWriter.h>
-
 // vtkDMRI includes
 #include <vtkTeemEstimateDiffusionTensor.h>
 #include <vtkTensorMask.h>
-
-// VTK includes
-#include <vtkMath.h>
-#include <vtkNew.h>
-#include <vtkVersion.h>
 
 // ITK includes
 #include <itkFloatingPointExceptions.h>

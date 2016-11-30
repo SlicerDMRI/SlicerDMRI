@@ -16,6 +16,7 @@ SEMMacroBuildCLI(
   LOGO_HEADER ${Slicer_ACTUAL_SOURCE_DIR}/Resources/ITKLogo.h
   TARGET_LIBRARIES SlicerBaseLogic vtkTeem ${VTK_LIBRARIES}
   INCLUDE_DIRECTORIES
+    ${Slicer_ACTUAL_SOURCE_DIR}
     ${vtkITK_INCLUDE_DIRS}
     ${vtkTeem_INCLUDE_DIRS}
   )

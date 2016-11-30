@@ -2,9 +2,6 @@
 #-----------------------------------------------------------------------------
 set(MODULE_NAME DWIToDTIEstimation)
 
-# Avoid vtkNRRDReader/vtkNrrdReader filename confusion on case insensitive file systems
-include_directories(BEFORE ${vtkTeem_INCLUDE_DIRS})
-
 #-----------------------------------------------------------------------------
 
 #
