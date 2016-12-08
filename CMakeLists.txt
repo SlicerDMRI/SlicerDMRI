@@ -11,7 +11,7 @@ set(EXTENSION_CONTRIBUTORS "Isaiah Norton, Lauren O'Donnell (Brigham & Women's H
 set(EXTENSION_DESCRIPTION "SlicerDMRI is an umbrella extension for Slicer Diffusion MRI functionality.")
 set(EXTENSION_ICONURL "http://raw.githubusercontent.com/SlicerDMRI/slicerdmri.github.io/master/images/DMRI_3D_SLICER-icon.png")
 set(EXTENSION_SCREENSHOTURLS "https://www.slicer.org/slicerWiki/images/0/09/SlicerDMRIScreenshot.jpg")
-set(EXTENSION_DEPENDS "NA") # Specified as a space separated list or 'NA' if any
+set(EXTENSION_DEPENDS "UKFTractography") # Specified as a space separated list or 'NA' if any
 set(EXTENSION_BUILD_SUBDIRECTORY inner-build)
 
 set(SUPERBUILD_TOPLEVEL_PROJECT inner)
