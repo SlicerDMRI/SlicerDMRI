@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<executable>
+  <category>Diffusion.Import and Export</category>
+  <title>Tractography DICOM Save</title>
+  <index>1</index>
+  <description><![CDATA[<p>Utility for conversion of Slicer-style VTK tractography to DICOM TrackSet.</p>]]></description>
+  <version>1.0</version>
+  <documentation-url>http://wiki.slicer.org/slicerWiki/index.php/Documentation/Nightly/Modules/TractographyDICOMSave</documentation-url>
+  <license>3D Slicer Contribution and Software License Agreement</license>
+  <contributor>Isaiah Norton (BWH)</contributor>
+  <acknowledgements><![CDATA[This work is funded by the National Institutes of Health through the National Cancer Institute Information Technology for Cancer Research program, Grant CA199459]]></acknowledgements>
+
+  <parameters>
+    <label>IO</label>
+
+    <description><![CDATA[Input/output parameters]]></description>
+
+    <geometry type="fiberbundle">
+      <name>vtk_fiberbundle</name>
+      <label>Fiber Bundle</label>
+      <channel>input</channel>
+      <longflag>--vtk_fiberbundle</longflag>
+      <description><![CDATA[Input FiberBundle/VTK for conversion to DICOM TrackSet]]></description>
+    </geometry>
+
+    <file multiple="true">
+      <name>reference_dicom</name>
+      <label>Reference DICOM File</label>
+      <channel>input</channel>
+      <longflag>--reference_dicom</longflag>
+      <description><![CDATA[Reference diffusion-weighted DICOM Files to associate with TrackSet.]]></description>
+    </file>
+
+    <directory>
+      <name>output_directory</name>
+      <label>Output Directory</label>
+      <longflag>--output_dicom</longflag>
+      <description><![CDATA[Output DICOM TrackSet Directory]]></description>
+    </directory>
+
+    <string>
+      <name>output_filename</name>
+      <label>Output Filename</label>
+      <longflag>--output_filename</longflag>
+      <description><![CDATA[Output DICOM TrackSet File]]></description>
+      <default>track.dcm</default>
+    </string>
+
+  </parameters>
+
+  <parameters advanced="true">
+    <label>Advanced</label>
+
+    <boolean>
+      <name>ras_to_lps</name>
+      <label>RAS to LPS</label>
+      <default>true</default>
+      <longflag>ras_to_lps</longflag>
+      <description><![CDATA[Change coordinate system from RAS (Slicer) to LPS (DICOM) ]]></description>
+    </boolean>
+  </parameters>
+
+</executable>

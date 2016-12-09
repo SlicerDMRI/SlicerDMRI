@@ -8,6 +8,7 @@ set(CLP ${MODULE_NAME})
 include_directories(
   ${vtkITK_INCLUDE_DIRS}
   ${MRMLCore_INCLUDE_DIRS}
+  ${vtkDMRI_INCLUDE_DIRS}
   ${vtkTeem_INCLUDE_DIRS}
   )
 add_executable(${CLP}Test ${CLP}Test.cxx)

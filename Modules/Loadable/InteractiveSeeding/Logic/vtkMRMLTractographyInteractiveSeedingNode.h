@@ -25,7 +25,7 @@
 #include <vtkMatrix4x4.h>
 #include <vtkTransform.h>
 
-#include "vtkSlicerTractographyInteractiveSeedingModuleLogicExport.h"
+#include "vtkIntxSeedingLogicExport.h"
 
 class vtkImageData;
 
@@ -58,11 +58,11 @@ public:
   virtual const char* GetNodeTagName() {return "FiducialSeedingParameters";};
 
   // Description:
-  // Get/Set Stopping Mode (module parameter)
+  // Get/Set Threshold Mode (module parameter)
   // 0 - FA
   // 1 - Linear Measure
-  vtkGetMacro(StoppingMode, int);
-  vtkSetMacro(StoppingMode, int);
+  vtkGetMacro(ThresholdMode, int);
+  vtkSetMacro(ThresholdMode, int);
 
   // Description:
   // Get/Set Stopping Value (module parameter)
@@ -144,9 +144,9 @@ public:
   vtkSetMacro(UseIndexSpace, int);
 
   // Description
-  // Lable Map seeding Linear Measure start threshold.
-  vtkGetMacro(LinearMeasureStart,double);
-  vtkSetMacro(LinearMeasureStart,double);
+  // Lable Map seeding start threshold based on ThresholdMode
+  vtkGetMacro(StartThreshold,double);
+  vtkSetMacro(StartThreshold,double);
 
   // Description
   // Lable Map seeding seed spacing.
@@ -198,7 +198,7 @@ protected:
   vtkMRMLTractographyInteractiveSeedingNode(const vtkMRMLTractographyInteractiveSeedingNode&);
   void operator=(const vtkMRMLTractographyInteractiveSeedingNode&);
 
-  int StoppingMode;
+  int ThresholdMode;
   int DisplayMode;
 
   double StoppingValue;
@@ -215,7 +215,7 @@ protected:
   vtkIntArray *ROILabels;
   int RandomGrid;
   int UseIndexSpace;
-  double LinearMeasureStart;
+  double StartThreshold;
   double SeedSpacing;
 
   int WriteToFile;

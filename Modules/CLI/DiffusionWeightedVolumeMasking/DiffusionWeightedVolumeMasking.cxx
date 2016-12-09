@@ -2,8 +2,8 @@
 #include <vtkMRMLNRRDStorageNode.h>
 
 // vtkTeem includes
-#include <vtkNRRDReader.h>
-#include <vtkNRRDWriter.h>
+#include <Libs/vtkTeem/vtkNRRDReader.h>
+#include <Libs/vtkTeem/vtkNRRDWriter.h>
 
 // VTK includes
 #include <vtkNew.h>

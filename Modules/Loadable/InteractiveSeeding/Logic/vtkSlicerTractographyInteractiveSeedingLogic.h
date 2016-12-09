@@ -25,7 +25,7 @@
 #include <cstdlib>
 
 #include "vtkSlicerModuleLogic.h"
-#include "vtkSlicerTractographyInteractiveSeedingModuleLogicExport.h"
+#include "vtkIntxSeedingLogicExport.h"
 
 class vtkMRMLTractographyInteractiveSeedingNode;
 class vtkMRMLDiffusionTensorVolumeNode;
@@ -56,7 +56,7 @@ public:
   void CreateTractsForOneSeed(vtkSeedTracts *seed,
                               vtkMRMLDiffusionTensorVolumeNode *volumeNode,
                               vtkMRMLTransformableNode *transformableNode,
-                              int stoppingMode,
+                              int thresholdMode,
                               double stoppingValue,
                               double stoppingCurvature,
                               double integrationStepLength,
@@ -85,8 +85,8 @@ public:
                               int useIndexSpace,
                               double seedSpacing,
                               int randomGrid,
-                              double linearMeasureStart,
-                              int stoppingMode,
+                              double startThreshold,
+                              int thresholdMode,
                               double stoppingValue,
                               double stoppingCurvature,
                               double integrationStepLength,
@@ -96,6 +96,8 @@ public:
   void SetAndObserveTractographyInteractiveSeedingNode(vtkMRMLTractographyInteractiveSeedingNode *node);
 
   int IsObservedNode(vtkMRMLNode *node);
+
+  void UpdateOnce();
 
 protected:
   vtkSlicerTractographyInteractiveSeedingLogic();

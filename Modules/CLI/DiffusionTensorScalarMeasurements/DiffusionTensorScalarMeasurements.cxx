@@ -1,8 +1,8 @@
 
 // vtkTeem includes
 #include <vtkDiffusionTensorMathematics.h>
-#include <vtkNRRDReader.h>
-#include <vtkNRRDWriter.h>
+#include <Libs/vtkTeem/vtkNRRDReader.h>
+#include <Libs/vtkTeem/vtkNRRDWriter.h>
 
 // VTK includes
 #include <vtkImageData.h>

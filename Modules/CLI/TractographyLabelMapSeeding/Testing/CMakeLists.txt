@@ -13,13 +13,11 @@ set_target_properties(${CLP}Test PROPERTIES FOLDER ${${CLP}_TARGETS_FOLDER})
 set(testname ${CLP}Test)
 add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test>
   ${CLP}Test
-  --outputdirectory ${TEMP}
-  --name ${CLP}Test_line
   --seedspacing 4
   --clthreshold 0.3
   --minimumlength 10
   --maximumlength 800
-  --stoppingmode LinearMeasure
+  --thresholdmode FractionalAnisotropy
   --stoppingvalue 0.1
   --stoppingcurvature 0.8
   --integrationsteplength 0.5

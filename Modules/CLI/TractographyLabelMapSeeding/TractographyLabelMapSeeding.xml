@@ -37,35 +37,6 @@
   <parameters>
     <label>Seeding Options</label>
     <description><![CDATA[Options for seed placement]]></description>
-    <boolean>
-      <name>UseIndexSpace</name>
-      <label>Use Index Space</label>
-      <flag>-x</flag>
-      <longflag>--useindexspace</longflag>
-      <description><![CDATA[Seed at IJK voxel grid]]></description>
-      <default>false</default>
-    </boolean>
-    <double>
-      <name>SeedSpacing</name>
-      <label>Seed Spacing</label>
-      <flag>-s</flag>
-      <longflag>--seedspacing</longflag>
-      <description><![CDATA[Spacing (in mm) between seed points, only matters if use Use Index Space is off]]></description>
-      <default>2</default>
-      <constraints>
-        <minimum>0.1</minimum>
-        <maximum>10</maximum>
-        <step>0.1</step>
-      </constraints>
-    </double>
-    <boolean>
-      <name>RandomGrid</name>
-      <label>Random Grid</label>
-      <flag>-r</flag>
-      <longflag>--randomgrid</longflag>
-      <description><![CDATA[Enable random placing of seeds]]></description>
-      <default>false</default>
-    </boolean>
     <double>
       <name>ClTh</name>
       <label>Linear Measure Start Threshold</label>
@@ -85,7 +56,7 @@
     <description><![CDATA[Parameters for the tractography method]]></description>
     <double>
       <name>MinimumLength</name>
-      <label>Minimum Path Length</label>
+      <label>Minimum Length</label>
       <flag>-l</flag>
       <longflag>--minimumlength</longflag>
       <description><![CDATA[Minimum length of the fibers (in mm)]]></description>
@@ -110,11 +81,11 @@
       </constraints>
     </double>
     <string-enumeration>
-      <name>StoppingMode</name>
+      <name>ThresholdMode</name>
       <label>Stopping Criteria</label>
-      <description><![CDATA[Tensor measurement used to stop the tractography]]></description>
+      <description><![CDATA[Tensor measurement used to start and stop the tractography]]></description>
       <flag>-f</flag>
-      <longflag>--stoppingmode</longflag>
+      <longflag>--thresholdmode</longflag>
       <default>FractionalAnisotropy</default>
       <element>LinearMeasure</element>
       <element>FractionalAnisotropy</element>
@@ -171,30 +142,39 @@
       <default>1</default>
     </integer>
   </parameters>
-  <parameters>
-    <label>Multiple File Output</label>
-    <description><![CDATA[Multiple file output parameters]]></description>
+
+  <parameters advanced="true">
     <boolean>
-      <name>WriteToFile</name>
-      <label>Write Fibers To Disk</label>
-      <longflag>--writetofile</longflag>
-      <description><![CDATA[Write fibers to disk or create in the scene?]]></description>
+      <name>UseIndexSpace</name>
+      <label>Use Index Space</label>
+      <flag>-x</flag>
+      <longflag>--useindexspace</longflag>
+      <description><![CDATA[Seed at IJK voxel grid]]></description>
       <default>false</default>
     </boolean>
-    <directory>
-      <name>OutputDirectory</name>
-      <label>Output Directory</label>
-      <channel>output</channel>
-      <longflag>--outputdirectory</longflag>
-      <description><![CDATA[Directory in which to save fiber(s)]]></description>
-    </directory>
-    <string>
-      <name>FilePrefix</name>
-      <label>File Prefix Name</label>
-      <flag>-n</flag>
-      <longflag>--name</longflag>
-      <description><![CDATA[Name to use for fiber files]]></description>
-      <default>line</default>
-    </string>
+
+    <double>
+      <name>SeedSpacing</name>
+      <label>Seed Spacing</label>
+      <flag>-s</flag>
+      <longflag>--seedspacing</longflag>
+      <description><![CDATA[Spacing (in mm) between seed points, only matters if use Use Index Space is off]]></description>
+      <default>2</default>
+      <constraints>
+        <minimum>0.1</minimum>
+        <maximum>10</maximum>
+        <step>0.1</step>
+      </constraints>
+    </double>
+
+    <boolean>
+      <name>RandomGrid</name>
+      <label>Random Grid</label>
+      <flag>-r</flag>
+      <longflag>--randomgrid</longflag>
+      <description><![CDATA[Enable random placing of seeds]]></description>
+      <default>false</default>
+    </boolean>
   </parameters>
+
 </executable>

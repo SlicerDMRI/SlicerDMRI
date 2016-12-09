@@ -8,6 +8,7 @@
   <license>3D Slicer Contribution and Software License Agreement</license>
   <contributor>Raul San Jose, Lauren O'Donnell, Demian Wassermann, Isaiah Norton, Alex Yarmarkovich (SPL, LMI, BWH, SlicerDMRI)</contributor>
   <acknowledgements><![CDATA[This module is based on the estimation functionality provided by the Teem library.<br><br> The SlicerDMRI developers gratefully acknowledge funding for this project provided by NIH NCI ITCR U01CA199459 (Open Source Diffusion MRI Technology For Brain Cancer Research), NIH P41EB015898 (National Center for Image-Guided Therapy) and NIH P41EB015902 (Neuroimaging Analysis Center), as well as the National Alliance for Medical Image Computing (NA-MIC), funded by the National Institutes of Health through the NIH Roadmap for Medical Research, Grant U54 EB005149.]]></acknowledgements>
+
   <parameters>
     <label>IO</label>
     <description><![CDATA[Input/output parameters]]></description>
@@ -41,23 +42,22 @@
       <description><![CDATA[Estimated baseline (non-Diffusion Weighted) volume]]></description>
     </image>
   </parameters>
-  <parameters>
-    <label>Estimation Settings</label>
-    <description><![CDATA[Parameters for the tensor estimation algorithm]]></description>
+
+  <parameters advanced="true">
+    <label>Advanced Settings</label>
+    <description><![CDATA[Advanced estimation settings]]></description>
+
     <string-enumeration>
       <name>estimationMethod</name>
       <flag>e</flag>
       <longflag>enumeration</longflag>
-      <description><![CDATA[LS: Least Squares, WLS: Weighted Least Squares]]></description>
-      <label>Estimation Parameters</label>
+      <description><![CDATA[Fitting method. LS: Least Squares, WLS: Weighted Least Squares]]></description>
+      <label>Fitting Method ([Weighted] Least Squares)</label>
       <default>LS</default>
       <element>LS</element>
       <element>WLS</element>
     </string-enumeration>
-  </parameters>
-  <parameters advanced="true">
-    <label>Advanced Settings</label>
-    <description><![CDATA[Advanced estimation settings]]></description>
+
     <boolean>
       <name>ShiftNegativeEigenvalues</name>
       <longflag>shiftNeg</longflag>
@@ -65,5 +65,6 @@
       <label>Shift Negative Eigenvalues</label>
       <default>false</default>
     </boolean>
+
   </parameters>
 </executable>

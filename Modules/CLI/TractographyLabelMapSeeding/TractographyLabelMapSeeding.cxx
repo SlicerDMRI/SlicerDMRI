@@ -1,5 +1,7 @@
-// Slicer includes
+// SEM CLI generated header
 #include "TractographyLabelMapSeedingCLP.h"
+
+// vtkDMRI includes
 #include "vtkDiffusionTensorMathematics.h"
 #include "vtkSeedTracts.h"
 
@@ -83,21 +85,21 @@ int main( int argc, char * argv[] )
     } else { // If the mask does not exist, create one
       math->SetInputConnection(reader->GetOutputPort());
 
-      if( StoppingMode == std::string("LinearMeasurement") || StoppingMode == std::string("LinearMeasure") )
+      if( ThresholdMode == std::string("LinearMeasurement") || ThresholdMode == std::string("LinearMeasure") )
         {
         math->SetOperationToLinearMeasure();
         }
-      else if( StoppingMode == std::string("PlanarMeasurement") || StoppingMode == std::string("PlanarMeasure") )
+      else if( ThresholdMode == std::string("PlanarMeasurement") || ThresholdMode == std::string("PlanarMeasure") )
         {
         math->SetOperationToPlanarMeasure();
         }
-      else if( StoppingMode == std::string("FractionalAnisotropy") )
+      else if( ThresholdMode == std::string("FractionalAnisotropy") )
         {
         math->SetOperationToFractionalAnisotropy();
         }
       else
         {
-        std::cerr << "Mode " << StoppingMode << " is not supported" << endl;
+        std::cerr << "Mode " << ThresholdMode << " is not supported" << endl;
         return EXIT_FAILURE;
         }
 
@@ -199,15 +201,6 @@ int main( int argc, char * argv[] )
 
     // 4. Set Tractography specific parameters
 
-    if( WriteToFile )
-      {
-      seed->SetFileDirectoryName(OutputDirectory.c_str() );
-      if( FilePrefix.length() > 0 )
-        {
-        seed->SetFilePrefix(FilePrefix.c_str() );
-        }
-      }
-
     if( UseIndexSpace )
       {
       seed->SetIsotropicSeeding(0);
@@ -223,21 +216,21 @@ int main( int argc, char * argv[] )
     vtkNew<vtkHyperStreamlineDTMRI> streamer;
     seed->SetVtkHyperStreamlinePointsSettings(streamer.GetPointer());
 
-    if( StoppingMode == std::string("LinearMeasurement") || StoppingMode == std::string("LinearMeasure") )
+    if( ThresholdMode == std::string("LinearMeasurement") || ThresholdMode == std::string("LinearMeasure") )
       {
-      streamer->SetStoppingModeToLinearMeasure();
+      streamer->SetThresholdModeToLinearMeasure();
       }
-    else if( StoppingMode == std::string("PlanarMeasurement") || StoppingMode == std::string("PlanarMeasure") )
+    else if( ThresholdMode == std::string("PlanarMeasurement") || ThresholdMode == std::string("PlanarMeasure") )
       {
-      streamer->SetStoppingModeToPlanarMeasure();
+      streamer->SetThresholdModeToPlanarMeasure();
       }
-    else if( StoppingMode == std::string("FractionalAnisotropy") )
+    else if( ThresholdMode == std::string("FractionalAnisotropy") )
       {
-      streamer->SetStoppingModeToFractionalAnisotropy();
+      streamer->SetThresholdModeToFractionalAnisotropy();
       }
     else
       {
-      std::cerr << "Mode " << StoppingMode << " is not supported" << endl;
+      std::cerr << "Mode " << ThresholdMode << " is not supported" << endl;
       return EXIT_FAILURE;
       }
 
@@ -250,32 +243,30 @@ int main( int argc, char * argv[] )
     seed->SeedStreamlinesInROI();
 
     // Save result
-    if ( !WriteToFile )
-      {
-      // 6. Extra5ct PolyData in RAS
-      vtkNew<vtkPolyData> outFibers;
-      seed->TransformStreamlinesToRASAndAppendToPolyData(outFibers.GetPointer());
 
-      std::string fileExtension = vtksys::SystemTools::LowerCase( vtksys::SystemTools::GetFilenameLastExtension(OutputFibers.c_str()) );
-      if (fileExtension == ".vtk")
-        {
-          vtkNew<vtkPolyDataWriter> writer;
-          writer->SetFileName(OutputFibers.c_str());
-          writer->SetFileTypeToBinary();
-          writer->SetInputData(outFibers.GetPointer());
-          writer->Write();
-        }
-      else
-        {
-        if (fileExtension != ".vtp")
-          {
-          cerr << "Extension not recognize, saving the information in VTP format" << endl;
-          }
-        vtkNew<vtkXMLPolyDataWriter> writer;
-        writer->SetFileName(OutputFibers.c_str() );
+    // 6. Extract PolyData in RAS
+    vtkNew<vtkPolyData> outFibers;
+    seed->TransformStreamlinesToRASAndAppendToPolyData(outFibers.GetPointer());
+
+    std::string fileExtension = vtksys::SystemTools::LowerCase( vtksys::SystemTools::GetFilenameLastExtension(OutputFibers.c_str()) );
+    if (fileExtension == ".vtk")
+      {
+        vtkNew<vtkPolyDataWriter> writer;
+        writer->SetFileName(OutputFibers.c_str());
+        writer->SetFileTypeToBinary();
         writer->SetInputData(outFibers.GetPointer());
         writer->Write();
+      }
+    else
+      {
+      if (fileExtension != ".vtp")
+        {
+        cerr << "Extension not recognize, saving the information in VTP format" << endl;
         }
+      vtkNew<vtkXMLPolyDataWriter> writer;
+      writer->SetFileName(OutputFibers.c_str() );
+      writer->SetInputData(outFibers.GetPointer());
+      writer->Write();
       }
   }
   catch( ... )

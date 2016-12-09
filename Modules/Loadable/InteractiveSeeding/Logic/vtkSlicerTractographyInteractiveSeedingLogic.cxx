@@ -193,7 +193,7 @@ int vtkSlicerTractographyInteractiveSeedingLogic::IsObservedNode(vtkMRMLNode *no
 void vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForOneSeed(vtkSeedTracts *seed,
                                                             vtkMRMLDiffusionTensorVolumeNode *volumeNode,
                                                             vtkMRMLTransformableNode *transformableNode,
-                                                            int stoppingMode,
+                                                            int thresholdMode,
                                                             double stoppingValue,
                                                             double stoppingCurvature,
                                                             double integrationStepLength,
@@ -282,17 +282,17 @@ void vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForOneSeed(vtkSee
   seed->SetVtkHyperStreamlinePointsSettings(streamer.GetPointer());
   seed->SetMinimumPathLength(minPathLength);
 
-  if ( stoppingMode == 0 )
+  if ( thresholdMode == 0 )
     {
-     streamer->SetStoppingModeToLinearMeasure();
+     streamer->SetThresholdModeToLinearMeasure();
     }
-  else if ( stoppingMode == 1 )
+  else if ( thresholdMode == 1 )
     {
-    streamer->SetStoppingModeToFractionalAnisotropy();
+    streamer->SetThresholdModeToFractionalAnisotropy();
     }
-  else if ( stoppingMode == 2 )
+  else if ( thresholdMode == 2 )
     {
-    streamer->SetStoppingModeToPlanarMeasure();
+    streamer->SetThresholdModeToPlanarMeasure();
     }
 
   //streamer->SetMaximumPropagationDistance(this->MaximumPropagationDistance);
@@ -389,7 +389,7 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTracts(vtkMRMLTractograp
                                                             vtkMRMLDiffusionTensorVolumeNode *volumeNode,
                                                             vtkMRMLNode *seedingNode,
                                                             vtkMRMLFiberBundleNode *fiberNode,
-                                                            int stoppingMode,
+                                                            int thresholdMode,
                                                             double stoppingValue,
                                                             double stoppingCurvature,
                                                             double integrationStepLength,
@@ -462,8 +462,8 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTracts(vtkMRMLTractograp
                                     parametersNode->GetUseIndexSpace(),
                                     parametersNode->GetSeedSpacing(),
                                     parametersNode->GetRandomGrid(),
-                                    parametersNode->GetLinearMeasureStart(),
-                                    parametersNode->GetStoppingMode(),
+                                    parametersNode->GetStartThreshold(),
+                                    parametersNode->GetThresholdMode(),
                                     parametersNode->GetStoppingValue(),
                                     parametersNode->GetStoppingCurvature(),
                                     parametersNode->GetIntegrationStep(),
@@ -486,7 +486,7 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTracts(vtkMRMLTractograp
         }
 
       this->CreateTractsForOneSeed(seed.GetPointer(), volumeNode, annotationNode,
-                                   stoppingMode, stoppingValue, stoppingCurvature,
+                                   thresholdMode, stoppingValue, stoppingCurvature,
                                    integrationStepLength, minPathLength, regionSize,
                                    sampleStep, maxNumberOfSeeds, seedSelectedFiducials);
       }
@@ -494,21 +494,21 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTracts(vtkMRMLTractograp
   else if (annotationNode) // loop over points in the models
     {
     this->CreateTractsForOneSeed(seed.GetPointer(), volumeNode, annotationNode,
-                                 stoppingMode, stoppingValue, stoppingCurvature,
+                                 thresholdMode, stoppingValue, stoppingCurvature,
                                  integrationStepLength, minPathLength, regionSize,
                                  sampleStep, maxNumberOfSeeds, seedSelectedFiducials);
     }
   else if (markupsFiducialNode) // loop over points in the markup
     {
     this->CreateTractsForOneSeed(seed.GetPointer(), volumeNode, markupsFiducialNode,
-                                 stoppingMode, stoppingValue, stoppingCurvature,
+                                 thresholdMode, stoppingValue, stoppingCurvature,
                                  integrationStepLength, minPathLength, regionSize,
                                  sampleStep, maxNumberOfSeeds, seedSelectedFiducials);
     }
   else if (modelNode) // loop over points in the models
     {
     this->CreateTractsForOneSeed(seed.GetPointer(), volumeNode, modelNode,
-                                 stoppingMode, stoppingValue, stoppingCurvature,
+                                 thresholdMode, stoppingValue, stoppingCurvature,
                                  integrationStepLength, minPathLength, regionSize,
                                  sampleStep, maxNumberOfSeeds, seedSelectedFiducials);
     }
@@ -714,6 +714,20 @@ void vtkSlicerTractographyInteractiveSeedingLogic
 
   this->AddMRMLNodesObservers();
 
+  this->UpdateOnce();
+}
+
+//----------------------------------------------------------------------------
+void vtkSlicerTractographyInteractiveSeedingLogic
+::UpdateOnce()
+{
+  vtkMRMLTractographyInteractiveSeedingNode* snode = this->TractographyInteractiveSeedingNode;
+
+  if (snode == NULL)
+    {
+    return;
+    }
+
   vtkMRMLDiffusionTensorVolumeNode *volumeNode =
     vtkMRMLDiffusionTensorVolumeNode::SafeDownCast(
       this->GetMRMLScene()->GetNodeByID(snode->GetInputVolumeRef()));
@@ -728,7 +742,7 @@ void vtkSlicerTractographyInteractiveSeedingLogic
     }
 
   this->CreateTracts(snode, volumeNode, seedingNode, fiberNode,
-                     snode->GetStoppingMode(),
+                     snode->GetThresholdMode(),
                      snode->GetStoppingValue(),
                      snode->GetStoppingCurvature(),
                      snode->GetIntegrationStep(),
@@ -774,7 +788,7 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForLabelMap(
                                                             double seedSpacing,
                                                             int randomGrid,
                                                             double linearMeasureStart,
-                                                            int stoppingMode,
+                                                            int thresholdMode,
                                                             double stoppingValue,
                                                             double stoppingCurvature,
                                                             double integrationStepLength,
@@ -828,7 +842,7 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForLabelMap(
   else
     {
     math->SetInputConnection(volumeNode->GetImageDataConnection());
-    if ( stoppingMode == 0 )
+    if ( thresholdMode == 0 )
       {
       math->SetOperationToLinearMeasure();
       }
@@ -984,17 +998,17 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForLabelMap(
   vtkNew<vtkHyperStreamlineDTMRI> streamer;
   seed->SetVtkHyperStreamlinePointsSettings(streamer.GetPointer());
 
-  if ( stoppingMode == 0 )
+  if ( thresholdMode == 0 )
     {
-     streamer->SetStoppingModeToLinearMeasure();
+     streamer->SetThresholdModeToLinearMeasure();
     }
-  else if ( stoppingMode == 1 )
+  else if ( thresholdMode == 1 )
     {
-    streamer->SetStoppingModeToFractionalAnisotropy();
+    streamer->SetThresholdModeToFractionalAnisotropy();
     }
-  else if ( stoppingMode == 2 )
+  else if ( thresholdMode == 2 )
     {
-    streamer->SetStoppingModeToPlanarMeasure();
+    streamer->SetThresholdModeToPlanarMeasure();
     }
 
   streamer->SetStoppingThreshold(stoppingValue);
