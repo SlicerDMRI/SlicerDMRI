@@ -16,6 +16,8 @@
 #include <vtkPolyDataReader.h>
 #include <vtkStringArray.h>
 #include <vtkXMLPolyDataReader.h>
+#include <vtkSortDataArray.h>
+#include <vtkDoubleArray.h>
 // VTKsys includes
 #include <vtksys/SystemTools.hxx>
 
@@ -47,6 +49,12 @@ std::map< std::string, std::map<std::string, double> > Clusters;
 
 #define INVALID_NUMBER_PRINT std::string("NAN")
 #define EXCLUDED_NUMBER_PRINT std::string("Num_Clamp_Excluded")
+#define MEAN_PRINT std::string("Mean")
+#define MAX_PRINT std::string("Max")
+#define MIN_PRINT std::string("Min")
+#define MEDIAN_PRINT std::string("Median")
+#define VARIANCE_PRINT std::string("Variance")
+
 std::string SEPARATOR;
 
 typedef std::pair<size_t, size_t> Range;
@@ -67,11 +75,13 @@ void computeFiberStats(vtkSmartPointer<vtkPolyData> input,
 
 void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> input,
                                std::string &id,
-                               std::string &operation);
+                               std::string &operation, 
+                               bool moreStatistics);
 
 int computeTensorMeasurement(vtkSmartPointer<vtkPolyData> input,
                              std::string &id,
-                             std::string &operation);
+                             std::string &operation,
+                             bool moreStatistics);
 
 void getPathFromParentToChild(vtkMRMLHierarchyNode *parent,
                               vtkMRMLHierarchyNode *child,
@@ -151,7 +161,8 @@ void computeFiberStats(vtkSmartPointer<vtkPolyData> poly,
 
 void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
                                std::string &id,
-                               std::string &operation)
+                               std::string &operation,
+                               bool moreStatistics)
 {
   vtkIdType npoints = poly->GetNumberOfPoints();
   vtkIdType npoints_final = npoints;
@@ -192,7 +203,8 @@ void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
         op_max = op_iter->second.second;
         }
       }
-
+    
+    vtkDoubleArray *vals = vtkDoubleArray::New();
     double val;
     double sum = 0;
     for (int n=0; n < npoints; n++)
@@ -210,17 +222,50 @@ void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
         npoints_excluded += 1;
         continue;
         }
-
+      vals->InsertNextValue(val);
       sum += val;
       }
+
+    vtkSortDataArray::Sort(vals);
+
+    double sortval = 0;
+    double median  = 0;
+    double mean = 0;
+    double max = 0;
+    double min = 0;
+    double variance = 0;
+
     if (npoints_final > 0)
       {
-      sum /= npoints_final;
+      mean = sum / npoints_final;
+
+      if (moreStatistics)
+        {
+        min = (double) vals->GetComponent(0, 0);
+        max = (double) vals->GetComponent(npoints_final - 1, 0);
+        median = (double) vals->GetComponent((int) (npoints_final / 2), 0);
+
+        for (int n = 0; n < npoints_final; n++)
+          {
+          sortval = (double) vals->GetComponent(n, 0);
+          variance += (sortval - mean) * (sortval - mean);
+          }
+        variance /= npoints_final - 1;
+        }
       }
     else
       {
-      sum = vtkMath::Nan();
+      mean = vtkMath::Nan();
+      if (moreStatistics)
+        {
+        min = vtkMath::Nan();
+        max = vtkMath::Nan();
+        median = vtkMath::Nan();
+        variance = vtkMath::Nan();
+        }
       }
+
+    vals->Delete();
 
     std::map< std::string, std::map<std::string, double> >::iterator it = OutTable.find(id);
     if (it == OutTable.end())
@@ -228,38 +273,38 @@ void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
       OutTable[id] = std::map<std::string, double>();
       it = OutTable.find(id);
       }
-      it->second[name] = sum;
 
-    // record the number of NaNs for this measurement
-    std::string nanid = name + "." + INVALID_NUMBER_PRINT;
-    it = OutTable.find(id);
-    if (it == OutTable.end())
+    std::string name_mean = name + "." + MEAN_PRINT;
+    it->second[name_mean] = mean;
+    
+    if (moreStatistics)
       {
-      OutTable[id] = std::map<std::string, double>();
-      it = OutTable.find(id);
-      }
-    it->second[nanid] = npoints - npoints_final;
+      std::string name_min = name + "." + MIN_PRINT;
+      std::string name_max = name + "." + MAX_PRINT;
+      std::string name_mediam = name + "." + MEDIAN_PRINT;
+      std::string name_variance = name + "." + VARIANCE_PRINT;
+      std::string nanid = name + "." + INVALID_NUMBER_PRINT;
 
-    if (measuring_clamped)
+      it->second[name_min] = min;
+	    it->second[name_max] = max;
+	    it->second[name_mediam] = median;
+	    it->second[name_variance] = variance;
+      it->second[nanid] = npoints - npoints_final; // record the number of NaNs for this measurement
+
+      if (measuring_clamped)
       {
-      // record aggregate count of excluded points outside of clamped range
-      std::string excluded_id = EXCLUDED_NUMBER_PRINT;
-      it = OutTable.find(id);
-      if (it == OutTable.end())
-        {
-        OutTable[id] = std::map<std::string, double>();
-        it = OutTable.find(id);
+        // record aggregate count of excluded points outside of clamped range
+        std::string excluded_id = EXCLUDED_NUMBER_PRINT;
+        it->second[excluded_id] += npoints_excluded;
         }
-      it->second[excluded_id] += npoints_excluded;
       }
-
     } //for (int i=0; i<poly->GetPointData()->GetNumberOfArrays(); i++)
-
 }
 
 int computeTensorMeasurement(vtkSmartPointer<vtkPolyData> poly,
                              std::string &id,
-                             std::string &operation)
+                             std::string &operation,
+                             bool moreStatistics)
 {
   //TODO loop over all tensors, use ExtractTensor
   vtkNew<vtkAssignAttribute> assignAttribute;
@@ -326,7 +371,7 @@ int computeTensorMeasurement(vtkSmartPointer<vtkPolyData> poly,
       std::cout << "no scalars computed for cluster: \"" << id << "\" and op: \"" << operation << "\"" << std::endl;
       }
     std::string scalarName = name + std::string(".") + operation;
-    computeScalarMeasurements(math->GetOutput(), id, scalarName);
+    computeScalarMeasurements(math->GetOutput(), id, scalarName, moreStatistics);
     }
 
   return EXIT_SUCCESS;
@@ -334,12 +379,13 @@ int computeTensorMeasurement(vtkSmartPointer<vtkPolyData> poly,
 
 int computeAllTensorMeasurements(vtkSmartPointer<vtkPolyData> input,
                                  std::string &id,
-                                 std::vector<std::string> operations)
+                                 std::vector<std::string> operations,
+                                 bool moreStatistics)
 {
   int result = EXIT_SUCCESS;
   std::vector<std::string>::iterator op_iter = operations.begin();
   for (; op_iter != operations.end(); op_iter++)
-    result = result & computeTensorMeasurement(input, id, *op_iter);
+    result = result & computeTensorMeasurement(input, id, *op_iter, moreStatistics);
 
   return result;
 }
@@ -887,14 +933,14 @@ int main( int argc, char * argv[] )
             getPathFromParentToChild(topHierNode, dispHierarchyNode, id);
             vtkSmartPointer<vtkPolyData> data = fiberNode->GetPolyData();
             computeFiberStats(data, id);
-            computeScalarMeasurements(data, id, EMPTY_OP);
-            computeAllTensorMeasurements(data, id, operations);
+            computeScalarMeasurements(data, id, EMPTY_OP, moreStatistics);
+            computeAllTensorMeasurements(data, id, operations, moreStatistics);
             } // if (fiberNode)
           } // if (dispHierarchyNode)
         } // for (unsigned int i = 0; i < allChildren.size(); ++i)
       } // if (inputType == std::string("Fibers_Hierarchy"))
     } //if (inputType == ... || ... )
-  else if (inputType == std::string("Fibers_File_Folder") )
+  else if (inputType == std::string("Fibers_File_Folder"))
     {
     // File based
     if (InputDirectory.size() == 0)
@@ -926,8 +972,8 @@ int main( int argc, char * argv[] )
         continue;
         }
       computeFiberStats(data, fileName);
-      computeScalarMeasurements(data, fileName, EMPTY_OP);
-      computeAllTensorMeasurements(data, fileName, operations);
+      computeScalarMeasurements(data, fileName, EMPTY_OP, moreStatistics);
+      computeAllTensorMeasurements(data, fileName, operations, moreStatistics);
       }
 
     // Loop over .vtp files
@@ -949,8 +995,8 @@ int main( int argc, char * argv[] )
         }
 
       computeFiberStats(data, fileName);
-      computeScalarMeasurements(data, fileName, EMPTY_OP);
-      computeAllTensorMeasurements(data, fileName, operations);
+      computeScalarMeasurements(data, fileName, EMPTY_OP, moreStatistics);
+      computeAllTensorMeasurements(data, fileName, operations, moreStatistics);
       }
     } //if (inputType == std::string("Fibers File Folder") )
 
