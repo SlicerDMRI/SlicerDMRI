@@ -144,6 +144,24 @@ int main( int argc, char * argv[] )
 
   if ( !inPts || numPts  < 1 || !inLines || numLines < 1 )
     {
+    std::string extension2 = vtksys::SystemTools::GetFilenameLastExtension(OutputFibers.c_str());
+    std::string extension_output = vtksys::SystemTools::LowerCase(extension2);
+    if (extension_output == std::string(".vtk"))
+      {
+        vtkNew<vtkPolyDataWriter> writer;
+        writer->SetFileName(OutputFibers.c_str());
+        writer->SetInputData(input.GetPointer());
+        writer->SetFileTypeToBinary();
+        writer->Write();
+      }
+    else if (extension_output == std::string(".vtp"))
+      {
+        vtkNew<vtkXMLPolyDataWriter> writer;
+        writer->SetFileName(OutputFibers.c_str());
+        writer->SetInputData(input.GetPointer());
+        writer->SetDataModeToBinary();
+        writer->Write();
+      }
     return EXIT_SUCCESS;
     }
 
@@ -382,17 +400,17 @@ int main( int argc, char * argv[] )
     {
       vtkNew<vtkPolyDataWriter> writer;
       writer->SetFileName(OutputFibers.c_str());
-           writer->SetInputData(outFibers.GetPointer());
-           writer->SetFileTypeToBinary();
-           writer->Write();
+      writer->SetInputData(outFibers.GetPointer());
+      writer->SetFileTypeToBinary();
+      writer->Write();
     }
   else if (extension_output == std::string(".vtp"))
     {
-           vtkNew<vtkXMLPolyDataWriter> writer;
-           writer->SetFileName(OutputFibers.c_str());
-           writer->SetInputData(outFibers.GetPointer());
-           writer->SetDataModeToBinary();
-           writer->Write();
+      vtkNew<vtkXMLPolyDataWriter> writer;
+      writer->SetFileName(OutputFibers.c_str());
+      writer->SetInputData(outFibers.GetPointer());
+      writer->SetDataModeToBinary();
+      writer->Write();
     }
   }
   catch ( ... )
