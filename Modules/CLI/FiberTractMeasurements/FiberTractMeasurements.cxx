@@ -286,9 +286,9 @@ void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
       std::string nanid = name + "." + INVALID_NUMBER_PRINT;
 
       it->second[name_min] = min;
-	    it->second[name_max] = max;
-	    it->second[name_mediam] = median;
-	    it->second[name_variance] = variance;
+      it->second[name_max] = max;
+      it->second[name_mediam] = median;
+      it->second[name_variance] = variance;
       it->second[nanid] = npoints - npoints_final; // record the number of NaNs for this measurement
 
       if (measuring_clamped)
