@@ -71,4 +71,15 @@
       <default>false</default>
     </boolean>
   </parameters>
+    <parameters advanced="true">
+    <label>Advanced Settings</label>
+    <description><![CDATA[Advanced settings]]></description>
+    <boolean>
+      <name>moreStatistics</name>
+      <label>Output more statistics</label>
+      <longflag>--moreStatistics</longflag>
+      <description><![CDATA[Output additional statistics, including maximum, minimum, median, variance.]]></description>
+      <default>false</default>
+    </boolean>
+  </parameters>
 </executable>
