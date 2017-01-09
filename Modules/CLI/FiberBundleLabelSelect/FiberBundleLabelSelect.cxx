@@ -45,6 +45,28 @@
 
 #include <vtkPolyDataPointSampler.h>
 
+void write_output(std::string fname, vtkPolyData* polydata)
+{
+  std::string extension2 = vtksys::SystemTools::GetFilenameLastExtension(fname);
+  std::string extension_output = vtksys::SystemTools::LowerCase(extension2);
+  if (extension_output == std::string(".vtk"))
+    {
+    vtkNew<vtkPolyDataWriter> writer;
+    writer->SetFileName(fname.c_str());
+    writer->SetInputData(polydata);
+    writer->SetFileTypeToBinary();
+    writer->Write();
+    }
+  else if (extension_output == std::string(".vtp"))
+    {
+    vtkNew<vtkXMLPolyDataWriter> writer;
+    writer->SetFileName(fname.c_str());
+    writer->SetInputData(polydata);
+    writer->SetDataModeToBinary();
+    writer->Write();
+    }
+}
+
 int main( int argc, char * argv[] )
 {
   PARSE_ARGS;
@@ -144,6 +166,7 @@ int main( int argc, char * argv[] )
 
   if ( !inPts || numPts  < 1 || !inLines || numLines < 1 )
     {
+    write_output(OutputFibers, input);
     return EXIT_SUCCESS;
     }
 
@@ -154,8 +177,8 @@ int main( int argc, char * argv[] )
   double p[3];
 
   unsigned int label;
-  
-  // Fiber points sampling 
+
+  // Fiber points sampling
   vtkPolyDataPointSampler *resampler = vtkPolyDataPointSampler::New();
   resampler->GenerateEdgePointsOn();
   resampler->GenerateVertexPointsOff();
@@ -165,12 +188,12 @@ int main( int argc, char * argv[] )
   std::cout << " Sampling Distance: " << SamplingDistance << std::endl;
   resampler->SetDistance(SamplingDistance);
 
-  vtkPolyData* tmpPd; 
+  vtkPolyData* tmpPd;
   vtkIdList* tmpCellPtIds;
-  vtkPoints* tmpPoints; 
+  vtkPoints* tmpPoints;
   vtkCellArray* tmpLines;
   vtkPoints* sampledCellPts;
-  
+
   std::cout << " Total number of fibers before selection: " << numLines << std::endl;
 
   int *labelDims = imageCastLabel_A->GetOutput()->GetDimensions();
@@ -192,7 +215,7 @@ int main( int argc, char * argv[] )
       passAll.push_back(false);
       }
 
-    // Create a new polydata that only contains the line and the points on it 
+    // Create a new polydata that only contains the line and the points on it
     tmpPd = vtkPolyData::New();
     tmpPoints = vtkPoints::New();
     tmpCellPtIds = vtkIdList::New();
@@ -203,8 +226,8 @@ int main( int argc, char * argv[] )
       vtkIdType dx = tmpPoints->InsertNextPoint(p);
       tmpCellPtIds->InsertNextId(dx);
       }
-    tmpLines->InsertNextCell(tmpCellPtIds);                  
- 
+    tmpLines->InsertNextCell(tmpCellPtIds);
+
     tmpPd->SetLines(tmpLines);
     tmpPd->SetPoints(tmpPoints);
 
@@ -376,24 +399,8 @@ int main( int argc, char * argv[] )
     }
 
   //3. Save the output in VTK or VTP
-  std::string extension2 = vtksys::SystemTools::GetFilenameLastExtension(OutputFibers.c_str());
-  std::string extension_output = vtksys::SystemTools::LowerCase(extension2);
-  if (extension_output == std::string(".vtk"))
-    {
-      vtkNew<vtkPolyDataWriter> writer;
-      writer->SetFileName(OutputFibers.c_str());
-           writer->SetInputData(outFibers.GetPointer());
-           writer->SetFileTypeToBinary();
-           writer->Write();
-    }
-  else if (extension_output == std::string(".vtp"))
-    {
-           vtkNew<vtkXMLPolyDataWriter> writer;
-           writer->SetFileName(OutputFibers.c_str());
-           writer->SetInputData(outFibers.GetPointer());
-           writer->SetDataModeToBinary();
-           writer->Write();
-    }
+  write_output(OutputFibers, outFibers.GetPointer());
+
   }
   catch ( ... )
       {
