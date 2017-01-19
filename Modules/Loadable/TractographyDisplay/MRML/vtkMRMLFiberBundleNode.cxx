@@ -256,7 +256,7 @@ void vtkMRMLFiberBundleNode::UpdateReferenceID(const char *oldID, const char *ne
 }
 
 //----------------------------------------------------------------------------
-vtkAlgorithmOutput* vtkMRMLFiberBundleNode::GetFilteredPolyDataConnection()
+vtkAlgorithmOutput* vtkMRMLFiberBundleNode::GetFilteredMeshConnection()
 {
   if (this->SelectWithAnnotationNode)
     {
@@ -271,10 +271,10 @@ vtkAlgorithmOutput* vtkMRMLFiberBundleNode::GetFilteredPolyDataConnection()
 //----------------------------------------------------------------------------
 vtkPolyData* vtkMRMLFiberBundleNode::GetFilteredPolyData()
 {
-  vtkAlgorithm* producer = this->GetFilteredPolyDataConnection() ?
-    this->GetFilteredPolyDataConnection()->GetProducer() : 0;
-  int index = this->GetFilteredPolyDataConnection() ?
-    this->GetFilteredPolyDataConnection()->GetIndex() : -1;
+  vtkAlgorithm* producer = this->GetFilteredMeshConnection() ?
+    this->GetFilteredMeshConnection()->GetProducer() : 0;
+  int index = this->GetFilteredMeshConnection() ?
+    this->GetFilteredMeshConnection()->GetIndex() : -1;
   return vtkPolyData::SafeDownCast(
     producer ? producer->GetOutputDataObject(index) : 0);
 }
@@ -398,10 +398,10 @@ vtkMRMLFiberBundleDisplayNode* vtkMRMLFiberBundleNode::AddGlyphDisplayNode()
 }
 
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleNode::SetPolyDataConnection(vtkAlgorithmOutput *inputPort)
+void vtkMRMLFiberBundleNode::SetMeshConnection(vtkAlgorithmOutput *inputPort)
 {
   this->ExtractSelectedPolyDataIds->SetInputConnection(0, inputPort);
-  this->Superclass::SetPolyDataConnection(inputPort);
+  this->Superclass::SetMeshConnection(inputPort);
   vtkPolyData* polyData = this->GetPolyData();
 
   if (polyData)
@@ -449,7 +449,7 @@ void vtkMRMLFiberBundleNode
 ::SetPolyDataToDisplayNode(vtkMRMLModelDisplayNode* modelDisplayNode)
 {
   assert(modelDisplayNode->IsA("vtkMRMLFiberBundleDisplayNode"));
-  modelDisplayNode->SetInputPolyDataConnection(this->GetFilteredPolyDataConnection());
+  modelDisplayNode->SetInputMeshConnection(this->GetFilteredMeshConnection());
 }
 
 //----------------------------------------------------------------------------
@@ -475,7 +475,7 @@ void vtkMRMLFiberBundleNode::SetSelectWithAnnotationNode(int _arg)
   if (this->SelectWithAnnotationNode != _arg)
     {
     this->SelectWithAnnotationNode = _arg;
-    this->SetPolyDataToDisplayNodes();
+    this->SetMeshToDisplayNodes();
     this->Modified();
     }
 }

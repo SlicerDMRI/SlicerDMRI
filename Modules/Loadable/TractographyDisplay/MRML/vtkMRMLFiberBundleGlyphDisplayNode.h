@@ -60,7 +60,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleGlyphD
 
   ///
   /// Update the pipeline based on this node attributes
-  virtual void UpdatePolyDataPipeline();
+  virtual void UpdateAssignedAttribute();
 
   //--------------------------------------------------------------------------
   /// Display Information: Geometry to display (not mutually exclusive)
@@ -79,7 +79,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleGlyphD
   void operator= ( const vtkMRMLFiberBundleGlyphDisplayNode& );
 
   /// Gets result in glyph PolyData
-  virtual vtkAlgorithmOutput* GetOutputPolyDataConnection();
+  virtual vtkAlgorithmOutput* GetOutputMeshConnection();
 
   /// Enumerated
 

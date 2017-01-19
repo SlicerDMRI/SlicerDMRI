@@ -665,7 +665,7 @@ void qSlicerTractographyDisplayWidget::updateScalarRange()
 
   if (d->FiberBundleDisplayNode->GetVisibility() )
     {
-    d->FiberBundleDisplayNode->GetOutputPolyDataConnection()->GetProducer()->Update();
+    d->FiberBundleDisplayNode->GetOutputMeshConnection()->GetProducer()->Update();
     }
   d->FiberBundleDisplayNode->GetScalarRange(range);
   if (d->FiberBundleDisplayNode->GetAutoScalarRange())
@@ -722,7 +722,7 @@ void qSlicerTractographyDisplayWidget::updateWidgetFromMRML()
   bool wasBlocking = d->ActiveTensorComboBox->blockSignals(true);
 
   QStringList tensorItems;
-  d->getPolyDataTensors(d->FiberBundleDisplayNode->GetInputPolyData(), tensorItems);
+  d->getPolyDataTensors(d->FiberBundleNode->GetPolyData(), tensorItems);
   d->ActiveTensorComboBox->clear();
   d->ActiveTensorComboBox->addItems(tensorItems);
 

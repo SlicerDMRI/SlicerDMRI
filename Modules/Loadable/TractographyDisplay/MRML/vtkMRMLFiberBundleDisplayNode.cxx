@@ -266,17 +266,17 @@ void vtkMRMLFiberBundleDisplayNode::ProcessMRMLEvents ( vtkObject *caller,
   if (vtkMRMLDiffusionTensorDisplayPropertiesNode::SafeDownCast(caller) &&
     event ==  vtkCommand::ModifiedEvent)
     {
-    this->Modified();
+    this->UpdateAssignedAttribute();
     }
   return;
 }
 
 //---------------------------------------------------------------------------
-void vtkMRMLFiberBundleDisplayNode::UpdatePolyDataPipeline()
+void vtkMRMLFiberBundleDisplayNode::UpdateAssignedAttribute()
 {
   if (this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModeScalarData)
     {
-    this->Superclass::UpdatePolyDataPipeline();
+    this->Superclass::UpdateAssignedAttribute();
     }
   else if (this->GetActiveTensorName() &&
       std::string(this->GetActiveTensorName()) != std::string("") &&

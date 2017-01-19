@@ -49,7 +49,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleLineDi
 
   ///
   /// Update the pipeline based on this node attributes
-  virtual void UpdatePolyDataPipeline();
+  virtual void UpdateAssignedAttribute();
 
 
  protected:
@@ -59,7 +59,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleLineDi
   void operator= ( const vtkMRMLFiberBundleLineDisplayNode& );
 
   /// Reimplemented to return the output of the display pipeline
-  virtual vtkAlgorithmOutput* GetOutputPolyDataConnection();
+  virtual vtkAlgorithmOutput* GetOutputMeshConnection();
 
   /// display pipeline
   vtkPolyDataTensorToColor *TensorToColor;

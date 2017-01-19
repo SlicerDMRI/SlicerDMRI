@@ -111,18 +111,18 @@ void vtkMRMLFiberBundleGlyphDisplayNode::PrintSelf(ostream& os, vtkIndent indent
 }
 
 //----------------------------------------------------------------------------
-vtkAlgorithmOutput* vtkMRMLFiberBundleGlyphDisplayNode::GetOutputPolyDataConnection()
+vtkAlgorithmOutput* vtkMRMLFiberBundleGlyphDisplayNode::GetOutputMeshConnection()
 {
   return this->DiffusionTensorGlyphFilter->GetOutputPort();
 }
 
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleGlyphDisplayNode::UpdatePolyDataPipeline()
+void vtkMRMLFiberBundleGlyphDisplayNode::UpdateAssignedAttribute()
 {
-  this->Superclass::UpdatePolyDataPipeline();
+  this->Superclass::UpdateAssignedAttribute();
 
   this->DiffusionTensorGlyphFilter->SetInputConnection(
-    this->Superclass::GetOutputPolyDataConnection());
+    this->Superclass::GetOutputMeshConnection());
 
   // set display properties according to the tensor-specific display properties node for glyphs
   vtkMRMLDiffusionTensorDisplayPropertiesNode * diffusionTensorDisplayNode =
@@ -277,7 +277,7 @@ void vtkMRMLFiberBundleGlyphDisplayNode::UpdatePolyDataPipeline()
         }
       else if (this->GetInputPolyData())
         {
-        this->GetOutputPolyDataConnection()->GetProducer()->Update();
+        this->GetOutputMeshConnection()->GetProducer()->Update();
         vtkPointData *pointData = this->GetOutputPolyData()->GetPointData();
         if (pointData)
           {

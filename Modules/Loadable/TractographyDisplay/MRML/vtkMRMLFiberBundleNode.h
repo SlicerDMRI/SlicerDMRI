@@ -149,12 +149,12 @@ public:
 
   ///
   /// Reimplemented from internal reasons
-  virtual void SetPolyDataConnection(vtkAlgorithmOutput* inputPort);
+  virtual void SetMeshConnection(vtkAlgorithmOutput* inputPort);
 
   ///
   /// Gets the subsampled PolyData converted from the real data in the node
   virtual vtkPolyData* GetFilteredPolyData();
-  virtual vtkAlgorithmOutput* GetFilteredPolyDataConnection();
+  virtual vtkAlgorithmOutput* GetFilteredMeshConnection();
 
   ///
   /// get associated line display node or NULL if not set
