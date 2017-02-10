@@ -21,6 +21,7 @@ add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test
     --outputfile ${TEMP}/fibermeasurementstestingoutputfolder.txt
     --format Column_Hierarchy
     --separator Tab
+    --moreStatistics
   )
 set_property(TEST ${testname} PROPERTY LABELS ${CLP})
 
@@ -32,6 +33,7 @@ add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test
     --outputfile ${TEMP}/fibermeasurementstestingoutputhierarchy.txt
     --format Column_Hierarchy
     --separator Tab
+    --moreStatistics
   )
 set_property(TEST ${testname} PROPERTY LABELS ${CLP})
 
@@ -44,6 +46,7 @@ add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test
     --format Column_Hierarchy
     --separator Tab
     --printAllStatistics
+    --moreStatistics
   )
 set_property(TEST ${testname} PROPERTY LABELS ${CLP})
 
