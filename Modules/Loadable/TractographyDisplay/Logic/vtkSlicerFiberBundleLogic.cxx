@@ -114,24 +114,29 @@ vtkMRMLFiberBundleNode* vtkSlicerFiberBundleLogic::AddFiberBundle (const char* f
 {
   vtkDebugMacro("Adding fiber bundle from filename " << filename);
 
-  vtkMRMLFiberBundleNode *fiberBundleNode = vtkMRMLFiberBundleNode::New();
-  vtkMRMLFiberBundleStorageNode *storageNode = vtkMRMLFiberBundleStorageNode::New();
+  vtkSmartPointer<vtkMRMLFiberBundleNode> fiberBundleNode =
+    vtkSmartPointer<vtkMRMLFiberBundleNode>::New();
+  vtkSmartPointer<vtkMRMLFiberBundleStorageNode> storageNode =
+    vtkSmartPointer<vtkMRMLFiberBundleStorageNode>::New();
 
   storageNode->SetFileName(filename);
   if (storageNode->ReadData(fiberBundleNode) != 0)
     {
+    // set node name based on filename
+    const std::string fname(filename);
+    const std::string name = itksys::SystemTools::GetFilenameWithoutExtension(fname);
+    const std::string uname( this->GetMRMLScene()->GetUniqueNameByString(name.c_str()));
+    fiberBundleNode->SetName(uname.c_str());
+
+    fiberBundleNode->SetScene(this->GetMRMLScene());
+    fiberBundleNode->SetAndObserveStorageNodeID(storageNode->GetID());
     this->GetMRMLScene()->AddNode(fiberBundleNode);
     fiberBundleNode->CreateDefaultDisplayNodes();
-
-    fiberBundleNode->Delete();
     }
   else
     {
     vtkErrorMacro("Couldn't read file, returning null fiberBundle node: " << filename);
-    fiberBundleNode->Delete();
-    fiberBundleNode = NULL;
     }
-  storageNode->Delete();
 
   return fiberBundleNode;
 }
