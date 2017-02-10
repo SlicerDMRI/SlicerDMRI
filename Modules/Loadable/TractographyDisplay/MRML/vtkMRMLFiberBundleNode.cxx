@@ -35,6 +35,7 @@ Version:   $Revision: 1.3 $
 #include <vtkInformation.h>
 #include <vtkNew.h>
 #include <vtkObjectFactory.h>
+#include <vtkPointData.h>
 #include <vtkPlanes.h>
 #include <vtkSelection.h>
 #include <vtkSelectionNode.h>
@@ -45,6 +46,7 @@ Version:   $Revision: 1.3 $
 #include <cassert>
 #include <math.h>
 #include <vector>
+#include <sstream>
 
 //------------------------------------------------------------------------------
 vtkCxxSetReferenceStringMacro(vtkMRMLFiberBundleNode, AnnotationNodeID);
@@ -219,7 +221,6 @@ void vtkMRMLFiberBundleNode::UpdateScene(vtkMRMLScene *scene)
       this->SelectWithAnnotationNode = 0;
     }
 
-
    const int ActualSelectWithAnnotationNode = this->SelectWithAnnotationNode;
    this->SelectWithAnnotationNode = -1;
    this->SetSelectWithAnnotationNode(ActualSelectWithAnnotationNode);
@@ -329,80 +330,32 @@ vtkMRMLFiberBundleDisplayNode* vtkMRMLFiberBundleNode::GetGlyphDisplayNode()
 
 
 //----------------------------------------------------------------------------
-vtkMRMLFiberBundleDisplayNode* vtkMRMLFiberBundleNode::AddLineDisplayNode()
-{
-  if (!this->GetScene())
-    {
-    return NULL;
-    }
-  vtkSmartPointer<vtkMRMLFiberBundleDisplayNode> node = this->GetLineDisplayNode();
-  if (node == NULL)
-    {
-    node = vtkSmartPointer<vtkMRMLFiberBundleLineDisplayNode>::New();
-    this->GetScene()->AddNode(node);
-
-    vtkNew<vtkMRMLDiffusionTensorDisplayPropertiesNode> glyphDTDPN;
-    this->GetScene()->AddNode(glyphDTDPN.GetPointer());
-    node->SetAndObserveDiffusionTensorDisplayPropertiesNodeID(glyphDTDPN->GetID());
-    node->SetAndObserveColorNodeID("vtkMRMLColorTableNodeRainbow");
-
-    this->AddAndObserveDisplayNodeID(node->GetID());
-    }
-  return node;
-}
-
-//----------------------------------------------------------------------------
-vtkMRMLFiberBundleDisplayNode* vtkMRMLFiberBundleNode::AddTubeDisplayNode()
-{
-  if (!this->GetScene())
-    {
-    return NULL;
-    }
-  vtkSmartPointer<vtkMRMLFiberBundleDisplayNode> node = this->GetTubeDisplayNode();
-  if (node == NULL)
-    {
-    node = vtkSmartPointer<vtkMRMLFiberBundleTubeDisplayNode>::New();
-    this->GetScene()->AddNode(node);
-
-    vtkNew<vtkMRMLDiffusionTensorDisplayPropertiesNode> glyphDTDPN;
-    this->GetScene()->AddNode(glyphDTDPN.GetPointer());
-    node->SetAndObserveDiffusionTensorDisplayPropertiesNodeID(glyphDTDPN->GetID());
-    node->SetAndObserveColorNodeID("vtkMRMLColorTableNodeRainbow");
-
-    this->AddAndObserveDisplayNodeID(node->GetID());
-    }
-  return node;
-}
-
-//----------------------------------------------------------------------------
-vtkMRMLFiberBundleDisplayNode* vtkMRMLFiberBundleNode::AddGlyphDisplayNode()
-{
-  if (!this->GetScene())
-    {
-    return NULL;
-    }
-  vtkSmartPointer<vtkMRMLFiberBundleDisplayNode> node = this->GetGlyphDisplayNode();
-  if (node == NULL)
-    {
-    node = vtkSmartPointer<vtkMRMLFiberBundleGlyphDisplayNode>::New();
-    this->GetScene()->AddNode(node);
-
-    vtkNew<vtkMRMLDiffusionTensorDisplayPropertiesNode> glyphDTDPN;
-    this->GetScene()->AddNode(glyphDTDPN.GetPointer());
-    node->SetAndObserveDiffusionTensorDisplayPropertiesNodeID(glyphDTDPN->GetID());
-    node->SetAndObserveColorNodeID("vtkMRMLColorTableNodeRainbow");
-
-    this->AddAndObserveDisplayNodeID(node->GetID());
-    }
-  return node;
-}
-
-//----------------------------------------------------------------------------
 void vtkMRMLFiberBundleNode::SetMeshConnection(vtkAlgorithmOutput *inputPort)
 {
   this->ExtractSelectedPolyDataIds->SetInputConnection(0, inputPort);
   this->Superclass::SetMeshConnection(inputPort);
   vtkPolyData* polyData = this->GetPolyData();
+
+  // Ensure that tensor arrays are named and set
+  if (polyData && polyData->GetPointData())
+    {
+    for (int i=0; i<polyData->GetPointData()->GetNumberOfArrays(); i++)
+      {
+      if (polyData->GetPointData()->GetArray(i)->GetNumberOfComponents() == 9)
+        {
+        if (polyData->GetPointData()->GetArray(i)->GetName() == 0)
+          {
+          std::stringstream ss;
+          ss << "Tensor_" << i;
+          polyData->GetPointData()->GetArray(i)->SetName(ss.str().c_str());
+          }
+        if (!polyData->GetPointData()->GetTensors())
+          {
+          polyData->GetPointData()->SetTensors(polyData->GetPointData()->GetArray(i));
+          }
+        }
+      }
+    }
 
   if (polyData)
     {
@@ -697,15 +650,47 @@ vtkMRMLStorageNode* vtkMRMLFiberBundleNode::CreateDefaultStorageNode()
 }
 
 //---------------------------------------------------------------------------
+vtkMRMLFiberBundleDisplayNode* addDisplayNodeAndDTDPN(vtkMRMLFiberBundleNode* fbNode,
+                                                      vtkMRMLFiberBundleDisplayNode* node)
+{
+  if (!fbNode->GetScene())
+    return node;
+
+  fbNode->GetScene()->AddNode(node);
+  vtkNew<vtkMRMLDiffusionTensorDisplayPropertiesNode> glyphDTDPN;
+  fbNode->GetScene()->AddNode(glyphDTDPN.GetPointer());
+  node->SetAndObserveDiffusionTensorDisplayPropertiesNodeID(glyphDTDPN->GetID());
+  node->SetAndObserveColorNodeID("vtkMRMLColorTableNodeRainbow");
+
+  fbNode->AddAndObserveDisplayNodeID(node->GetID());
+  return node;
+}
+
+//---------------------------------------------------------------------------
 void vtkMRMLFiberBundleNode::CreateDefaultDisplayNodes()
 {
   vtkDebugMacro("vtkMRMLFiberBundleNode::CreateDefaultDisplayNodes");
+  if (!this->GetScene())
+    return;
 
-  vtkMRMLFiberBundleDisplayNode *fbdn = this->AddLineDisplayNode();
-  fbdn->SetVisibility(1);
-  fbdn = this->AddTubeDisplayNode();
-  fbdn->SetVisibility(0);
-  fbdn = this->AddGlyphDisplayNode();
-  fbdn->SetVisibility(0);
+  if (!this->GetTubeDisplayNode())
+  {
+    vtkNew<vtkMRMLFiberBundleTubeDisplayNode> node;
+    addDisplayNodeAndDTDPN(this, node.GetPointer());
+    node->SetVisibility(1);
+  }
+
+  if (!this->GetLineDisplayNode())
+  {
+    vtkNew<vtkMRMLFiberBundleLineDisplayNode> node;
+    addDisplayNodeAndDTDPN(this, node.GetPointer());
+    node->SetVisibility(0);
+  }
+
+  if (!this->GetGlyphDisplayNode())
+  {
+    vtkNew<vtkMRMLFiberBundleGlyphDisplayNode> node;
+    addDisplayNodeAndDTDPN(this, node.GetPointer());
+    node->SetVisibility(0);
+  }
 }
-

@@ -44,7 +44,6 @@ public:
   //vtkTypeMacro(vtkMRMLFiberBundleNode,vtkMRMLTransformableNode);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-
   //--------------------------------------------------------------------------
   /// MRMLNode methods
   //--------------------------------------------------------------------------
@@ -167,18 +166,6 @@ public:
   ///
   /// get associated glyph display node or NULL if not set
   vtkMRMLFiberBundleDisplayNode* GetGlyphDisplayNode();
-
-  ///
-  /// add line display node if not already present and return it
-  vtkMRMLFiberBundleDisplayNode* AddLineDisplayNode();
-
-  ///
-  /// add tube display node if not already present and return it
-  vtkMRMLFiberBundleDisplayNode* AddTubeDisplayNode();
-
-  ///
-  /// add glyph display node if not already present and return it
-  vtkMRMLFiberBundleDisplayNode* AddGlyphDisplayNode();
 
   ///
   /// Create and return default storage node or NULL if does not have one

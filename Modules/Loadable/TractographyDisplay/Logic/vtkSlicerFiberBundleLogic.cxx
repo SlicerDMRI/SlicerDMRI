@@ -115,68 +115,13 @@ vtkMRMLFiberBundleNode* vtkSlicerFiberBundleLogic::AddFiberBundle (const char* f
   vtkDebugMacro("Adding fiber bundle from filename " << filename);
 
   vtkMRMLFiberBundleNode *fiberBundleNode = vtkMRMLFiberBundleNode::New();
-  vtkMRMLFiberBundleLineDisplayNode *displayLineNode = vtkMRMLFiberBundleLineDisplayNode::New();
-  vtkMRMLFiberBundleTubeDisplayNode *displayTubeNode = vtkMRMLFiberBundleTubeDisplayNode::New();
-  vtkMRMLFiberBundleGlyphDisplayNode *displayGlyphNode = vtkMRMLFiberBundleGlyphDisplayNode::New();
   vtkMRMLFiberBundleStorageNode *storageNode = vtkMRMLFiberBundleStorageNode::New();
-
-  vtkMRMLDiffusionTensorDisplayPropertiesNode *lineDTDPN = vtkMRMLDiffusionTensorDisplayPropertiesNode::New();
-  vtkMRMLDiffusionTensorDisplayPropertiesNode *tubeDTDPN = vtkMRMLDiffusionTensorDisplayPropertiesNode::New();
-  vtkMRMLDiffusionTensorDisplayPropertiesNode *glyphDTDPN = vtkMRMLDiffusionTensorDisplayPropertiesNode::New();
-  glyphDTDPN->SetGlyphGeometry(vtkMRMLDiffusionTensorDisplayPropertiesNode::Ellipsoids);
 
   storageNode->SetFileName(filename);
   if (storageNode->ReadData(fiberBundleNode) != 0)
     {
-    const std::string fname(filename);
-    const std::string name = itksys::SystemTools::GetFilenameWithoutExtension(fname);
-    const std::string uname( this->GetMRMLScene()->GetUniqueNameByString(name.c_str()));
-    fiberBundleNode->SetName(uname.c_str());
-
-    displayLineNode->SetVisibility(1);
-    displayTubeNode->SetVisibility(0);
-    displayGlyphNode->SetVisibility(0);
-
-    fiberBundleNode->SetScene(this->GetMRMLScene());
-    storageNode->SetScene(this->GetMRMLScene());
-    displayLineNode->SetScene(this->GetMRMLScene());
-    displayTubeNode->SetScene(this->GetMRMLScene());
-    displayGlyphNode->SetScene(this->GetMRMLScene());
-
-    this->GetMRMLScene()->SaveStateForUndo();
-    this->GetMRMLScene()->AddNode(lineDTDPN);
-    this->GetMRMLScene()->AddNode(tubeDTDPN);
-    this->GetMRMLScene()->AddNode(glyphDTDPN);
-
-    displayLineNode->SetAndObserveDiffusionTensorDisplayPropertiesNodeID(lineDTDPN->GetID());
-    displayTubeNode->SetAndObserveDiffusionTensorDisplayPropertiesNodeID(tubeDTDPN->GetID());
-    displayGlyphNode->SetAndObserveDiffusionTensorDisplayPropertiesNodeID(glyphDTDPN->GetID());
-
-    this->GetMRMLScene()->AddNode(storageNode);
-    this->GetMRMLScene()->AddNode(displayLineNode);
-    this->GetMRMLScene()->AddNode(displayTubeNode);
-    this->GetMRMLScene()->AddNode(displayGlyphNode);
-
-    fiberBundleNode->SetAndObserveStorageNodeID(storageNode->GetID());
-    displayLineNode->SetAndObserveColorNodeID("vtkMRMLColorTableNodeRainbow");
-    displayTubeNode->SetAndObserveColorNodeID("vtkMRMLColorTableNodeRainbow");
-    displayGlyphNode->SetAndObserveColorNodeID("vtkMRMLColorTableNodeRainbow");
-
-    fiberBundleNode->SetAndObserveDisplayNodeID(displayLineNode->GetID());
-    fiberBundleNode->AddAndObserveDisplayNodeID(displayTubeNode->GetID());
-    fiberBundleNode->AddAndObserveDisplayNodeID(displayGlyphNode->GetID());
-
     this->GetMRMLScene()->AddNode(fiberBundleNode);
-
-    if (!this->SetPolyDataTensors(fiberBundleNode))
-      {
-      vtkErrorMacro("No Tensors found in: " << filename);
-      }
-
-    // Set up display logic and any other logic classes in future
-    //this->InitializeLogicForFiberBundleNode(fiberBundleNode);
-
-    //this->Modified();
+    fiberBundleNode->CreateDefaultDisplayNodes();
 
     fiberBundleNode->Delete();
     }
@@ -187,15 +132,6 @@ vtkMRMLFiberBundleNode* vtkSlicerFiberBundleLogic::AddFiberBundle (const char* f
     fiberBundleNode = NULL;
     }
   storageNode->Delete();
-  displayLineNode->Delete();
-  displayTubeNode->Delete();
-  displayGlyphNode->Delete();
-
-  //displayLogic->Delete();
-
-  lineDTDPN->Delete();
-  tubeDTDPN->Delete();
-  glyphDTDPN->Delete();
 
   return fiberBundleNode;
 }
@@ -222,7 +158,6 @@ int vtkSlicerFiberBundleLogic::SaveFiberBundle (const char* filename, vtkMRMLFib
     storageNode->Delete();
     }
 
-  //storageNode->SetAbsoluteFileName(true);
   storageNode->SetFileName(filename);
 
   int res = storageNode->WriteData(fiberBundleNode);
@@ -236,6 +171,15 @@ void vtkSlicerFiberBundleLogic::PrintSelf(ostream& os, vtkIndent indent)
   this->vtkObject::PrintSelf(os, indent);
 
   os << indent << "vtkSlicerFiberBundleLogic:             " << this->GetClassName() << "\n";
+}
+
+//---------------------------------------------------------------------------
+void vtkSlicerFiberBundleLogic::SetMRMLSceneInternal(vtkMRMLScene* newScene)
+{
+  vtkNew<vtkIntArray> events;
+  events->InsertNextValue(vtkMRMLScene::NodeAddedEvent);
+  events->InsertNextValue(vtkMRMLScene::NodeRemovedEvent);
+  this->SetAndObserveMRMLSceneEvents(newScene, events.GetPointer());
 }
 
 //-----------------------------------------------------------------------------
@@ -254,69 +198,28 @@ void vtkSlicerFiberBundleLogic::RegisterNodes()
 #endif
 }
 
-//------------------------------------------------------------------------------
-bool vtkSlicerFiberBundleLogic::SetPolyDataTensors(vtkMRMLFiberBundleNode *fiberBundleNode)
+//---------------------------------------------------------------------------
+void vtkSlicerFiberBundleLogic::OnMRMLSceneNodeAdded(vtkMRMLNode* node)
 {
-  vtkPolyData *polyData = fiberBundleNode->GetPolyData();
-  bool hasTensors = false;
-  vtkDataArray *tensors = 0;
-  if (polyData && polyData->GetPointData()->GetTensors() )
+  if ((!node) || (!node->IsA("vtkMRMLFiberBundleNode")))
     {
-    tensors = polyData->GetPointData()->GetTensors();
-    hasTensors = true;
+    return;
     }
-  else if (polyData && polyData->GetPointData())
+  if (this->GetMRMLScene() &&
+      (this->GetMRMLScene()->IsImporting() ||
+       this->GetMRMLScene()->IsRestoring() ||
+       this->GetMRMLScene()->IsBatchProcessing()))
     {
-    for (int i=0; i<polyData->GetPointData()->GetNumberOfArrays(); i++)
-      {
-      if (polyData->GetPointData()->GetArray(i)->GetNumberOfComponents() == 9)
-        {
-        if (polyData->GetPointData()->GetArray(i)->GetName() == 0)
-          {
-          std::stringstream ss;
-          ss << "Tensor_" << i;
-          polyData->GetPointData()->GetArray(i)->SetName(ss.str().c_str());
-          }
-        if (!hasTensors)
-          {
-          tensors = polyData->GetPointData()->GetArray(i);
-          polyData->GetPointData()->SetTensors(tensors);
-          hasTensors = true;
-          }
-        }
-      }
+    return;
     }
 
-  if (tensors)
+  vtkMRMLFiberBundleNode *fbNode = vtkMRMLFiberBundleNode::SafeDownCast(node);
+  if (!fbNode)
     {
-    if (polyData->GetCellData())
-      {
-      polyData->GetCellData()->SetScalars(0);
-      }
-    vtkMRMLFiberBundleDisplayNode *dnode = fiberBundleNode->GetLineDisplayNode();
-    if (dnode)
-      {
-      vtkDataArray *da = dnode->GetInputPolyData()->GetPointData()->GetArray(tensors->GetName());
-      dnode->GetInputPolyData()->GetPointData()->SetTensors(da);
-
-      dnode->SetActiveTensorName(tensors->GetName());
-      }
-    dnode = fiberBundleNode->GetTubeDisplayNode();
-    if (dnode)
-      {
-      vtkDataArray *da = dnode->GetInputPolyData()->GetPointData()->GetArray(tensors->GetName());
-      dnode->GetInputPolyData()->GetPointData()->SetTensors(da);
-
-      dnode->SetActiveTensorName(tensors->GetName());
-      }
-    dnode = fiberBundleNode->GetGlyphDisplayNode();
-    if (dnode)
-      {
-      vtkDataArray *da = dnode->GetInputPolyData()->GetPointData()->GetArray(tensors->GetName());
-      dnode->GetInputPolyData()->GetPointData()->SetTensors(da);
-
-      dnode->SetActiveTensorName(tensors->GetName());
-      }
+    return;
     }
-  return hasTensors;
+  if (fbNode->GetDisplayNode() == NULL)
+    {
+    fbNode->CreateDefaultDisplayNodes();
+    }
 }
