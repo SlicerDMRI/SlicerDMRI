@@ -188,6 +188,9 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleDispla
   virtual void ProcessMRMLEvents ( vtkObject *caller,
                                  unsigned long event,
                                  void *callData );
+
+  virtual void SetInputMeshConnection (vtkAlgorithmOutput*);
+
  protected:
   vtkMRMLFiberBundleDisplayNode ( );
   ~vtkMRMLFiberBundleDisplayNode ( );

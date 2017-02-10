@@ -62,7 +62,8 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_LOGIC_EXPORT vtkSlicerFiberBundleLog
   // Gets called automatically when the MRMLScene is attached to this logic class.
   virtual void RegisterNodes();
 
-  static bool SetPolyDataTensors(vtkMRMLFiberBundleNode *fiberBundleNode);
+  virtual void SetMRMLSceneInternal(vtkMRMLScene*);
+  virtual void OnMRMLSceneNodeAdded(vtkMRMLNode*);
 
 protected:
   vtkSlicerFiberBundleLogic();

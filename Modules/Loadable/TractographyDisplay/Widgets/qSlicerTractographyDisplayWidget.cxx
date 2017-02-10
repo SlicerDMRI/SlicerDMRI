@@ -199,20 +199,9 @@ void qSlicerTractographyDisplayWidget::setFiberBundleNode(vtkMRMLFiberBundleNode
     this->setFiberBundleDisplayNode((vtkMRMLFiberBundleDisplayNode*)NULL);
     this->updateWidgetFromMRML();
     }
-  else if (d->FiberBundleDisplayNode)
+  else if (fiberBundleNode->GetDisplayNode())
     {
-      if (d->FiberBundleDisplayNode->IsA("vtkMRMLFiberBundleLineDisplayNode"))
-        {
-        this->setFiberBundleDisplayNode(fiberBundleNode->GetLineDisplayNode());
-        }
-      else if (d->FiberBundleDisplayNode->IsA("vtkMRMLFiberBundleTubeDisplayNode"))
-        {
-        this->setFiberBundleDisplayNode(fiberBundleNode->GetTubeDisplayNode());
-        }
-      else if (d->FiberBundleDisplayNode->IsA("vtkMRMLFiberBundleGlyphDisplayNode"))
-        {
-        this->setFiberBundleDisplayNode(fiberBundleNode->GetGlyphDisplayNode());
-        }
+    this->setFiberBundleDisplayNode(fiberBundleNode->GetDisplayNode());
     }
 }
 

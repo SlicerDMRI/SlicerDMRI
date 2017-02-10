@@ -141,30 +141,8 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::onEnter()
     {
     vtkMRMLFiberBundleNode *fiberNode = vtkMRMLFiberBundleNode::New();
     fiberNode->SetScene(this->mrmlScene());
-
-    vtkMRMLFiberBundleDisplayNode *dnode = 0;
-    dnode = fiberNode->AddTubeDisplayNode();
-    dnode->DisableModifiedEventOn();
-    dnode->SetScalarVisibility(1);
-    dnode->SetOpacity(1);
-    dnode->SetVisibility(1);
-    dnode->DisableModifiedEventOff();
-
-    dnode = fiberNode->AddLineDisplayNode();
-    dnode->DisableModifiedEventOn();
-    dnode->SetVisibility(0);
-    dnode->SetOpacity(1);
-    dnode->SetScalarVisibility(0);
-    dnode->DisableModifiedEventOff();
-
-    dnode = fiberNode->AddGlyphDisplayNode();
-    dnode->DisableModifiedEventOn();
-    dnode->SetVisibility(0);
-    dnode->SetScalarVisibility(1);
-    dnode->SetOpacity(1);
-    dnode->DisableModifiedEventOff();
-
     fiberNode = vtkMRMLFiberBundleNode::SafeDownCast(this->mrmlScene()->AddNode(fiberNode));
+    fiberNode->CreateDefaultDisplayNodes();
     Q_ASSERT(fiberNode);
     fiberNode->SetName("FiberBundle");
 

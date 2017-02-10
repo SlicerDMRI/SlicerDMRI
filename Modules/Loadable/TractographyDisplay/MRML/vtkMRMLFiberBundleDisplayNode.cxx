@@ -272,6 +272,13 @@ void vtkMRMLFiberBundleDisplayNode::ProcessMRMLEvents ( vtkObject *caller,
 }
 
 //---------------------------------------------------------------------------
+void vtkMRMLFiberBundleDisplayNode::SetInputMeshConnection(vtkAlgorithmOutput* connection)
+{
+  this->Superclass::SetInputMeshConnection(connection);
+  this->UpdateAssignedAttribute();
+}
+
+//---------------------------------------------------------------------------
 void vtkMRMLFiberBundleDisplayNode::UpdateAssignedAttribute()
 {
   if (this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModeScalarData)

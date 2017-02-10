@@ -107,7 +107,6 @@ void vtkSlicerTractographyInteractiveSeedingLogic::AddMRMLNodesObservers()
     {
     vtkMRMLDiffusionTensorVolumeNode *dtiNode = vtkMRMLDiffusionTensorVolumeNode::SafeDownCast(
           this->GetMRMLScene()->GetNodeByID(this->TractographyInteractiveSeedingNode->GetInputVolumeRef()));
-    vtkSetAndObserveMRMLNodeMacro(this->DiffusionTensorVolumeNode, dtiNode);
 
     vtkMRMLNode *seedinNode = this->GetMRMLScene()->GetNodeByID(this->TractographyInteractiveSeedingNode->GetInputFiducialRef());
 
@@ -513,110 +512,11 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTracts(vtkMRMLTractograp
                                  sampleStep, maxNumberOfSeeds, seedSelectedFiducials);
     }
 
-  //6. Extra5ct PolyData in RAS
-  if( !parametersNode->GetWriteToFile()  )
-  {
-    vtkNew<vtkPolyData> outFibers;
+  //6. Extract PolyData in RAS
+  vtkNew<vtkPolyData> outFibers;
 
-    seed->TransformStreamlinesToRASAndAppendToPolyData(outFibers.GetPointer());
-
-    int wasModifying = fiberNode->StartModify();
-
-    std::vector< vtkMRMLFiberBundleDisplayNode * > dnodes;
-    int newNode = 0;
-    vtkMRMLFiberBundleDisplayNode *dnode = fiberNode->GetTubeDisplayNode();
-    if (dnode == NULL || oldPoly == NULL)
-      {
-      dnode = fiberNode->AddTubeDisplayNode();
-      dnode->DisableModifiedEventOn();
-      dnode->SetScalarVisibility(1);
-      dnode->SetOpacity(1);
-      dnode->SetVisibility(1);
-      dnode->DisableModifiedEventOff();
-      newNode = 1;
-      }
-   dnode->DisableModifiedEventOn();
-   dnodes.push_back(dnode);
-   if (oldPoly == NULL && displayMode == 1)
-      {
-      dnode->SetVisibility(1);
-      }
-    else if (oldPoly == NULL && displayMode == 0)
-      {
-      dnode->SetVisibility(0);
-      }
-
-    dnode = fiberNode->GetLineDisplayNode();
-    if (dnode == NULL || oldPoly == NULL)
-      {
-      dnode = fiberNode->AddLineDisplayNode();
-      if (newNode)
-        {
-        dnode->DisableModifiedEventOn();
-        dnode->SetVisibility(0);
-        dnode->SetOpacity(1);
-        dnode->SetScalarVisibility(1);
-        dnode->DisableModifiedEventOff();
-        }
-      }
-    dnode->DisableModifiedEventOn();
-    dnodes.push_back(dnode);
-    if (oldPoly == NULL && displayMode == 0)
-      {
-      dnode->SetVisibility(1);
-      }
-    else if (oldPoly == NULL && displayMode == 1)
-      {
-      dnode->SetVisibility(0);
-      }
-
-    dnode = fiberNode->GetGlyphDisplayNode();
-    if (dnode == NULL || oldPoly == NULL)
-      {
-      dnode = fiberNode->AddGlyphDisplayNode();
-      if (newNode)
-        {
-        dnode->DisableModifiedEventOn();
-        dnode->SetVisibility(0);
-        dnode->SetScalarVisibility(1);
-        dnode->SetOpacity(1);
-        dnode->DisableModifiedEventOff();
-        }
-      }
-    dnode->DisableModifiedEventOn();
-    dnodes.push_back(dnode);
-
-    if (fiberNode->GetStorageNode() == NULL)
-      {
-      vtkNew<vtkMRMLFiberBundleStorageNode> storageNode;
-      fiberNode->GetScene()->AddNode(storageNode.GetPointer());
-      fiberNode->SetAndObserveStorageNodeID(storageNode->GetID());
-      }
-
-    if (vxformNode != NULL )
-      {
-      fiberNode->SetAndObserveTransformNodeID(vxformNode->GetID());
-      }
-    else
-      {
-      fiberNode->SetAndObserveTransformNodeID(NULL);
-      }
-
-    //For the results to reflect the paremeters, we make sure that there is no subsampling in the fibers
-    fiberNode->SetSubsamplingRatio(1.);
-
-    for (unsigned int i=0; i<dnodes.size(); i++)
-      {
-      dnodes[i]->DisableModifiedEventOff();
-      }
-
-    fiberNode->SetAndObservePolyData(outFibers.GetPointer());
-
-    fiberNode->EndModify(wasModifying);
-
-    // count on fiberNode->SetAndObservePolyData() sending PolyDataModifiedEvent
-    //fiberNode->InvokeEvent(vtkMRMLFiberBundleNode::PolyDataModifiedEvent, NULL);
-  }
+  seed->TransformStreamlinesToRASAndAppendToPolyData(outFibers.GetPointer());
+  fiberNode->SetAndObservePolyData(outFibers.GetPointer());
 
   return 1;
 }
@@ -639,12 +539,15 @@ void vtkSlicerTractographyInteractiveSeedingLogic::ProcessMRMLNodesEvents(vtkObj
     return;
     }
 
-  if (event == vtkMRMLHierarchyNode::ChildNodeAddedEvent ||
+  if (event == vtkMRMLModelNode::PolyDataModifiedEvent ||
+      event == vtkMRMLMarkupsNode::PointModifiedEvent)
+    {
+    this->UpdateOnce();
+    }
+  else if (event == vtkMRMLHierarchyNode::ChildNodeAddedEvent ||
       event == vtkMRMLHierarchyNode::ChildNodeRemovedEvent ||
       event == vtkMRMLNode::HierarchyModifiedEvent ||
       event == vtkMRMLTransformableNode::TransformModifiedEvent ||
-      event == vtkMRMLModelNode::PolyDataModifiedEvent ||
-      event == vtkMRMLMarkupsNode::PointModifiedEvent ||
       event == vtkMRMLMarkupsNode::MarkupAddedEvent ||
       event == vtkMRMLMarkupsNode::MarkupRemovedEvent)
     {
