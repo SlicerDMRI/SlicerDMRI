@@ -249,7 +249,7 @@ int add_tracts(SP<TrcTractographyResults> dcmtract,
 
   OFCondition result;
 
-  CodeWithModifiers anatomyCode;
+  CodeWithModifiers anatomyCode("3");
   anatomyCode.set("T-A0095", "SRT", "White matter of brain and spinal cord");
   CodeSequenceMacro diffusionModelCode("113231", "DCM", "Single Tensor");
   CodeSequenceMacro algorithmCode("113211", "DCM", "Deterministic");
