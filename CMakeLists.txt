@@ -16,6 +16,9 @@ set(EXTENSION_BUILD_SUBDIRECTORY inner-build)
 
 set(SUPERBUILD_TOPLEVEL_PROJECT inner)
 
+option(SlicerDMRI_ENABLE_TRACTIO "Enable TractIO module" ON)
+mark_as_advanced(SlicerDMRI_ENABLE_TRACTIO)
+
 #-----------------------------------------------------------------------------
 # Extension dependencies
 find_package(Slicer COMPONENTS ConfigurePrerequisites REQUIRED)
