@@ -32,7 +32,7 @@
 #include "VTK_to_DICOMTractCLP.h"
 
 // Shared ptr aliases
-#define SP std::shared_ptr
+#define SP OFshared_ptr
 #define vtkSP vtkSmartPointer
 
 #define TIO_MANUFACTURER "libTractIO";
