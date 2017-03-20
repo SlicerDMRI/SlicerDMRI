@@ -90,36 +90,20 @@ endif()
 # --------------------------------------------------------------------------
 # Folder
 # --------------------------------------------------------------------------
-if(NOT DEFINED ${PROJECT_NAME}_FOLDER)
-  set(${PROJECT_NAME}_FOLDER ${PROJECT_NAME})
+if(NOT DEFINED ${lib_name}_FOLDER)
+  set(${lib_name}_FOLDER ${lib_name})
 endif()
-if(NOT "${${PROJECT_NAME}_FOLDER}" STREQUAL "")
-  set_target_properties(${lib_name} PROPERTIES FOLDER ${${PROJECT_NAME}_FOLDER})
+if(NOT "${${lib_name}_FOLDER}" STREQUAL "")
+  set_target_properties(${lib_name} PROPERTIES FOLDER ${${lib_name}_FOLDER})
 endif()
 
 # --------------------------------------------------------------------------
 # Export target
 # --------------------------------------------------------------------------
-if(NOT DEFINED ${PROJECT_NAME}_EXPORT_FILE)
-  set(${PROJECT_NAME}_EXPORT_FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
+if(NOT DEFINED ${lib_name}_EXPORT_FILE)
+  set(${lib_name}_EXPORT_FILE ${CMAKE_CURRENT_BINARY_DIR}/${lib_name}Targets.cmake)
 endif()
-export(TARGETS ${lib_name} APPEND FILE ${${PROJECT_NAME}_EXPORT_FILE})
-
-# --------------------------------------------------------------------------
-# Install library
-# --------------------------------------------------------------------------
-if(NOT DEFINED ${PROJECT_NAME}_INSTALL_BIN_DIR)
-  set(${PROJECT_NAME}_INSTALL_BIN_DIR bin)
-endif()
-if(NOT DEFINED ${PROJECT_NAME}_INSTALL_LIB_DIR)
-  set(${PROJECT_NAME}_INSTALL_LIB_DIR lib/${PROJECT_NAME})
-endif()
-
-install(TARGETS ${lib_name}
-  RUNTIME DESTINATION ${${PROJECT_NAME}_INSTALL_BIN_DIR} COMPONENT RuntimeLibraries
-  LIBRARY DESTINATION ${${PROJECT_NAME}_INSTALL_LIB_DIR} COMPONENT RuntimeLibraries
-  ARCHIVE DESTINATION ${${PROJECT_NAME}_INSTALL_LIB_DIR} COMPONENT Development
-  )
+export(TARGETS ${lib_name} APPEND FILE ${${lib_name}_EXPORT_FILE})
 
 # --------------------------------------------------------------------------
 # Python Wrapping
@@ -127,23 +111,35 @@ install(TARGETS ${lib_name}
 if(VTK_WRAP_PYTHON)
   include(vtkMacroKitPythonWrap)
 
-  vtkMacroKitPythonWrap(
-    KIT_NAME ${lib_name}
-    KIT_SRCS ${vtkDMRI_SRCS}
-    KIT_INSTALL_BIN_DIR ${${PROJECT_NAME}_INSTALL_BIN_DIR}
-    KIT_INSTALL_LIB_DIR ${${PROJECT_NAME}_INSTALL_LIB_DIR}
+  SlicerMacroPythonWrapModuleVTKLibrary(
+    NAME ${lib_name}
+    SRCS ${vtkDMRI_SRCS}
+    WRAPPED_TARGET_LIBRARIES vtkDMRI
+    RELATIVE_PYTHON_DIR "."
+    )
+
+  # Set python module logic output
+  set_target_properties(${lib_name}Python ${lib_name}PythonD PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${Slicer_QTLOADABLEMODULES_BIN_DIR}"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${Slicer_QTLOADABLEMODULES_LIB_DIR}"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${Slicer_QTLOADABLEMODULES_LIB_DIR}"
     )
   # Export target
-  export(TARGETS ${lib_name}Python ${lib_name}PythonD APPEND FILE ${${PROJECT_NAME}_EXPORT_FILE})
-  # Folder
-  if(NOT "${${PROJECT_NAME}_FOLDER}" STREQUAL "")
-    set_target_properties(${lib_name}Python PROPERTIES FOLDER ${${PROJECT_NAME}_FOLDER})
-    set_target_properties(${lib_name}PythonD PROPERTIES FOLDER ${${PROJECT_NAME}_FOLDER})
-  endif()
+  export(TARGETS ${lib_name}Python ${lib_name}PythonD APPEND FILE ${${lib_name}_EXPORT_FILE})
 endif()
 
 # --------------------------------------------------------------------------
 # Set INCLUDE_DIRS variable
 # --------------------------------------------------------------------------
-set(${PROJECT_NAME}_INCLUDE_DIRS ${Slicer_ACTUAL_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
-  CACHE INTERNAL "${PROJECT_NAME} include dirs" FORCE)
+set(${lib_name}_INCLUDE_DIRS ${Slicer_ACTUAL_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
+  CACHE INTERNAL "${lib_name} include dirs" FORCE)
+
+# --------------------------------------------------------------------------
+# Install library
+# --------------------------------------------------------------------------
+install(TARGETS ${lib_name}
+  RUNTIME DESTINATION ${Slicer_INSTALL_QTLOADABLEMODULES_BIN_DIR} COMPONENT RuntimeLibraries
+  LIBRARY DESTINATION ${Slicer_INSTALL_QTLOADABLEMODULES_LIB_DIR} COMPONENT RuntimeLibraries
+  ARCHIVE DESTINATION ${Slicer_INSTALL_QTLOADABLEMODULES_LIB_DIR} COMPONENT Development
+  )
+
