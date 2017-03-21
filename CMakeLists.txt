@@ -9,7 +9,7 @@ set(EXTENSION_HOMEPAGE "http://slicerdmri.github.io")
 set(EXTENSION_CATEGORY "Diffusion")
 set(EXTENSION_CONTRIBUTORS "Isaiah Norton, Lauren O'Donnell (Brigham & Women's Hospital)")
 set(EXTENSION_DESCRIPTION "SlicerDMRI is an umbrella extension for Slicer Diffusion MRI functionality.")
-set(EXTENSION_ICONURL "http://www.example.com/Slicer/Extensions/SlicerDMRI.png")
+set(EXTENSION_ICONURL "http://raw.githubusercontent.com/SlicerDMRI/slicerdmri.github.io/master/images/DMRI_3D_SLICER-icon.png")
 set(EXTENSION_SCREENSHOTURLS "http://raw.githubusercontent.com/SlicerDMRI/slicerdmri.github.io/master/images/DMRI_3D_SLICER-icon.png")
 set(EXTENSION_DEPENDS "NA") # Specified as a space separated list or 'NA' if any
 set(EXTENSION_BUILD_SUBDIRECTORY inner-build)
