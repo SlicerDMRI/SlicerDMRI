@@ -8,6 +8,8 @@
 #include "vtkMRMLDiffusionTensorVolumeNode.h"
 #include "vtkMRMLAnnotationHierarchyNode.h"
 #include "vtkMRMLAnnotationFiducialNode.h"
+#include "vtkMRMLMarkupsFiducialNode.h"
+#include "vtkMRMLLabelMapVolumeNode.h"
 #include "vtkMRMLScene.h"
 
 // Tractography Logic includes
@@ -817,4 +819,43 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::toggleEnableInteractiveS
 
   this->setEnableSeeding(state);
   d->EnableSeedingCheckBox->setChecked(state);
+}
+
+//-----------------------------------------------------------------------------
+bool qSlicerTractographyInteractiveSeedingModuleWidget::setEditedNode(
+  vtkMRMLNode* node, QString role/*=QString()*/, QString context/*=QString()*/ )
+{
+  Q_D(qSlicerTractographyInteractiveSeedingModuleWidget);
+  if (vtkMRMLDiffusionTensorVolumeNode::SafeDownCast(node))
+    {
+    d->DTINodeSelector->setCurrentNode(node);
+    return true;
+    }
+  else if ( vtkMRMLMarkupsFiducialNode::SafeDownCast(node)
+    || vtkMRMLAnnotationHierarchyNode::SafeDownCast(node)
+    || vtkMRMLModelNode::SafeDownCast(node)
+    || vtkMRMLLabelMapVolumeNode::SafeDownCast(node) )
+    {
+    d->FiducialNodeSelector->setCurrentNode(node);
+    return true;
+    }
+  return false;
+}
+
+//-----------------------------------------------------------
+double qSlicerTractographyInteractiveSeedingModuleWidget::nodeEditable(vtkMRMLNode* node)
+{
+  if (vtkMRMLDiffusionTensorVolumeNode::SafeDownCast(node))
+    {
+    return 0.9;
+    }
+  else if ( vtkMRMLMarkupsFiducialNode::SafeDownCast(node)
+    || vtkMRMLAnnotationHierarchyNode::SafeDownCast(node)
+    || vtkMRMLModelNode::SafeDownCast(node)
+    || vtkMRMLLabelMapVolumeNode::SafeDownCast(node) )
+    {
+    return 0.6;
+    }
+
+  return 0.0;
 }
