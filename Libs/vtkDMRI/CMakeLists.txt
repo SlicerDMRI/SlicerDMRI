@@ -82,10 +82,11 @@ set(libs
   )
 target_link_libraries(${lib_name} ${libs})
 
-# Apply user-defined properties to the library target.
-if(Slicer_LIBRARY_PROPERTIES)
-  set_target_properties(${lib_name} PROPERTIES ${Slicer_LIBRARY_PROPERTIES})
-endif()
+set_target_properties(${lib_name} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${Slicer_QTLOADABLEMODULES_BIN_DIR}"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${Slicer_QTLOADABLEMODULES_LIB_DIR}"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${Slicer_QTLOADABLEMODULES_LIB_DIR}"
+    )
 
 # --------------------------------------------------------------------------
 # Folder
