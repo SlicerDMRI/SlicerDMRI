@@ -25,8 +25,9 @@
 #include <vtkMRMLMarkupsFiducialNode.h>
 #include <vtkMRMLScene.h>
 #include <vtkMRMLScalarVolumeNode.h>
-#include "vtkMRMLTractographyInteractiveSeedingNode.h"
 #include <vtkMRMLTransformNode.h>
+#include <vtkMRMLSubjectHierarchyNode.h>
+#include "vtkMRMLTractographyInteractiveSeedingNode.h"
 
 // vtkTeem includes
 #include <vtkDiffusionTensorMathematics.h>
@@ -656,6 +657,14 @@ void vtkSlicerTractographyInteractiveSeedingLogic
                      snode->GetSeedSelectedFiducials(),
                      snode->GetDisplayMode()
                      );
+
+  // Make sure output fiber node is under the DTI volume in subject hierarchy
+  vtkMRMLSubjectHierarchyNode* shNode =
+    vtkMRMLSubjectHierarchyNode::GetSubjectHierarchyNode(this->GetMRMLScene());
+  if (shNode)
+    {
+    shNode->CreateItem(shNode->GetItemByDataNode(volumeNode), fiberNode);
+    }
 }
 
 //----------------------------------------------------------------------------
