@@ -21,7 +21,6 @@ if(${VTK_VERSION_MAJOR} GREATER 5)
   include(${VTK_CMAKE_DIR}/vtkMakeInstantiator.cmake)
 endif()
 
-# note that this only runs when CMake does, so must re-run after `make clean`
 VTK_MAKE_INSTANTIATOR3("${MODULE_NAME}Instantiator"
   displayable_manager_instantiator_SRCS
   "${displayable_manager_SRCS}"

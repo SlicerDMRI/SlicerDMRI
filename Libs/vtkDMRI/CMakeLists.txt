@@ -82,11 +82,10 @@ set(libs
   )
 target_link_libraries(${lib_name} ${libs})
 
-set_target_properties(${lib_name} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${Slicer_QTLOADABLEMODULES_BIN_DIR}"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${Slicer_QTLOADABLEMODULES_LIB_DIR}"
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${Slicer_QTLOADABLEMODULES_LIB_DIR}"
-    )
+# Apply user-defined properties to the library target.
+if(Slicer_LIBRARY_PROPERTIES)
+  set_target_properties(${lib_name} PROPERTIES ${Slicer_LIBRARY_PROPERTIES})
+endif()
 
 # --------------------------------------------------------------------------
 # Folder
@@ -110,6 +109,7 @@ export(TARGETS ${lib_name} APPEND FILE ${${lib_name}_EXPORT_FILE})
 # Python Wrapping
 # --------------------------------------------------------------------------
 if(VTK_WRAP_PYTHON)
+  include(vtkMacroKitPythonWrap)
 
   SlicerMacroPythonWrapModuleVTKLibrary(
     NAME ${lib_name}
@@ -127,6 +127,12 @@ if(VTK_WRAP_PYTHON)
   # Export target
   export(TARGETS ${lib_name}Python ${lib_name}PythonD APPEND FILE ${${lib_name}_EXPORT_FILE})
 endif()
+
+# --------------------------------------------------------------------------
+# Set INCLUDE_DIRS variable
+# --------------------------------------------------------------------------
+set(${lib_name}_INCLUDE_DIRS ${Slicer_ACTUAL_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
+  CACHE INTERNAL "${lib_name} include dirs" FORCE)
 
 # --------------------------------------------------------------------------
 # Install library
