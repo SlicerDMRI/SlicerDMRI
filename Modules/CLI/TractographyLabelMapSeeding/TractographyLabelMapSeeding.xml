@@ -39,7 +39,7 @@
     <description><![CDATA[Options for seed placement]]></description>
     <double>
       <name>ClTh</name>
-      <label>Linear Measure Start Threshold</label>
+      <label>Start Threshold</label>
       <flag>-c</flag>
       <longflag>--clthreshold</longflag>
       <description><![CDATA[Minimum Linear Measure for the seeding to start.]]></description>
