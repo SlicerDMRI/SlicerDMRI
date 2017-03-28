@@ -117,6 +117,7 @@ public:
   // Get/Set Display Mode (module parameter)
   // 0 - Lines
   // 1 - Tubes
+  enum { Lines = 0, Tubes = 1 };
   vtkGetMacro(DisplayMode, int);
   vtkSetMacro(DisplayMode, int);
 

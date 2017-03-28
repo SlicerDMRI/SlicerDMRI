@@ -82,7 +82,7 @@ public slots:
   void setStoppingCriteria(const QString&);
 
   /// Set display mode 0-line 1-tube
-  void setTrackDisplayMode(int value);
+  void setTrackDisplayMode(const QString&);
 
   /// Set stopping curvature
   void setStoppingCurvature(double value);
