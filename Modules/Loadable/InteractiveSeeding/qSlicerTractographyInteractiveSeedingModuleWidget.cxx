@@ -219,8 +219,8 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::setup()
                 SLOT(setStoppingCurvature(double)));
 
   QObject::connect(d->StoppingCriteriaComboBox,
-                SIGNAL(currentIndexChanged(int)),
-                SLOT(setStoppingCriteria(int)));
+                SIGNAL(currentIndexChanged(const QString&)),
+                SLOT(setStoppingCriteria(const QString&)));
 
   QObject::connect(d->StoppingValueSpinBox,
                 SIGNAL(valueChanged(double)),
@@ -366,7 +366,8 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::setParametersPreset(int 
     }
   if (index == 0) //Slicer4 Interctive Seeding Defaults
     {
-     this->TractographyInteractiveSeedingNode->SetThresholdMode(0); //FA
+     this->TractographyInteractiveSeedingNode->SetThresholdMode(
+             vtkMRMLTractographyInteractiveSeedingNode::FractionalAnisotropy); // FA
      this->TractographyInteractiveSeedingNode->SetStoppingValue(0.25);
      this->TractographyInteractiveSeedingNode->SetStoppingCurvature(0.7);
      this->TractographyInteractiveSeedingNode->SetIntegrationStep(0.5);
@@ -382,7 +383,8 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::setParametersPreset(int 
     }
   else if (index == 1) //Slicer3 Fiducial Seeding Defaults
     {
-     this->TractographyInteractiveSeedingNode->SetThresholdMode(1); //LM
+     this->TractographyInteractiveSeedingNode->SetThresholdMode(
+             vtkMRMLTractographyInteractiveSeedingNode::LinearMeasure); //LM
      this->TractographyInteractiveSeedingNode->SetStoppingValue(0.25);
      this->TractographyInteractiveSeedingNode->SetStoppingCurvature(0.7);
      this->TractographyInteractiveSeedingNode->SetIntegrationStep(0.5);
@@ -398,7 +400,8 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::setParametersPreset(int 
     }
   else if (index == 2) //Slicer3 Labelmap Seeding Defaults
     {
-     this->TractographyInteractiveSeedingNode->SetThresholdMode(1); // LM
+     this->TractographyInteractiveSeedingNode->SetThresholdMode(
+             vtkMRMLTractographyInteractiveSeedingNode::LinearMeasure); // LM
      this->TractographyInteractiveSeedingNode->SetStoppingValue(0.1);
      this->TractographyInteractiveSeedingNode->SetStoppingCurvature(0.8);
      this->TractographyInteractiveSeedingNode->SetIntegrationStep(0.5);
@@ -693,15 +696,22 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::setFiducialRegionStep(do
     }
 }
 
-
 //-----------------------------------------------------------------------------
-void qSlicerTractographyInteractiveSeedingModuleWidget::setStoppingCriteria(int value)
+void qSlicerTractographyInteractiveSeedingModuleWidget::setStoppingCriteria(const QString& value)
 {
-  if (this->TractographyInteractiveSeedingNode)
-    {
-    this->TractographyInteractiveSeedingNode->SetThresholdMode(value);
-    }
+  if (NULL == this->TractographyInteractiveSeedingNode)
+    return;
+
+  if (value == "Fractional Anisotropy")
+    this->TractographyInteractiveSeedingNode->SetThresholdMode
+          (vtkMRMLTractographyInteractiveSeedingNode::FractionalAnisotropy);
+  else if (value == "Linear Measure")
+    this->TractographyInteractiveSeedingNode->SetThresholdMode
+          (vtkMRMLTractographyInteractiveSeedingNode::LinearMeasure);
+  else
+    assert("Unhandled Stopping Criteria");
 }
+
 //-----------------------------------------------------------------------------
 void qSlicerTractographyInteractiveSeedingModuleWidget::setTrackDisplayMode(int value)
 {

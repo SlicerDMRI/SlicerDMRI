@@ -61,6 +61,7 @@ public:
   // Get/Set Threshold Mode (module parameter)
   // 0 - FA
   // 1 - Linear Measure
+  enum { FractionalAnisotropy = 0, LinearMeasure = 1, PlanarMeasure = 2 };
   vtkGetMacro(ThresholdMode, int);
   vtkSetMacro(ThresholdMode, int);
 
