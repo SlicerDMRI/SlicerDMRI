@@ -31,7 +31,7 @@ vtkMRMLNodeNewMacro(vtkMRMLTractographyInteractiveSeedingNode);
 //----------------------------------------------------------------------------
 vtkMRMLTractographyInteractiveSeedingNode::vtkMRMLTractographyInteractiveSeedingNode()
 {
-   this->ThresholdMode = 0; //FA
+   this->ThresholdMode = vtkMRMLTractographyInteractiveSeedingNode::FractionalAnisotropy; //FA
    this->StartThreshold = 0.3;
    this->StoppingValue = 0.25;
    this->StoppingCurvature = 0.7;

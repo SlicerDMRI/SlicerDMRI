@@ -79,7 +79,7 @@ public slots:
   void setFiberBundleNode(vtkMRMLNode *node);
 
   /// Set stopping criteria 0-Linear Measure, 1 - FA
-  void setStoppingCriteria(int value);
+  void setStoppingCriteria(const QString&);
 
   /// Set display mode 0-line 1-tube
   void setTrackDisplayMode(int value);

@@ -190,6 +190,25 @@ int vtkSlicerTractographyInteractiveSeedingLogic::IsObservedNode(vtkMRMLNode *no
 }
 
 //----------------------------------------------------------------------------
+// DRY local helper function
+void setStreamerThresholdMode(vtkSmartPointer<vtkHyperStreamlineDTMRI> streamer,
+                              int thresholdMode)
+{
+  if ( thresholdMode == vtkMRMLTractographyInteractiveSeedingNode::LinearMeasure )
+    {
+     streamer->SetThresholdModeToLinearMeasure();
+    }
+  else if ( thresholdMode == vtkMRMLTractographyInteractiveSeedingNode::FractionalAnisotropy )
+    {
+    streamer->SetThresholdModeToFractionalAnisotropy();
+    }
+  else if ( thresholdMode == vtkMRMLTractographyInteractiveSeedingNode::PlanarMeasure )
+    {
+    streamer->SetThresholdModeToPlanarMeasure();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForOneSeed(vtkSeedTracts *seed,
                                                             vtkMRMLDiffusionTensorVolumeNode *volumeNode,
                                                             vtkMRMLTransformableNode *transformableNode,
@@ -282,18 +301,7 @@ void vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForOneSeed(vtkSee
   seed->SetVtkHyperStreamlinePointsSettings(streamer.GetPointer());
   seed->SetMinimumPathLength(minPathLength);
 
-  if ( thresholdMode == 0 )
-    {
-     streamer->SetThresholdModeToLinearMeasure();
-    }
-  else if ( thresholdMode == 1 )
-    {
-    streamer->SetThresholdModeToFractionalAnisotropy();
-    }
-  else if ( thresholdMode == 2 )
-    {
-    streamer->SetThresholdModeToPlanarMeasure();
-    }
+  setStreamerThresholdMode(streamer.GetPointer(), thresholdMode);
 
   //streamer->SetMaximumPropagationDistance(this->MaximumPropagationDistance);
   streamer->SetStoppingThreshold(stoppingValue);
@@ -754,7 +762,8 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForLabelMap(
   else
     {
     math->SetInputConnection(volumeNode->GetImageDataConnection());
-    if ( thresholdMode == 0 )
+    if ( thresholdMode ==
+         vtkMRMLTractographyInteractiveSeedingNode::LinearMeasure )
       {
       math->SetOperationToLinearMeasure();
       }
@@ -910,18 +919,7 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForLabelMap(
   vtkNew<vtkHyperStreamlineDTMRI> streamer;
   seed->SetVtkHyperStreamlinePointsSettings(streamer.GetPointer());
 
-  if ( thresholdMode == 0 )
-    {
-     streamer->SetThresholdModeToLinearMeasure();
-    }
-  else if ( thresholdMode == 1 )
-    {
-    streamer->SetThresholdModeToFractionalAnisotropy();
-    }
-  else if ( thresholdMode == 2 )
-    {
-    streamer->SetThresholdModeToPlanarMeasure();
-    }
+  setStreamerThresholdMode(streamer.GetPointer(), thresholdMode);
 
   streamer->SetStoppingThreshold(stoppingValue);
   streamer->SetMaximumPropagationDistance(maxPathLength);
