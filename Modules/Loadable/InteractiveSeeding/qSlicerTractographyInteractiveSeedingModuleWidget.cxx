@@ -247,8 +247,8 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::setup()
                 SLOT(setFiducialRegionStep(double)));
 
   QObject::connect(d->DisplayTracksComboBox,
-                SIGNAL(currentIndexChanged(int)),
-                SLOT(setTrackDisplayMode(int)));
+                SIGNAL(currentIndexChanged(const QString&)),
+                SLOT(setTrackDisplayMode(const QString&)));
 
   QObject::connect(d->SeedSelectedCheckBox,
                 SIGNAL(stateChanged(int)),
@@ -614,12 +614,22 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::updateWidgetFromMRML()
     d->StoppingCurvatureSpinBox->setValue(paramNode->GetStoppingCurvature());
     d->StoppingCriteriaComboBox->setCurrentIndex(paramNode->GetThresholdMode());
     d->StoppingValueSpinBox->setValue(paramNode->GetStoppingValue());
-    d->DisplayTracksComboBox->setCurrentIndex(paramNode->GetDisplayMode());
     d->ROILabelInput->setText(paramNode->ROILabelsToString().c_str());
     d->RandomGridCheckBox->setChecked(paramNode->GetRandomGrid());
     d->UseIndexSpaceCheckBox->setChecked(paramNode->GetUseIndexSpace());
     d->StartThresholdSlider->setValue(paramNode->GetStartThreshold());
     d->SeedSpacingSlider->setValue(paramNode->GetSeedSpacing());
+
+    { // Use enums for display mode
+      QString target;
+      switch (paramNode->GetDisplayMode())
+        {
+        case vtkMRMLTractographyInteractiveSeedingNode::Tubes: target = "Tubes";
+        case vtkMRMLTractographyInteractiveSeedingNode::Lines: target = "Lines";
+        default: assert("Unknown display mode type!"); target = "Lines";
+        }
+      d->DisplayTracksComboBox->setCurrentIndex(d->DisplayTracksComboBox->findText(target));
+    }
 
     d->ParameterNodeSelector->setCurrentNode(
       this->mrmlScene()->GetNodeByID(paramNode->GetID()));
@@ -713,12 +723,17 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::setStoppingCriteria(cons
 }
 
 //-----------------------------------------------------------------------------
-void qSlicerTractographyInteractiveSeedingModuleWidget::setTrackDisplayMode(int value)
+void qSlicerTractographyInteractiveSeedingModuleWidget::setTrackDisplayMode(const QString& value)
 {
-  if (this->TractographyInteractiveSeedingNode)
-    {
-    this->TractographyInteractiveSeedingNode->SetDisplayMode(value);
-    }
+  if (NULL == this->TractographyInteractiveSeedingNode)
+    return;
+
+  if (value == "Lines")
+    this->TractographyInteractiveSeedingNode->SetDisplayMode(vtkMRMLTractographyInteractiveSeedingNode::Lines);
+  else if (value == "Tubes")
+    this->TractographyInteractiveSeedingNode->SetDisplayMode(vtkMRMLTractographyInteractiveSeedingNode::Tubes);
+  else
+    assert("Unhandled Track Display Mode");
 }
 
 //-----------------------------------------------------------------------------
