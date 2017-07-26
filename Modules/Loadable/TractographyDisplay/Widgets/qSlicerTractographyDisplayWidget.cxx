@@ -656,21 +656,23 @@ void qSlicerTractographyDisplayWidget::updateScalarRange()
     {
     d->FiberBundleDisplayNode->GetOutputMeshConnection()->GetProducer()->Update();
     }
+
   d->FiberBundleDisplayNode->GetScalarRange(range);
+
   if (d->FiberBundleDisplayNode->GetAutoScalarRange())
     {
+    d->FiberBundleColorRangeWidget->setRange(range[0], range[1]);
     d->FiberBundleColorRangeWidget->setMinimumValue(range[0]);
     d->FiberBundleColorRangeWidget->setMaximumValue(range[1]);
-    d->FiberBundleColorRangeWidget->setRange(range[0], range[1]);
     }
   else
     {
-    d->FiberBundleColorRangeWidget->setMinimumValue(range[0]);
-    d->FiberBundleColorRangeWidget->setMaximumValue(range[1]);
-
     if ((d->FiberBundleColorRangeWidget->minimum() > range[0]) ||
         (d->FiberBundleColorRangeWidget->maximum() < range[1]))
       d->FiberBundleColorRangeWidget->setRange(range[0], range[1]);
+
+    d->FiberBundleColorRangeWidget->setMinimumValue(range[0]);
+    d->FiberBundleColorRangeWidget->setMaximumValue(range[1]);
     }
   const double step = (range[1] - range[0]) / 100.;
   d->FiberBundleColorRangeWidget->setSingleStep(step);
