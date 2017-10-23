@@ -36,7 +36,6 @@
 #include "vtkSlicerFiberBundleLogic.h"
 
 #include <vtkMRMLThreeDViewDisplayableManagerFactory.h>
-#include "TractographyDisplayInstantiator.h"
 
 //-----------------------------------------------------------------------------
 Q_EXPORT_PLUGIN2(qSlicerTractographyDisplayModule, qSlicerTractographyDisplayModule);
