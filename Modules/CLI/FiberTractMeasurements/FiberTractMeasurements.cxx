@@ -5,6 +5,10 @@
 #include <Libs/vtkTeem/vtkNRRDReader.h>
 #include <Libs/vtkTeem/vtkNRRDWriter.h>
 
+// vnl includes
+#include <vnl/vnl_math.h>
+#include <vnl/vnl_double_3.h>
+
 // VTK includes
 #include <vtkAssignAttribute.h>
 #include <vtkGlobFileNames.h>
@@ -75,7 +79,7 @@ void computeFiberStats(vtkSmartPointer<vtkPolyData> input,
 
 void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> input,
                                std::string &id,
-                               std::string &operation, 
+                               std::string &operation,
                                bool moreStatistics);
 
 int computeTensorMeasurement(vtkSmartPointer<vtkPolyData> input,
@@ -135,6 +139,40 @@ void getPathFromParentToChild(vtkMRMLHierarchyNode *parent,
     }
 }
 
+double computeMeanLineLength(vtkSmartPointer<vtkPolyData> poly)
+{
+  size_t total_measured_lines = 0;
+  double total_length = 0.0;
+  vnl_double_3 prev, next;
+  vtkNew<vtkIdList> pointIds;
+
+  poly->GetLines()->InitTraversal();
+
+  while(poly->GetLines()->GetNextCell(pointIds.GetPointer()))
+    {
+    // get first point
+    poly->GetPoints()->GetPoint(pointIds->GetId(0), prev.data_block());
+
+    // count by segments
+    size_t n = 1;
+
+    for ( ; n < pointIds->GetNumberOfIds(); n++)
+      {
+      // get next point
+      poly->GetPoints()->GetPoint(pointIds->GetId(n), next.data_block());
+
+      // add segment length to total
+      total_length += (next - prev).two_norm();
+      prev = next;
+      }
+
+    // only count line if actually measured
+    if (n > 1) { total_measured_lines++; }
+    }
+
+  return total_length / total_measured_lines;
+}
+
 void computeFiberStats(vtkSmartPointer<vtkPolyData> poly,
                        std::string &id)
 {
@@ -143,8 +181,9 @@ void computeFiberStats(vtkSmartPointer<vtkPolyData> poly,
     return;
   }
 
-  int npoints = poly->GetNumberOfPoints();
-  int npolys = poly->GetNumberOfCells();
+  size_t npoints = poly->GetNumberOfPoints();
+  size_t npolys = poly->GetNumberOfCells();
+  double mean_length = computeMeanLineLength(poly);
 
   //if (npoints > 0 && npolys > 0)
   //  {
@@ -154,8 +193,9 @@ void computeFiberStats(vtkSmartPointer<vtkPolyData> poly,
       OutTable[id] = std::map<std::string, double>();
       it = OutTable.find(id);
       }
-    it->second[std::string("Num_Points")] = npoints;
-    it->second[std::string("Num_Fibers")] = npolys;
+    it->second["Num_Points"] = npoints;
+    it->second["Num_Fibers"] = npolys;
+    it->second["Mean_Length"] = mean_length;
    // }
 }
 
@@ -203,7 +243,7 @@ void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
         op_max = op_iter->second.second;
         }
       }
-    
+
     vtkDoubleArray *vals = vtkDoubleArray::New();
     double val;
     double sum = 0;
@@ -276,7 +316,7 @@ void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
 
     std::string name_mean = name + "." + MEAN_PRINT;
     it->second[name_mean] = mean;
-    
+
     if (moreStatistics)
       {
       std::string name_min = name + "." + MIN_PRINT;
@@ -845,6 +885,7 @@ int main( int argc, char * argv[] )
 
   aggregate_names.push_back("Num_Points");
   aggregate_names.push_back("Num_Fibers");
+  aggregate_names.push_back("Mean_Length");
   aggregate_names.push_back(EXCLUDED_NUMBER_PRINT);
 
   if (inputType == std::string("Fibers_Hierarchy") )
