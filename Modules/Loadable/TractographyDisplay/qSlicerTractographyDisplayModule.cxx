@@ -25,6 +25,7 @@
 #include <qSlicerCoreApplication.h>
 #include <qSlicerCoreIOManager.h>
 #include <qSlicerNodeWriter.h>
+#include <vtkSlicerVersionConfigure.h> // For Slicer_VERSION_MAJOR, Slicer_VERSION_MINOR
 
 // Tractography QTModule includes
 #include "qSlicerTractographyDisplayModule.h"
@@ -36,6 +37,12 @@
 #include "vtkSlicerFiberBundleLogic.h"
 
 #include <vtkMRMLThreeDViewDisplayableManagerFactory.h>
+
+// DisplayableManager initialization
+#if Slicer_VERSION_MAJOR == 4 && Slicer_VERSION_MINOR >= 9
+#include <vtkAutoInit.h>
+VTK_MODULE_INIT(vtkTractographyDisplayMRMLDM)
+#endif
 
 //-----------------------------------------------------------------------------
 Q_EXPORT_PLUGIN2(qSlicerTractographyDisplayModule, qSlicerTractographyDisplayModule);
