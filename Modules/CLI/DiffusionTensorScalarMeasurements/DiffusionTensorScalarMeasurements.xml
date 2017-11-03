@@ -35,6 +35,7 @@
       <element>FractionalAnisotropy</element>
       <element>Trace</element>
       <element>Determinant</element>
+      <element>MeanDiffusivity</element>
       <element>RelativeAnisotropy</element>
       <element>Mode</element>
       <element>LinearMeasure</element>

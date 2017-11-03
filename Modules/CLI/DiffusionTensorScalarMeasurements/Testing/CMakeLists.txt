@@ -35,7 +35,8 @@ set(MeasuresToTest
       MidEigenvalue
       MaxEigenvalue
       ParallelDiffusivity
-      PerpendicularDiffusivity)
+      PerpendicularDiffusivity
+      MeanDiffusivity)
 
 foreach(measure ${MeasuresToTest})
   set(testname ${CLP}Test${measure})

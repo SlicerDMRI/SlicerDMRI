@@ -140,6 +140,10 @@ int main( int argc, char * argv[] )
     {
     math->SetOperationToPerpendicularDiffusivity();
     }
+  else if( operation == std::string("MeanDiffusivity") )
+    {
+    math->SetOperationToMeanDiffusivity();
+    }
   else
     {
     std::cerr << argv[0] << ": Operation " << operation << "not supported" << std::endl;
