@@ -52,6 +52,7 @@ vtkMRMLFiberBundleTubeDisplayNode::vtkMRMLFiberBundleTubeDisplayNode()
   this->TubeFilter->SetInputConnection(
     this->Superclass::GetOutputMeshConnection());
 
+
   this->TensorToColor = vtkPolyDataTensorToColor::New();
   this->TensorToColor->SetInputConnection(this->TubeFilter->GetOutputPort());
 
@@ -158,6 +159,7 @@ void vtkMRMLFiberBundleTubeDisplayNode::UpdateAssignedAttribute()
     this->Superclass::GetOutputMeshConnection());
   this->TubeFilter->SetInputConnection(
     this->Superclass::GetOutputMeshConnection());
+  this->TensorToColor->SetInputConnection(this->TubeFilter->GetOutputPort());
 
   if (!this->Visibility)
     {
@@ -334,7 +336,7 @@ void vtkMRMLFiberBundleTubeDisplayNode::UpdateAssignedAttribute()
       else if (this->GetInputPolyData())
         {
         this->GetOutputMeshConnection()->GetProducer()->Update();
-        vtkPointData *pointData = this->GetOutputPolyData()->GetPointData();
+        vtkPointData *pointData = this->GetOutputMesh()->GetPointData();
         if (pointData)
           {
           double *activeScalarRange = 0;
@@ -365,7 +367,7 @@ void vtkMRMLFiberBundleTubeDisplayNode::UpdateAssignedAttribute()
              this->GetInputPolyData())
       {
       this->GetInputMeshConnection()->GetProducer()->Update();
-      vtkPointData *pointData = this->GetOutputPolyData()->GetPointData();
+      vtkPointData *pointData = this->GetOutputMesh()->GetPointData();
       if (pointData &&
           pointData->GetArray(this->GetActiveScalarName()))
         {

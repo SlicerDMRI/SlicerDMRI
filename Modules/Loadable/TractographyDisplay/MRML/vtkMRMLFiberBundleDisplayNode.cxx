@@ -263,8 +263,10 @@ void vtkMRMLFiberBundleDisplayNode::ProcessMRMLEvents ( vtkObject *caller,
                                            void *callData )
 {
   Superclass::ProcessMRMLEvents(caller, event, callData);
-  if (vtkMRMLDiffusionTensorDisplayPropertiesNode::SafeDownCast(caller) &&
-    event ==  vtkCommand::ModifiedEvent)
+  if (event ==  vtkCommand::ModifiedEvent &&
+      (vtkMRMLDiffusionTensorDisplayPropertiesNode::SafeDownCast(caller) ||
+       vtkMRMLFiberBundleDisplayNode::SafeDownCast(caller))
+    )
     {
     this->UpdateAssignedAttribute();
     }
