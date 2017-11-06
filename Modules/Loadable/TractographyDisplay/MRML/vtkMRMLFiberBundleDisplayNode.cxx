@@ -306,29 +306,23 @@ void vtkMRMLFiberBundleDisplayNode::SetColorMode (int colorMode)
   int oldColorMode = this->GetColorMode();
   this->ColorMode = colorMode;
 
-  if (this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModeSolid)
+  if (this->GetColorMode() == vtkMRMLFiberBundleDisplayNode::colorModeSolid)
     {
-    this->ScalarVisibilityOff( );
+    this->ScalarVisibilityOff();
     }
-  else if (this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModeUseCellScalars)
+  else if ((this->GetColorMode() == vtkMRMLFiberBundleDisplayNode::colorModeScalarData) ||
+           (this->GetColorMode() == vtkMRMLFiberBundleDisplayNode::colorModeScalar) ||
+           (this->GetColorMode() == vtkMRMLFiberBundleDisplayNode::colorModeMeanFiberOrientation) ||
+           (this->GetColorMode() == vtkMRMLFiberBundleDisplayNode::colorModePointFiberOrientation) ||
+           (this->GetColorMode() == vtkMRMLFiberBundleDisplayNode::colorModeUseCellScalars))
     {
-    this->ScalarVisibilityOn( );
+    this->ScalarVisibilityOn();
     }
-  else if (this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModeMeanFiberOrientation)
+
+  if ((this->GetColorMode() != vtkMRMLFiberBundleDisplayNode::colorModeScalarData) &&
+      (this->GetColorMode() != vtkMRMLFiberBundleDisplayNode::colorModeUseCellScalars))
     {
-    this->ScalarVisibilityOn( );
-    }
-  else if (this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModePointFiberOrientation)
-    {
-    this->ScalarVisibilityOn( );
-   }
-  else if (this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModeScalarData)
-    {
-    this->ScalarVisibilityOn( );
-    }
-  else if (this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModeScalar)
-    {
-    this->ScalarVisibilityOn( );
+    this->SetActiveScalarName(NULL);
     }
 
   if (this->ColorMode != oldColorMode)
