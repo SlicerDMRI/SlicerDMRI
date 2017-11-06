@@ -218,6 +218,7 @@ void vtkMRMLFiberBundleTubeDisplayNode::UpdateAssignedAttribute()
   else if ((this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModeScalar) &&
            (DiffusionTensorDisplayPropertiesNode != NULL))
     {
+    this->TensorToColor->SetColorModeToEigenvalues();
     this->TensorToColor->SetExtractScalar(1);
 
     switch ( DiffusionTensorDisplayPropertiesNode->GetColorGlyphBy( ))
