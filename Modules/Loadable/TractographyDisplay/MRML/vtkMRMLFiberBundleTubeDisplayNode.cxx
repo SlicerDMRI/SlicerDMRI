@@ -159,7 +159,6 @@ void vtkMRMLFiberBundleTubeDisplayNode::UpdateAssignedAttribute()
     this->Superclass::GetOutputMeshConnection());
   this->TubeFilter->SetInputConnection(
     this->Superclass::GetOutputMeshConnection());
-  this->TensorToColor->SetInputConnection(this->TubeFilter->GetOutputPort());
 
   if (!this->Visibility)
     {
@@ -175,11 +174,11 @@ void vtkMRMLFiberBundleTubeDisplayNode::UpdateAssignedAttribute()
   this->TubeFilter->SetRadius(this->GetTubeRadius());
 
   // set line coloring
-  if (this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModeSolid)
+  if (this->GetColorMode() == vtkMRMLFiberBundleDisplayNode::colorModeSolid)
     {
     this->TensorToColor->SetExtractScalar(0);
     }
-  else if (this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModeUseCellScalars)
+  else if (this->GetColorMode() == vtkMRMLFiberBundleDisplayNode::colorModeUseCellScalars)
     {
     this->TensorToColor->SetExtractScalar(0); // force a copy of the data
     this->SetActiveScalarName("ClusterId");
