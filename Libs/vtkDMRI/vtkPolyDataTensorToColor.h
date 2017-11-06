@@ -21,14 +21,8 @@
 
 #include "vtkTensorGlyph.h"
 
-/// \brief Extracts points whose scalar value satisfies threshold criterion.
-///
-/// vtkPolyDataTensorToColor is a filter that extracts points from a dataset that
-/// satisfy a threshold criterion. The criterion can take three forms:
-/// 1) greater than a particular value; 2) less than a particular value; or
-/// 3) between a particular value. The output of the filter is polygonal data.
-///
-/// \sa vtkThreshold
+/// \brief Calculates scalar values from vtkPolyData tensors.
+
 class vtkDMRI_EXPORT vtkPolyDataTensorToColor : public vtkPolyDataAlgorithm
 {
 public:
