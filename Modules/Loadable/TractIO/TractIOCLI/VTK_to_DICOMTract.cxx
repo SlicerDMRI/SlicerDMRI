@@ -40,6 +40,9 @@
 #define TIO_DEVICESERIALNUMBER "0000";
 #define TIO_SOFTWAREVERSIONS "TractIO 0.1\\DCMTK 3.6.1";
 
+// Derived from Isaiah's Medical Connections UID root
+#define SLICERDMRI_UID_SERIES_ROOT "1.2.826.0.1.3680043.9.7239.2.1"
+
 // Forward declaration
 SP<TrcTractographyResults> create_dicom(std::vector<std::string> files);
 int add_tracts(SP<TrcTractographyResults> dcmtract,
@@ -95,12 +98,19 @@ int main(int argc, char *argv[])
     return EXIT_FAILURE;
     }
 
+  // rewrite the SeriesInstanceUID to be unique
+  IODGeneralSeriesModule series_mod = dicom->getSeries();
+  char uid[65];
+  series_mod.setSeriesInstanceUID(dcmGenerateUniqueIdentifier(uid, SLICERDMRI_UID_SERIES_ROOT));
+
   // add tracks from polydata
   if ( add_tracts(dicom, polydata) != 0)
     {
     std::cerr << "Error: Failed to add tracks from polydata." << std::endl;
     return EXIT_FAILURE;
     }
+
+
 
   // write DICOM to disk
   OFCondition ofresult;
