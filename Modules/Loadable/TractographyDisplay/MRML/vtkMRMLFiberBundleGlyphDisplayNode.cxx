@@ -187,8 +187,8 @@ void vtkMRMLFiberBundleGlyphDisplayNode::UpdateAssignedAttribute()
             {
             vtkDebugMacro("coloring with orientation ====================");
             this->DiffusionTensorGlyphFilter->ColorGlyphsByOrientation( );
-            vtkMRMLNode* ColorNode = this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow");
-            if (ColorNode)
+            vtkMRMLNode* colorNode = this->GetScene() ? this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow") : NULL;
+            if (colorNode)
               {
               this->SetAndObserveColorNodeID(ColorNode->GetID());
               }
