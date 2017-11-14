@@ -193,10 +193,10 @@ void vtkMRMLFiberBundleTubeDisplayNode::UpdateAssignedAttribute()
     this->ColorLinesByOrientation->SetColorMode(
       this->ColorLinesByOrientation->colorModeMeanFiberOrientation);
     this->TubeFilter->SetInputConnection(this->ColorLinesByOrientation->GetOutputPort());
-    vtkMRMLNode* ColorNode = this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow");
-    if (ColorNode)
+    vtkMRMLNode* colorNode = this->GetScene() ? this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow") : NULL;
+    if (colorNode)
       {
-      this->SetAndObserveColorNodeID(ColorNode->GetID());
+      this->SetAndObserveColorNodeID(colorNode->GetID());
       }
     }
   else if (this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModePointFiberOrientation)
@@ -205,10 +205,11 @@ void vtkMRMLFiberBundleTubeDisplayNode::UpdateAssignedAttribute()
     this->ColorLinesByOrientation->SetColorMode(
       this->ColorLinesByOrientation->colorModePointFiberOrientation);
     this->TubeFilter->SetInputConnection(this->ColorLinesByOrientation->GetOutputPort());
-    vtkMRMLNode* ColorNode = this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow");
-    if (ColorNode)
+    // TODO rename, easy to shadow vtkMRMLDisplayNode::ColorNode
+    vtkMRMLNode* colorNode = this->GetScene() ? this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow") : NULL;
+    if (colorNode)
       {
-      this->SetAndObserveColorNodeID(ColorNode->GetID());
+      this->SetAndObserveColorNodeID(colorNode->GetID());
       }
     }
   else if (this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModeScalarData)
@@ -245,10 +246,10 @@ void vtkMRMLFiberBundleTubeDisplayNode::UpdateAssignedAttribute()
         {
         vtkDebugMacro("coloring with orientation =================");
         this->TensorToColor->ColorGlyphsByOrientation( );
-        vtkMRMLNode* ColorNode = this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow");
-        if (ColorNode)
+        vtkMRMLNode* colorNode = this->GetScene() ? this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow") : NULL;
+        if (colorNode)
           {
-          this->SetAndObserveColorNodeID(ColorNode->GetID());
+          this->SetAndObserveColorNodeID(colorNode->GetID());
           }
         }
         break;
