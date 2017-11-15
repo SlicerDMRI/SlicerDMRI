@@ -317,6 +317,7 @@ void vtkMRMLFiberBundleDisplayNode::SetColorMode (int colorMode)
            (this->GetColorMode() == vtkMRMLFiberBundleDisplayNode::colorModeUseCellScalars))
     {
     this->ScalarVisibilityOn();
+    this->SetAutoScalarRange(1);
     }
 
   if ((this->GetColorMode() != vtkMRMLFiberBundleDisplayNode::colorModeScalarData) &&
