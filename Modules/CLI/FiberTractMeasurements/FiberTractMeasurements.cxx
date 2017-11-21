@@ -366,6 +366,10 @@ int computeTensorMeasurement(vtkSmartPointer<vtkPolyData> poly,
       {
       math->ColorGlyphsByTrace();
       }
+    else if( operation == "MeanDiffusivity")
+      {
+      math->ColorGlyphsByMeanDiffusivity();
+      }
     else if( operation == std::string("RelativeAnisotropy") )
       {
       math->ColorGlyphsByRelativeAnisotropy();
@@ -867,6 +871,7 @@ int main( int argc, char * argv[] )
   vtkNew<vtkPolyDataTensorToColor> math;
   std::vector<std::string> operations;
   operations.push_back(std::string("Trace"));
+  operations.push_back(std::string("MeanDiffusivity"));
   operations.push_back(std::string("RelativeAnisotropy"));
   operations.push_back(std::string("FractionalAnisotropy"));
   operations.push_back(std::string("LinearMeasure"));

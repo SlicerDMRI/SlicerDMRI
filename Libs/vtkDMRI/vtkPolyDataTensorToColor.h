@@ -58,6 +58,7 @@ public:
   void ColorGlyphsByPlanarMeasure();
   void ColorGlyphsByParallelDiffusivity();
   void ColorGlyphsByPerpendicularDiffusivity();
+  void ColorGlyphsByMeanDiffusivity();
   void ColorGlyphsByMaxEigenvalue();
   void ColorGlyphsByMidEigenvalue();
   void ColorGlyphsByMinEigenvalue();
