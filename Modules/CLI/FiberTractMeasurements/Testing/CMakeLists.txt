@@ -50,6 +50,18 @@ add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test
   )
 set_property(TEST ${testname} PROPERTY LABELS ${CLP})
 
+set(testname ${CLP}TestScalarOnlyFolder)
+add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test>
+  ${CLP}Test
+    --inputtype Fibers_File_Folder
+    --inputdirectory "${TEST_DATA}/../ScalarOnlyInput"
+    --outputfile ${TEMP}/fibermeasurementstestingoutputfolder_scalaronly.txt
+    --format Column_Hierarchy
+    --separator Tab
+    --moreStatistics
+  )
+set_property(TEST ${testname} PROPERTY LABELS ${CLP})
+
 #-----------------------------------------------------------------------------
 add_executable(CompareTxtsMeasures CompareTxts.cxx)
 target_link_libraries(CompareTxtsMeasures ${CLP}Lib ${SlicerExecutionModel_EXTRA_EXECUTABLE_TARGET_LIBRARIES})
@@ -79,3 +91,11 @@ add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:CompareTxt
   )
 set_property(TEST ${testname} PROPERTY LABELS ${CLP})
 set_property(TEST ${testname} PROPERTY DEPENDS ${CLP}TestHierarchy)
+
+set(testname ${CLP}CompareTxtsScalarOnlyFolder)
+add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:CompareTxtsMeasures>
+  ${TEMP}/fibermeasurementstestingoutputfolder_scalaronly.txt
+  ${BASELINE}/baseline_measurements_folder_scalaronly.txt
+  )
+set_property(TEST ${testname} PROPERTY LABELS ${CLP})
+set_property(TEST ${testname} PROPERTY DEPENDS ${CLP}TestFolder)
