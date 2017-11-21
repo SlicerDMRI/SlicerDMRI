@@ -49,6 +49,9 @@ void vtkPolyDataTensorToColor::ColorGlyphsByPlanarMeasure() {
 void vtkPolyDataTensorToColor::ColorGlyphsByParallelDiffusivity() {
   this->ColorGlyphsBy(vtkDiffusionTensorMathematics::VTK_TENS_PARALLEL_DIFFUSIVITY);
 }
+void vtkPolyDataTensorToColor::ColorGlyphsByMeanDiffusivity() {
+  this->ColorGlyphsBy(vtkDiffusionTensorMathematics::VTK_TENS_MEAN_DIFFUSIVITY);
+}
 void vtkPolyDataTensorToColor::ColorGlyphsByPerpendicularDiffusivity() {
   this->ColorGlyphsBy(vtkDiffusionTensorMathematics::VTK_TENS_PERPENDICULAR_DIFFUSIVITY);
 }
