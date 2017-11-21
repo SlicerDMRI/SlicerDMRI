@@ -1012,13 +1012,15 @@ int main( int argc, char * argv[] )
       reader->Update();
 
       vtkSmartPointer<vtkPolyData> data = reader->GetOutput();
+      computeFiberStats(data, fileName);
+      computeScalarMeasurements(data, fileName, EMPTY_OP, moreStatistics);
+
       if( !setTensors(data) )
         {
         std::cout << argv[0] << " : No tensor data for file " << fileName << std::endl;
         continue;
         }
-      computeFiberStats(data, fileName);
-      computeScalarMeasurements(data, fileName, EMPTY_OP, moreStatistics);
+
       computeAllTensorMeasurements(data, fileName, operations, moreStatistics);
       }
 
@@ -1034,14 +1036,14 @@ int main( int argc, char * argv[] )
       reader->Update();
 
       vtkSmartPointer<vtkPolyData> data = reader->GetOutput();
+      computeFiberStats(data, fileName);
+      computeScalarMeasurements(data, fileName, EMPTY_OP, moreStatistics);
       if( !setTensors(data) )
         {
         std::cout << argv[0] << " : No tensor data for file " << fileName << std::endl;
         continue;
         }
 
-      computeFiberStats(data, fileName);
-      computeScalarMeasurements(data, fileName, EMPTY_OP, moreStatistics);
       computeAllTensorMeasurements(data, fileName, operations, moreStatistics);
       }
     } //if (inputType == std::string("Fibers File Folder") )
