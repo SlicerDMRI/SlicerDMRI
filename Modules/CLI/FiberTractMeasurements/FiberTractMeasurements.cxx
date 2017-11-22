@@ -113,6 +113,18 @@ void printCluster(const std::string &id,
                   std::stringstream &measureNames,
                   std::stringstream &measureValues);
 
+namespace {
+  double median_of_sorted(vtkDoubleArray* d)
+  {
+    size_t n = d->GetNumberOfValues();
+    double mid_floorth = d->GetComponent(n/2, 0);
+    if (n % 2 != 0) // odd number of points
+      return mid_floorth;
+    else
+      return (mid_floorth + d->GetComponent(n/2 - 1, 0)) / 2;
+  }
+};
+
 //=============================================================================
 // Function definitions
 void getPathFromParentToChild(vtkMRMLHierarchyNode *parent,
@@ -283,7 +295,7 @@ void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
         {
         min = (double) vals->GetComponent(0, 0);
         max = (double) vals->GetComponent(npoints_final - 1, 0);
-        median = (double) vals->GetComponent((int) (npoints_final / 2), 0);
+        median = median_of_sorted(vals);
 
         for (int n = 0; n < npoints_final; n++)
           {
@@ -321,13 +333,13 @@ void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
       {
       std::string name_min = name + "." + MIN_PRINT;
       std::string name_max = name + "." + MAX_PRINT;
-      std::string name_mediam = name + "." + MEDIAN_PRINT;
+      std::string name_median = name + "." + MEDIAN_PRINT;
       std::string name_variance = name + "." + VARIANCE_PRINT;
       std::string nanid = name + "." + INVALID_NUMBER_PRINT;
 
       it->second[name_min] = min;
       it->second[name_max] = max;
-      it->second[name_mediam] = median;
+      it->second[name_median] = median;
       it->second[name_variance] = variance;
       it->second[nanid] = npoints - npoints_final; // record the number of NaNs for this measurement
 
