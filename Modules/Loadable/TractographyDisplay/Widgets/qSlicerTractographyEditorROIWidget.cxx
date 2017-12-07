@@ -269,6 +269,12 @@ void qSlicerTractographyEditorROIWidget::setInteractiveROI(bool arg)
     {
       ROINode->SetInteractiveMode((int)arg);
     }
+    if (arg && d->FiberBundleFromSelection->currentNode())
+    {
+      vtkMRMLFiberBundleNode* fbn =
+        vtkMRMLFiberBundleNode::SafeDownCast(d->FiberBundleFromSelection->currentNode());
+      fbn->SetMeshConnection(d->FiberBundleNode->GetMeshConnection());
+    }
   }
 }
 
