@@ -35,6 +35,7 @@ class vtkIdTypeArray;
 class vtkExtractPolyDataGeometry;
 class vtkPlanes;
 class vtkCleanPolyData;
+class vtMRMLModelDisplayNode;
 
 class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleNode : public vtkMRMLModelNode
 {
@@ -154,7 +155,7 @@ public:
   /// Gets the subsampled PolyData converted from the real data in the node
   virtual vtkPolyData* GetFilteredPolyData();
   virtual vtkAlgorithmOutput* GetFilteredMeshConnection();
-
+  void SetMeshToDisplayNode(vtkMRMLModelDisplayNode*);
   ///
   /// get associated line display node or NULL if not set
   vtkMRMLFiberBundleDisplayNode* GetLineDisplayNode();

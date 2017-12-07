@@ -259,8 +259,10 @@ void vtkMRMLFiberBundleNode::UpdateReferenceID(const char *oldID, const char *ne
 //----------------------------------------------------------------------------
 vtkAlgorithmOutput* vtkMRMLFiberBundleNode::GetFilteredMeshConnection()
 {
+  this->CleanPolyDataPostSubsampling->Update();
   if (this->SelectWithAnnotationNode)
     {
+    this->CleanPolyDataPostROISelection->Update();
     return this->CleanPolyDataPostROISelection->GetOutputPort();
     }
   else
@@ -332,8 +334,11 @@ vtkMRMLFiberBundleDisplayNode* vtkMRMLFiberBundleNode::GetGlyphDisplayNode()
 //----------------------------------------------------------------------------
 void vtkMRMLFiberBundleNode::SetMeshConnection(vtkAlgorithmOutput *inputPort)
 {
-  this->ExtractSelectedPolyDataIds->SetInputConnection(0, inputPort);
   this->Superclass::SetMeshConnection(inputPort);
+
+  this->ExtractSelectedPolyDataIds->SetInputConnection(0, inputPort);
+  this->SetMeshToDisplayNodes();
+
   vtkPolyData* polyData = this->GetPolyData();
 
   // Ensure that tensor arrays are named and set
@@ -616,18 +621,23 @@ void vtkMRMLFiberBundleNode::PrepareROISelection()
 }
 
 //----------------------------------------------------------------------------
+void vtkMRMLFiberBundleNode::SetMeshToDisplayNode(vtkMRMLModelDisplayNode* node)
+{
+  assert(node);
+  node->SetInputMeshConnection(this->GetFilteredMeshConnection());
+}
+
+//----------------------------------------------------------------------------
 void vtkMRMLFiberBundleNode::UpdateROISelection()
 {
   vtkMRMLAnnotationROINode* AnnotationROI =
     vtkMRMLAnnotationROINode::SafeDownCast(this->AnnotationNode);
-  if (AnnotationROI)
+  if (AnnotationROI && this->GetSelectWithAnnotationNode())
     {
-    AnnotationROI->GetTransformedPlanes(this->Planes);
     this->ExtractPolyDataGeometry->SetImplicitFunction(this->Planes);
-    }
-  if (this->GetSelectWithAnnotationNode())
-    {
-    this->InvokeEvent(vtkMRMLModelNode::PolyDataModifiedEvent, this);
+    AnnotationROI->GetTransformedPlanes(this->Planes);
+    this->ExtractPolyDataGeometry->Modified();
+    this->Modified();
     }
 }
 
