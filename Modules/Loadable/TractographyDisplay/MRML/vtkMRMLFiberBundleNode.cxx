@@ -27,7 +27,6 @@ Version:   $Revision: 1.3 $
 
 // VTK includes
 #include <vtkAlgorithmOutput.h>
-#include <vtkCleanPolyData.h>
 #include <vtkCommand.h>
 #include <vtkExtractPolyDataGeometry.h>
 #include <vtkExtractSelectedPolyDataIds.h>
@@ -37,16 +36,39 @@ Version:   $Revision: 1.3 $
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkPlanes.h>
+#include <vtkPassThrough.h>
 #include <vtkSelection.h>
 #include <vtkSelectionNode.h>
 #include <vtkVersion.h>
-
+/*
+#include "vtkObjectFactory.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkInformationVector.h"
+#include "vtkInformation.h"
+#include "vtkDataObject.h"
+#include "vtkSmartPointer.h"
+*/
 // STD includes
 #include <algorithm>
 #include <cassert>
 #include <math.h>
 #include <vector>
 #include <sstream>
+
+namespace {
+vtkPolyData* getAlgorithmPolyData(vtkAlgorithmOutput* output)
+{
+  if (!output)
+    return 0; // TODO nullptr
+
+  vtkAlgorithm* producer = output->GetProducer();
+  if (!producer)
+    return 0;
+
+  int index = output ? output->GetIndex() : -1;
+  return vtkPolyData::SafeDownCast(producer->GetOutputDataObject(index));
+}
+}; // anonymous namespace
 
 //------------------------------------------------------------------------------
 vtkCxxSetReferenceStringMacro(vtkMRMLFiberBundleNode, AnnotationNodeID);
@@ -58,31 +80,70 @@ vtkMRMLNodeNewMacro(vtkMRMLFiberBundleNode);
 vtkIdType vtkMRMLFiberBundleNode::MaxNumberOfFibersToShowByDefault = 10000;
 
 //-----------------------------------------------------------------------------
-vtkMRMLFiberBundleNode::vtkMRMLFiberBundleNode()
+vtkMRMLFiberBundleNode::~vtkMRMLFiberBundleNode()
 {
-  this->ShuffledIds = 0;
-  this->ExtractSelectedPolyDataIds = 0;
-  this->CleanPolyDataPostSubsampling = 0;
-  this->CleanPolyDataPostROISelection = 0;
-  this->SubsamplingRatio = 0;
-  this->SelectWithAnnotationNode = 0;
-  this->SelectionWithAnnotationNodeMode = vtkMRMLFiberBundleNode::PositiveAnnotationNodeSelection;
-  this->AnnotationNode = 0;
-  this->AnnotationNodeID = 0;
-  this->ExtractPolyDataGeometry = 0;
-  this->Planes = 0;
-  this->SelectWithAnnotationNode = 0;
-  this->EnableShuffleIDs = 1;
+  this->SetAndObserveAnnotationNodeID(NULL);
 
-  this->PrepareSubsampling();
-  this->PrepareROISelection();
+  this->ExtractSubsample->Delete();
+  this->ExtractFromROI->Delete();
+  this->Planes->Delete();
+  this->ShuffledIds->Delete();
+  this->LocalPassThrough->Delete();
 }
 
 //-----------------------------------------------------------------------------
-vtkMRMLFiberBundleNode::~vtkMRMLFiberBundleNode()
+/* Pipeline:
+  *
+  * note: this used to have CleanPolyData steps, but they were effectively no-ops.
+  *
+  * ExtractSubsample ->
+  *     ExtractFromROI(this->Planes)
+  *
+  * Output:
+  *
+  *   GetFilteredMeshConnection <- LocalPassThrough { SelectWithAnnotation ? ExtractFromROI :
+  *                                                                          ExtractSubsample }
+*/
+
+//-----------------------------------------------------------------------------
+vtkMRMLFiberBundleNode::vtkMRMLFiberBundleNode() :
+  ExtractSubsample(vtkExtractSelectedPolyDataIds::New()),
+  ExtractFromROI(vtkExtractPolyDataGeometry::New()),
+  Planes(vtkPlanes::New()),
+  ShuffledIds(vtkIdTypeArray::New()),
+  LocalPassThrough(vtkPassThrough::New()),
+  AnnotationNode(NULL),
+  AnnotationNodeID(NULL)
 {
-  this->CleanROISelection();
-  this->CleanSubsampling();
+  this->SubsamplingRatio = 1.0;
+  this->SelectWithAnnotation = false;
+  this->EnableShuffleIDs = true;
+  this->AnnotationSelectionMode = vtkMRMLFiberBundleNode::PositiveSelection;
+
+  // set up ExtractFromROI
+  this->ExtractFromROI->SetImplicitFunction(this->Planes);
+    this->ExtractFromROI->ExtractInsideOn();
+    this->ExtractFromROI->ExtractBoundaryCellsOn();
+
+  // set up ExtractSubsample
+  vtkNew<vtkSelection> sel;
+  vtkNew<vtkIdTypeArray> arr;
+
+  vtkNew<vtkSelectionNode> node;
+    node->GetProperties()->Set(vtkSelectionNode::CONTENT_TYPE(), vtkSelectionNode::INDICES);
+    node->GetProperties()->Set(vtkSelectionNode::FIELD_TYPE(), vtkSelectionNode::CELL);
+    node->SetSelectionList(arr.GetPointer());
+
+  sel->AddNode(node.GetPointer());
+  this->ExtractSubsample->SetInputData(1, sel.GetPointer());
+
+  // set up pipeline
+  this->ExtractFromROI->SetInputConnection(
+    this->ExtractSubsample->GetOutputPort());
+
+  // default mode: produce sub-sampled output
+  this->LocalPassThrough->SetInputConnection(
+    this->ExtractSubsample->GetOutputPort());
 }
 
 //----------------------------------------------------------------------------
@@ -98,12 +159,10 @@ void vtkMRMLFiberBundleNode::WriteXML(ostream& of, int nIndent)
     {
     of << indent << " AnnotationNodeRef=\"" << this->AnnotationNodeID << "\"";
     }
-  of << indent << " SelectWithAnnotationNode=\"" << this->SelectWithAnnotationNode << "\"";
-  of << indent << " SelectionWithAnnotationNodeMode=\"" << this->SelectionWithAnnotationNodeMode << "\"";
+  of << indent << " SelectWithAnnotation=\"" << this->SelectWithAnnotation << "\"";
+  of << indent << " AnnotationSelectionMode=\"" << this->AnnotationSelectionMode << "\"";
   of << indent << " SubsamplingRatio=\"" << this->SubsamplingRatio << "\"";
 }
-
-
 
 //----------------------------------------------------------------------------
 void vtkMRMLFiberBundleNode::ReadXMLAttributes(const char** atts)
@@ -115,7 +174,7 @@ void vtkMRMLFiberBundleNode::ReadXMLAttributes(const char** atts)
     {
     delete[] this->AnnotationNodeID;
     }
-  this->SelectWithAnnotationNode = 0;
+  this->SelectWithAnnotation = false;
 
   const char* attName;
   const char* attValue;
@@ -130,20 +189,19 @@ void vtkMRMLFiberBundleNode::ReadXMLAttributes(const char** atts)
       this->AnnotationNodeID = new char[n];
       strcpy(this->AnnotationNodeID, attValue);
       }
-    else if (!strcmp(attName, "SelectWithAnnotationNode"))
+    else if (!strcmp(attName, "SelectWithAnnotation"))
       {
-      this->SelectWithAnnotationNode = atoi(attValue);
+      this->SelectWithAnnotation = (bool)atoi(attValue);
       }
     else if (!strcmp(attName, "SelectionWithAnnotationNodeMode"))
       {
-      this->SelectionWithAnnotationNodeMode = atoi(attValue);
+      this->AnnotationSelectionMode = (SelectionModeEnum)atoi(attValue);
       }
     else if (!strcmp(attName, "SubsamplingRatio"))
       {
       this->SubsamplingRatio = atof(attValue);
       }
     }
-
 
   this->EndModify(disabledModify);
 }
@@ -164,8 +222,8 @@ void vtkMRMLFiberBundleNode::Copy(vtkMRMLNode *anode)
     {
     this->SetSubsamplingRatio(node->SubsamplingRatio);
     this->SetAnnotationNodeID(node->AnnotationNodeID);
-    this->SetSelectWithAnnotationNode(node->SelectWithAnnotationNode);
-    this->SetSelectionWithAnnotationNodeMode(node->SelectionWithAnnotationNodeMode);
+    this->SetSelectWithAnnotation(node->SelectWithAnnotation);
+    this->SetAnnotationSelectionMode(node->AnnotationSelectionMode);
     }
 
   this->EndModify(disabledModify);
@@ -174,20 +232,23 @@ void vtkMRMLFiberBundleNode::Copy(vtkMRMLNode *anode)
 //----------------------------------------------------------------------------
 void vtkMRMLFiberBundleNode::PrintSelf(ostream& os, vtkIndent indent)
 {
-
   Superclass::PrintSelf(os,indent);
-
 }
 
 //---------------------------------------------------------------------------
-void vtkMRMLFiberBundleNode::ProcessMRMLEvents ( vtkObject *caller,
-                                                 unsigned long event,
-                                                 void *callData )
+void vtkMRMLFiberBundleNode::ProcessMRMLEvents (vtkObject *caller,
+                                                unsigned long event,
+                                                void *callData)
 {
+  // TODO we should ignore display node events. Fowarding here is silly.
+  // but right now we can't, because the  qMRMLTractographyDisplayTreeView only
+  // knows how to watch modified events on vtkMRMLFiberBundleNode, so they must
+  // be propagated through Superclass.
+
   if (vtkMRMLAnnotationROINode::SafeDownCast(caller) && (event == vtkCommand::ModifiedEvent))
   {
-   vtkDebugMacro("Updating the ROI node");
-   this->UpdateROISelection();
+    vtkDebugMacro("Updating the ROI node");
+    this->UpdateROISelection();
   }
 
   if (vtkMRMLDiffusionTensorDisplayPropertiesNode::SafeDownCast(caller) && event == vtkCommand::ModifiedEvent)
@@ -197,43 +258,6 @@ void vtkMRMLFiberBundleNode::ProcessMRMLEvents ( vtkObject *caller,
 
   Superclass::ProcessMRMLEvents(caller, event, callData);
   return;
-}
-
-//-----------------------------------------------------------
-void vtkMRMLFiberBundleNode::UpdateScene(vtkMRMLScene *scene)
-{
-   Superclass::UpdateScene(scene);
-   int disabledModify = this->StartModify();
-
-  //We are forcing the update of the fields as UpdateScene should only be called after loading data
-
-   if (this->GetAnnotationNodeID() != NULL)
-     {
-     char* AnnotationNodeID = new char[strlen(this->GetAnnotationNodeID()) + 1];
-     strcpy(AnnotationNodeID, this->GetAnnotationNodeID());
-     delete[] this->GetAnnotationNodeID();
-     this->AnnotationNodeID = NULL;
-     this->SetAndObserveAnnotationNodeID(NULL);
-     this->SetAndObserveAnnotationNodeID(AnnotationNodeID);
-     }
-   else
-    {
-      this->SelectWithAnnotationNode = 0;
-    }
-
-   const int ActualSelectWithAnnotationNode = this->SelectWithAnnotationNode;
-   this->SelectWithAnnotationNode = -1;
-   this->SetSelectWithAnnotationNode(ActualSelectWithAnnotationNode);
-
-   const int ActualSelectionWithAnnotationNodeMode = this->SelectionWithAnnotationNodeMode;
-   this->SelectionWithAnnotationNodeMode = -1;
-   this->SetSelectionWithAnnotationNodeMode(ActualSelectionWithAnnotationNodeMode);
-
-   double ActualSubsamplingRatio = this->SubsamplingRatio;
-   this->SubsamplingRatio = 0.;
-   this->SetSubsamplingRatio(ActualSubsamplingRatio);
-
-   this->EndModify(disabledModify);
 }
 
 //-----------------------------------------------------------
@@ -259,27 +283,15 @@ void vtkMRMLFiberBundleNode::UpdateReferenceID(const char *oldID, const char *ne
 //----------------------------------------------------------------------------
 vtkAlgorithmOutput* vtkMRMLFiberBundleNode::GetFilteredMeshConnection()
 {
-  this->CleanPolyDataPostSubsampling->Update();
-  if (this->SelectWithAnnotationNode)
-    {
-    this->CleanPolyDataPostROISelection->Update();
-    return this->CleanPolyDataPostROISelection->GetOutputPort();
-    }
-  else
-    {
-    return this->CleanPolyDataPostSubsampling->GetOutputPort();
-    }
+  return this->LocalPassThrough->GetOutputPort();
 }
 
 //----------------------------------------------------------------------------
-vtkPolyData* vtkMRMLFiberBundleNode::GetFilteredPolyData()
+vtkPointSet* vtkMRMLFiberBundleNode::GetFilteredPolyData()
 {
-  vtkAlgorithm* producer = this->GetFilteredMeshConnection() ?
-    this->GetFilteredMeshConnection()->GetProducer() : 0;
-  int index = this->GetFilteredMeshConnection() ?
-    this->GetFilteredMeshConnection()->GetIndex() : -1;
-  return vtkPolyData::SafeDownCast(
-    producer ? producer->GetOutputDataObject(index) : 0);
+  this->ExtractSubsample->Update();
+  this->ExtractFromROI->Update();
+  return getAlgorithmPolyData(this->GetFilteredMeshConnection());
 }
 
 //----------------------------------------------------------------------------
@@ -330,16 +342,23 @@ vtkMRMLFiberBundleDisplayNode* vtkMRMLFiberBundleNode::GetGlyphDisplayNode()
   return node;
 }
 
-
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleNode::SetMeshConnection(vtkAlgorithmOutput *inputPort)
+void vtkMRMLFiberBundleNode::SetMeshToDisplayNode(vtkMRMLModelDisplayNode *modelDisplayNode)
 {
-  this->Superclass::SetMeshConnection(inputPort);
+  // overload here to make sure the display node gets our filtered output.
 
-  this->ExtractSelectedPolyDataIds->SetInputConnection(0, inputPort);
-  this->SetMeshToDisplayNodes();
+  // TODO: this override is stupid. Logically, if anything, a DisplayableNode pipeline
+  // should form a daisy chain with output from the parent class. However, vtkMRMLModelNode
+  // uses its internal MeshConnection object directly, so here we are.
 
-  vtkPolyData* polyData = this->GetPolyData();
+  assert(modelDisplayNode);
+  modelDisplayNode->SetInputMeshConnection(this->GetFilteredMeshConnection());
+}
+
+namespace {
+void fixupPolyDataTensors(vtkAlgorithmOutput* inputPort) {
+  // we need the raw polydata from the input object
+  vtkPolyData* polyData = getAlgorithmPolyData(inputPort);
 
   // Ensure that tensor arrays are named and set
   if (polyData && polyData->GetPointData())
@@ -361,34 +380,45 @@ void vtkMRMLFiberBundleNode::SetMeshConnection(vtkAlgorithmOutput *inputPort)
         }
       }
     }
+}
+}; // namespace
+
+//----------------------------------------------------------------------------
+void vtkMRMLFiberBundleNode::SetMeshConnection(vtkAlgorithmOutput *inputPort)
+{
+  this->Superclass::SetMeshConnection(inputPort);
+
+  this->ExtractSubsample->SetInputConnection(inputPort);
+
+  fixupPolyDataTensors(inputPort);
+
+  // we need the raw polydata from the input object
+  vtkPolyData* polyData = getAlgorithmPolyData(inputPort);
 
   if (polyData)
     {
     const vtkIdType numberOfFibers = polyData->GetNumberOfLines();
 
     std::vector<vtkIdType> idVector;
+    idVector.reserve(numberOfFibers);
     for(vtkIdType i = 0;  i < numberOfFibers; i++ )
-      {
       idVector.push_back(i);
-      }
-    random_shuffle ( idVector.begin(), idVector.end() );
+
+    if (this->EnableShuffleIDs)
+      std::random_shuffle(idVector.begin(), idVector.end());
 
     this->ShuffledIds->Initialize();
-    this->ShuffledIds->SetNumberOfTuples(numberOfFibers);
-    for(vtkIdType i = 0;  i < numberOfFibers; i++ )
-      {
-      if (this->EnableShuffleIDs)
-        {
-        this->ShuffledIds->SetValue(i, idVector[i]);
-        }
-      else
-        {
-        this->ShuffledIds->SetValue(i, i);
-        }
+
+      { // unsafe block: copy must be paired with allocation
+        //               so that the buffer is sufficient
+      this->ShuffledIds->SetNumberOfTuples(numberOfFibers);
+      std::copy(idVector.begin(), idVector.end(),
+                (vtkIdType*)this->ShuffledIds->GetVoidPointer(0));
       }
+
     float subsamplingRatio = this->SubsamplingRatio;
 
-    if (numberOfFibers > this->GetMaxNumberOfFibersToShowByDefault() )
+    if (numberOfFibers > vtkMRMLFiberBundleNode::MaxNumberOfFibersToShowByDefault )
       {
       subsamplingRatio = this->GetMaxNumberOfFibersToShowByDefault() * 1. / numberOfFibers;
       subsamplingRatio = floor(subsamplingRatio * 1e2) / 1e2;
@@ -399,70 +429,77 @@ void vtkMRMLFiberBundleNode::SetMeshConnection(vtkAlgorithmOutput *inputPort)
     this->SetSubsamplingRatio(subsamplingRatio);
 
     this->UpdateSubsampling();
+
+    if (this->GetSelectWithAnnotation() == true)
+      {
+      this->UpdateROISelection();
+      }
+
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleNode
-::SetPolyDataToDisplayNode(vtkMRMLModelDisplayNode* modelDisplayNode)
-{
-  assert(modelDisplayNode->IsA("vtkMRMLFiberBundleDisplayNode"));
-  modelDisplayNode->SetInputMeshConnection(this->GetFilteredMeshConnection());
-}
-
-//----------------------------------------------------------------------------
-void vtkMRMLFiberBundleNode::SetSubsamplingRatio (float _arg)
+void vtkMRMLFiberBundleNode::SetSubsamplingRatio (float ratio)
   {
-  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting subsamplingRatio to " << _arg);
+  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting subsamplingRatio to " << ratio);
   const float oldSubsampling = this->SubsamplingRatio;
-  const float newSubsamplingRatio = (_arg<0.?0.:(_arg>1.?1.:_arg));
+  const float newSubsamplingRatio = vtkMath::ClampValue<float>(ratio, 0.0, 1.0);
   if (oldSubsampling != newSubsamplingRatio)
     {
     this->SubsamplingRatio = newSubsamplingRatio;
-    this->UpdateSubsampling();
-    this->Modified();
     }
+    this->UpdateSubsampling();
   }
 
 
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleNode::SetSelectWithAnnotationNode(int _arg)
+void vtkMRMLFiberBundleNode::SetSelectWithAnnotation(bool state)
 {
-  vtkDebugMacro(<< this->GetClassName() << " (" << this
-                << "): setting SelectWithAnnotationNode  to " << _arg);
-  if (this->SelectWithAnnotationNode != _arg)
+  if (this->SelectWithAnnotation == state)
+    return;
+
+  this->SelectWithAnnotation = state;
+
+  int wasModifying = this->StartModify();
     {
-    this->SelectWithAnnotationNode = _arg;
-    this->SetMeshToDisplayNodes();
-    this->Modified();
+    if (state == true)
+      this->LocalPassThrough->SetInputConnection(this->ExtractFromROI->GetOutputPort());
+    else
+      this->LocalPassThrough->SetInputConnection(this->ExtractSubsample->GetOutputPort());
     }
+  this->EndModify(wasModifying);
+
+  this->UpdateROISelection();
 }
 
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleNode::SetSelectionWithAnnotationNodeMode(int _arg)
+void vtkMRMLFiberBundleNode::SetAnnotationSelectionMode(SelectionModeEnum mode)
 {
-  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting SelectionWithAnnotationNodeMode  to " << _arg);
-  if (this->SelectionWithAnnotationNodeMode != _arg)
-    {
-    this->SelectionWithAnnotationNodeMode = _arg;
+  if (this->AnnotationSelectionMode == mode)
+    return;
 
-    if (_arg == vtkMRMLFiberBundleNode::PositiveAnnotationNodeSelection)
+  this->AnnotationSelectionMode = mode;
+
+  if (mode == vtkMRMLFiberBundleNode::PositiveSelection)
     {
-      this->ExtractPolyDataGeometry->ExtractInsideOn();
-      this->ExtractPolyDataGeometry->ExtractBoundaryCellsOn();
-    } else if (_arg == vtkMRMLFiberBundleNode::NegativeAnnotationNodeSelection) {
-      this->ExtractPolyDataGeometry->ExtractInsideOff();
-      this->ExtractPolyDataGeometry->ExtractBoundaryCellsOff();
+    this->ExtractFromROI->ExtractInsideOn();
+    this->ExtractFromROI->ExtractBoundaryCellsOn();
+    }
+  else if (mode == vtkMRMLFiberBundleNode::NegativeSelection)
+    {
+    this->ExtractFromROI->ExtractInsideOff();
+    this->ExtractFromROI->ExtractBoundaryCellsOff();
+    }
+  else
+    {
+    this->LocalPassThrough->SetInputConnection(this->ExtractSubsample->GetOutputPort());
     }
 
-    this->Modified();
-    // \tbd really needed ?
-    this->InvokeEvent(vtkMRMLModelNode::PolyDataModifiedEvent, this);
-    }
+  this->UpdateROISelection();
 }
 
 //----------------------------------------------------------------------------
-vtkMRMLAnnotationNode* vtkMRMLFiberBundleNode::GetAnnotationNode ( )
+vtkMRMLAnnotationNode* vtkMRMLFiberBundleNode::GetAnnotationNode()
 {
   vtkMRMLAnnotationNode* node = NULL;
 
@@ -477,154 +514,64 @@ vtkMRMLAnnotationNode* vtkMRMLFiberBundleNode::GetAnnotationNode ( )
 }
 
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleNode::SetAndObserveAnnotationNodeID ( const char *id )
+void vtkMRMLFiberBundleNode::SetAndObserveAnnotationNodeID(const char *id)
 {
   if (id)
     {
     vtkDebugMacro("Observing annotation Node: "<<id);
     }
   // Stop observing any old node
-  vtkSetAndObserveMRMLObjectMacro (this->AnnotationNode, NULL);
+  vtkSetAndObserveMRMLObjectMacro(this->AnnotationNode, NULL);
 
   // Set the ID. This is the "ground truth" reference to the node.
-  this->SetAnnotationNodeID ( id );
+  this->SetAnnotationNodeID(id);
 
   // Get the node corresponding to the ID. This pointer is only to observe the object.
-  vtkMRMLNode *cnode = this->GetAnnotationNode ( );
+  vtkMRMLNode *cnode = this->GetAnnotationNode();
 
   // Observe the node using the pointer.
-  vtkSetAndObserveMRMLObjectMacro ( this->AnnotationNode , cnode );
+  vtkSetAndObserveMRMLObjectMacro(this->AnnotationNode, cnode);
+
+  if (!cnode)
+    {
+    this->SetSelectWithAnnotation(false);
+    }
 
   this->UpdateROISelection();
-
-}
-
-//----------------------------------------------------------------------------
-void vtkMRMLFiberBundleNode::PrepareSubsampling()
-{
-  vtkNew<vtkSelection> sel;
-  vtkNew<vtkSelectionNode> node;
-  vtkNew<vtkIdTypeArray> arr;
-
-  this->SubsamplingRatio = 1.;
-
-  this->ShuffledIds = vtkIdTypeArray::New();
-
-  this->ExtractSelectedPolyDataIds = vtkExtractSelectedPolyDataIds::New();
-
-  sel->AddNode(node.GetPointer());
-
-  node->GetProperties()->Set(vtkSelectionNode::CONTENT_TYPE(), vtkSelectionNode::INDICES);
-  node->GetProperties()->Set(vtkSelectionNode::FIELD_TYPE(), vtkSelectionNode::CELL);
-
-  arr->SetNumberOfTuples(0);
-  node->SetSelectionList(arr.GetPointer());
-
-  this->ExtractSelectedPolyDataIds->SetInputData(1, sel.GetPointer());
-
-  this->CleanPolyDataPostSubsampling = vtkCleanPolyData::New();
-  this->CleanPolyDataPostSubsampling->ConvertLinesToPointsOff();
-  this->CleanPolyDataPostSubsampling->ConvertPolysToLinesOff();
-  this->CleanPolyDataPostSubsampling->ConvertStripsToPolysOff();
-  this->CleanPolyDataPostSubsampling->PointMergingOff();
-
-  this->CleanPolyDataPostSubsampling->SetInputConnection(
-    this->ExtractSelectedPolyDataIds->GetOutputPort());
 }
 
 //----------------------------------------------------------------------------
 void vtkMRMLFiberBundleNode::UpdateSubsampling()
 {
   vtkDebugMacro(<< this->GetClassName() << "Updating the subsampling");
-  vtkSelection* sel = vtkSelection::SafeDownCast(this->ExtractSelectedPolyDataIds->GetInput(1));
-  vtkPolyData* polyData = this->GetPolyData();
-  if (sel && polyData)
+  vtkSelection* sel = vtkSelection::SafeDownCast(this->ExtractSubsample->GetInput(1));
+
+  vtkPolyData* polyData = getAlgorithmPolyData(this->Superclass::GetMeshConnection());
+
+  if (!(sel && polyData))
     {
-    vtkSelectionNode* node = sel->GetNode(0);
-
-    vtkIdTypeArray* arr = vtkIdTypeArray::SafeDownCast(node->GetSelectionList());
-    vtkIdType numberOfCellsToKeep = vtkIdType(floor(this->GetPolyData()->GetNumberOfLines() * this->SubsamplingRatio));
-
-    arr->Initialize();
-    arr->SetNumberOfTuples(numberOfCellsToKeep);
-    if (numberOfCellsToKeep > 0)
-      {
-      for (vtkIdType i=0; i<numberOfCellsToKeep; i++)
-        {
-        arr->SetValue(i, this->ShuffledIds->GetValue(i));
-        }
-      }
-
-    arr->Modified();
-    node->Modified();
-    sel->Modified();
+    return;
     }
 
-  /*
-  vtkMRMLFiberBundleDisplayNode *node = this->GetLineDisplayNode();
-  if (node != NULL)
+  vtkSelectionNode* node = sel->GetNode(0);
+  vtkIdTypeArray* arr = vtkIdTypeArray::SafeDownCast(node->GetSelectionList());
+  vtkIdType numberOfCellsToKeep = vtkIdType(floor(polyData->GetNumberOfLines() * this->SubsamplingRatio));
+
+  if (numberOfCellsToKeep == arr->GetNumberOfTuples())
+    // no change, no-op
+    return;
+
+  arr->Initialize();
+  arr->SetNumberOfTuples(numberOfCellsToKeep);
+  for (vtkIdType i=0; i < numberOfCellsToKeep; i++)
     {
-      node->SetPolyData(this->GetFilteredPolyData());
+    arr->SetValue(i, this->ShuffledIds->GetValue(i));
     }
 
-  node = this->GetTubeDisplayNode();
-  if (node != NULL)
-    {
-      node->SetPolyData(this->GetFilteredPolyData());
-    }
-  node = this->GetGlyphDisplayNode();
-  if (node != NULL)
-    {
-      node->SetPolyData(this->GetFilteredPolyData());
-    }
-  }
-    */
-    // \tbd why not Modified() instead ?
-  this->InvokeEvent(vtkMRMLModelNode::PolyDataModifiedEvent, this);
-  //this->Modified();
-}
+  arr->Modified();
 
-//----------------------------------------------------------------------------
-void vtkMRMLFiberBundleNode::CleanSubsampling()
-{
-  this->CleanPolyDataPostSubsampling->Delete();
-  this->ExtractSelectedPolyDataIds->Delete();
-  this->ShuffledIds->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkMRMLFiberBundleNode::PrepareROISelection()
-{
-  this->AnnotationNode = NULL;
-  this->AnnotationNodeID = NULL;
-
-  this->ExtractPolyDataGeometry = vtkExtractPolyDataGeometry::New();
-  this->Planes = vtkPlanes::New();
-
-  this->ExtractPolyDataGeometry->ExtractInsideOn();
-  this->ExtractPolyDataGeometry->ExtractBoundaryCellsOn();
-  this->ExtractPolyDataGeometry->SetInputConnection(
-    this->CleanPolyDataPostSubsampling->GetOutputPort());
-
-  this->SelectionWithAnnotationNodeMode = vtkMRMLFiberBundleNode::PositiveAnnotationNodeSelection;
-
-  this->CleanPolyDataPostROISelection = vtkCleanPolyData::New();
-  this->CleanPolyDataPostROISelection->ConvertLinesToPointsOff();
-  this->CleanPolyDataPostROISelection->ConvertPolysToLinesOff();
-  this->CleanPolyDataPostROISelection->ConvertStripsToPolysOff();
-  this->CleanPolyDataPostROISelection->PointMergingOff();
-
-  this->CleanPolyDataPostROISelection->SetInputConnection(
-    this->ExtractPolyDataGeometry->GetOutputPort());
-
-  this->SelectWithAnnotationNode = 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkMRMLFiberBundleNode::SetMeshToDisplayNode(vtkMRMLModelDisplayNode* node)
-{
-  assert(node);
-  node->SetInputMeshConnection(this->GetFilteredMeshConnection());
+  // tell the displaynode to render
+  this->InvokeCustomModifiedEvent( vtkMRMLModelNode::MeshModifiedEvent , this);
 }
 
 //----------------------------------------------------------------------------
@@ -632,25 +579,16 @@ void vtkMRMLFiberBundleNode::UpdateROISelection()
 {
   vtkMRMLAnnotationROINode* AnnotationROI =
     vtkMRMLAnnotationROINode::SafeDownCast(this->AnnotationNode);
-  if (AnnotationROI && this->GetSelectWithAnnotationNode())
+
+  if (AnnotationROI && this->GetSelectWithAnnotation() == true)
     {
-    this->ExtractPolyDataGeometry->SetImplicitFunction(this->Planes);
     AnnotationROI->GetTransformedPlanes(this->Planes);
-    this->ExtractPolyDataGeometry->Modified();
-    this->Modified();
+    this->ExtractFromROI->Modified();
     }
+
+  // tell the displaynode to render
+  this->InvokeCustomModifiedEvent( vtkMRMLModelNode::MeshModifiedEvent , this);
 }
-
-
-//----------------------------------------------------------------------------
-void vtkMRMLFiberBundleNode::CleanROISelection()
-{
-  this->SetAndObserveAnnotationNodeID(NULL);
-  this->CleanPolyDataPostROISelection->Delete();
-  this->ExtractPolyDataGeometry->Delete();
-  this->Planes->Delete();
-}
-
 
 //---------------------------------------------------------------------------
 vtkMRMLStorageNode* vtkMRMLFiberBundleNode::CreateDefaultStorageNode()

@@ -217,7 +217,7 @@ void vtkMRMLFiberBundleDisplayNode::SetAndObserveDiffusionTensorDisplayPropertie
   //so we emit the event that the polydata has been modified
   if (cnode)
     {
-    this->InvokeEvent(vtkMRMLModelNode::PolyDataModifiedEvent, this);
+    this->InvokeEvent(vtkMRMLModelNode::MeshModifiedEvent, this);
     }
 }
 

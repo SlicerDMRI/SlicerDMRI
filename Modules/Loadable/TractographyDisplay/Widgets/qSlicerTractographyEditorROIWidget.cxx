@@ -176,15 +176,15 @@ void qSlicerTractographyEditorROIWidget::
       d->AnnotationMRMLNodeForFiberSelection = d->FiberBundleNode->GetAnnotationNode();
       d->ROIForFiberSelectionMRMLNodeSelector->setCurrentNode(d->AnnotationMRMLNodeForFiberSelection);
     }
-    if (!d->FiberBundleNode->GetSelectWithAnnotationNode())
+    if (!d->FiberBundleNode->GetSelectWithAnnotation())
     {
       d->DisableROI->setChecked(true);
     }
-    else if (d->FiberBundleNode->GetSelectionWithAnnotationNodeMode() == vtkMRMLFiberBundleNode::PositiveAnnotationNodeSelection)
+    else if (d->FiberBundleNode->GetAnnotationSelectionMode() == vtkMRMLFiberBundleNode::PositiveSelection)
     {
       d->PositiveROI->setChecked(true);
     }
-    else if (d->FiberBundleNode->GetSelectionWithAnnotationNodeMode() == vtkMRMLFiberBundleNode::NegativeAnnotationNodeSelection)
+    else if (d->FiberBundleNode->GetAnnotationSelectionMode() == vtkMRMLFiberBundleNode::NegativeSelection)
     {
       d->NegativeROI->setChecked(true);
     }
@@ -219,6 +219,10 @@ void qSlicerTractographyEditorROIWidget::setAnnotationMRMLNodeForFiberSelection(
       {
       d->AnnotationMRMLNodeForFiberSelection = AnnotationNode;
       d->FiberBundleNode->SetAndObserveAnnotationNodeID(d->AnnotationMRMLNodeForFiberSelection->GetID());
+      }
+    else
+      {
+      d->FiberBundleNode->SetAndObserveAnnotationNodeID(NULL); // TODO nullptr
       }
     this->updateWidgetFromMRML();
   }
@@ -308,7 +312,7 @@ void qSlicerTractographyEditorROIWidget::disableROISelection(bool arg)
     Q_D(qSlicerTractographyEditorROIWidget);
     if (d->FiberBundleNode && d->AnnotationMRMLNodeForFiberSelection)
     {
-      d->FiberBundleNode->SelectWithAnnotationNodeOff();
+      d->FiberBundleNode->SetSelectWithAnnotation(false);
     }
   }
 }
@@ -320,8 +324,8 @@ void qSlicerTractographyEditorROIWidget::positiveROISelection(bool arg)
     Q_D(qSlicerTractographyEditorROIWidget);
     if (d->FiberBundleNode && d->AnnotationMRMLNodeForFiberSelection)
     {
-      d->FiberBundleNode->SelectWithAnnotationNodeOn();
-      d->FiberBundleNode->SetSelectionWithAnnotationNodeModeToPositive();
+      d->FiberBundleNode->SetSelectWithAnnotation(true);
+      d->FiberBundleNode->SetAnnotationSelectionMode(vtkMRMLFiberBundleNode::PositiveSelection);
     }
   }
 }
@@ -333,8 +337,8 @@ void qSlicerTractographyEditorROIWidget::negativeROISelection(bool arg)
     Q_D(qSlicerTractographyEditorROIWidget);
     if (d->FiberBundleNode && d->AnnotationMRMLNodeForFiberSelection)
     {
-      d->FiberBundleNode->SelectWithAnnotationNodeOn();
-      d->FiberBundleNode->SetSelectionWithAnnotationNodeModeToNegative();
+      d->FiberBundleNode->SetSelectWithAnnotation(true);
+      d->FiberBundleNode->SetAnnotationSelectionMode(vtkMRMLFiberBundleNode::NegativeSelection);
     }
   }
 }

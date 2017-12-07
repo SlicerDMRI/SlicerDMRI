@@ -282,6 +282,7 @@ void qSlicerTractographyDisplayWidget::setVisibility(bool state)
     {
     return;
     }
+
   d->FiberBundleDisplayNode->SetVisibility(state);
 }
 
@@ -362,10 +363,7 @@ void qSlicerTractographyDisplayWidget::setColorByScalar()
 void qSlicerTractographyDisplayWidget::onColorByScalarChanged(int scalarIndex)
 {
   Q_D(qSlicerTractographyDisplayWidget);
-  if (
-      !d->FiberBundleDisplayNode || !d->FiberBundleNode ||
-      !d->FiberBundleNode->GetPolyData() || !d->FiberBundleNode->GetPolyData()->GetPointData()
-      )
+  if (!d->FiberBundleDisplayNode || !d->FiberBundleNode)
     {
     return;
     }
