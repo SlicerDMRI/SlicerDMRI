@@ -34,8 +34,8 @@ class vtkMRMLAnnotationNode;
 class vtkIdTypeArray;
 class vtkExtractPolyDataGeometry;
 class vtkPlanes;
-class vtkCleanPolyData;
 class vtMRMLModelDisplayNode;
+class vtkPassThrough;
 
 class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleNode : public vtkMRMLModelNode
 {
@@ -74,10 +74,6 @@ public:
   /// Updates this node if it depends on other nodes
   /// when the node is deleted in the scene
   virtual void UpdateReferences();
-
-  ///
-  /// Finds the storage node and read the data
-  virtual void UpdateScene(vtkMRMLScene *scene);
 
   ///
   /// Update the stored reference to another node in the scene
@@ -123,29 +119,21 @@ public:
 
   ///
   /// Enable or disable the selection with an annotation node
-  virtual void SetSelectWithAnnotationNode(int);
-  vtkGetMacro(SelectWithAnnotationNode, int);
-  vtkBooleanMacro(SelectWithAnnotationNode, int);
+  virtual void SetSelectWithAnnotation(bool);
+  vtkGetMacro(SelectWithAnnotation, bool);
 
-  enum
+  enum SelectionModeEnum
   {
-    PositiveAnnotationNodeSelection,
-    NegativeAnnotationNodeSelection
+    NoSelection,
+    PositiveSelection,
+    NegativeSelection
   };
 
 
   ///
   /// Set the mode (positive or negative) of the selection with the annotation node
-  vtkGetMacro(SelectionWithAnnotationNodeMode, int);
-  virtual void SetSelectionWithAnnotationNodeMode(int);
-  virtual void SetSelectionWithAnnotationNodeModeToPositive()
-  {
-    this->SetSelectionWithAnnotationNodeMode(PositiveAnnotationNodeSelection);
-  }
-  virtual void SetSelectionWithAnnotationNodeModeToNegative()
-  {
-    this->SetSelectionWithAnnotationNodeMode(NegativeAnnotationNodeSelection);
-  }
+  vtkGetMacro(AnnotationSelectionMode, SelectionModeEnum);
+  virtual void SetAnnotationSelectionMode(SelectionModeEnum);
 
   ///
   /// Reimplemented from internal reasons
@@ -153,9 +141,10 @@ public:
 
   ///
   /// Gets the subsampled PolyData converted from the real data in the node
-  virtual vtkPolyData* GetFilteredPolyData();
+  virtual vtkPointSet* GetFilteredPolyData();
   virtual vtkAlgorithmOutput* GetFilteredMeshConnection();
   void SetMeshToDisplayNode(vtkMRMLModelDisplayNode*);
+
   ///
   /// get associated line display node or NULL if not set
   vtkMRMLFiberBundleDisplayNode* GetLineDisplayNode();
@@ -191,13 +180,9 @@ public:
   }
 
   // Description:
-  // Enable, Disapble shuffle of IDs
-  vtkGetMacro(EnableShuffleIDs, int);
-  void SetEnableShuffleIDs(int value)
-  {
-    this->EnableShuffleIDs = value;
-  }
-
+  // Enable, Disable shuffle of IDs
+  vtkGetMacro(EnableShuffleIDs, bool);
+  vtkSetMacro(EnableShuffleIDs, bool);
 
 protected:
   vtkMRMLFiberBundleNode();
@@ -205,38 +190,37 @@ protected:
   vtkMRMLFiberBundleNode(const vtkMRMLFiberBundleNode&);
   void operator=(const vtkMRMLFiberBundleNode&);
 
-  void SetPolyDataToDisplayNode(vtkMRMLModelDisplayNode* modelDisplayNode);
-
   // Description:
   // Maximum number of fibers to show per bundle when it is loaded.
   static vtkIdType MaxNumberOfFibersToShowByDefault;
   vtkIdTypeArray* ShuffledIds;
 
-  vtkExtractSelectedPolyDataIds* ExtractSelectedPolyDataIds;
-  vtkCleanPolyData* CleanPolyDataPostSubsampling;
-  vtkCleanPolyData* CleanPolyDataPostROISelection;
   float SubsamplingRatio;
 
-  virtual void PrepareSubsampling();
-  virtual void UpdateSubsampling();
-  virtual void CleanSubsampling();
 
   /// ALL MRML nodes
-  int SelectWithAnnotationNode;
-  int SelectionWithAnnotationNodeMode;
-  int EnableShuffleIDs;
+  bool EnableShuffleIDs;
+  bool SelectWithAnnotation;
+  SelectionModeEnum AnnotationSelectionMode;
 
   vtkMRMLAnnotationNode *AnnotationNode;
   char *AnnotationNodeID;
-  vtkExtractPolyDataGeometry *ExtractPolyDataGeometry;
-  vtkPlanes *Planes;
-
-  virtual void PrepareROISelection();
-  virtual void UpdateROISelection();
-  virtual void CleanROISelection();
 
   virtual void SetAnnotationNodeID(const char* id);
 
+private:
+  // Pipeline filter objects
+  vtkExtractPolyDataGeometry* ExtractFromROI;
+  vtkExtractSelectedPolyDataIds* ExtractSubsample;
+  vtkPlanes *Planes;
+  vtkPassThrough* LocalPassThrough;
+
+  // Internal methods
+  void UpdateSubsampling();
+  void UpdateROISelection();
+
+  void PrepareROISelection();
+  void PrepareSubsampling();
 };
 
 #endif
