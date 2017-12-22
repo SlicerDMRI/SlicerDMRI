@@ -91,8 +91,14 @@ void qMRMLTractographyDisplayTreeViewPrivate::init()
   this->SortFilterModel = q->sortFilterProxyModel();
 
   q->header()->setStretchLastSection(false);
+
+#ifdef Slicer_HAVE_QT5
+  q->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  q->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+#else
   q->header()->setResizeMode(QHeaderView::ResizeToContents);
   q->header()->setResizeMode(0, QHeaderView::Stretch);
+#endif
 
   //this->SortFilterModel->setSourceModel(this->SceneModel);
   //q->qMRMLTreeView::setModel(this->SortFilterModel);
