@@ -18,9 +18,6 @@
 
 ==============================================================================*/
 
-// QT includes
-#include <QtPlugin>
-
 // SlicerQt includes
 #include <qSlicerCoreApplication.h>
 #include <qSlicerCoreIOManager.h>
@@ -45,7 +42,11 @@ VTK_MODULE_INIT(vtkTractographyDisplayMRMLDM)
 #endif
 
 //-----------------------------------------------------------------------------
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+// QT includes
+#include <QtPlugin>
 Q_EXPORT_PLUGIN2(qSlicerTractographyDisplayModule, qSlicerTractographyDisplayModule);
+#endif
 
 //-----------------------------------------------------------------------------
 qSlicerTractographyDisplayModule::

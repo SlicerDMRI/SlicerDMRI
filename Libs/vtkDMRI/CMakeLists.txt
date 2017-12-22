@@ -118,7 +118,6 @@ if(VTK_WRAP_PYTHON)
   SlicerMacroPythonWrapModuleVTKLibrary(
     NAME ${lib_name}
     SRCS ${vtkDMRI_SRCS}
-    WRAPPED_TARGET_LIBRARIES vtkDMRI
     RELATIVE_PYTHON_DIR "."
     )
 
