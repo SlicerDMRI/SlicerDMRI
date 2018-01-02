@@ -251,6 +251,15 @@ void vtkMRMLFiberBundleNode::ProcessMRMLEvents (vtkObject *caller,
     this->UpdateROISelection();
   }
 
+  // TODO replace with subsampling filter
+  if ((event == vtkCommand::ModifiedEvent) &&
+      (this->GetMeshConnection())          &&
+      (this->GetMeshConnection()->GetProducer() == caller))
+  {
+    this->UpdateSubsampling();
+  }
+
+
   if (vtkMRMLDiffusionTensorDisplayPropertiesNode::SafeDownCast(caller) && event == vtkCommand::ModifiedEvent)
   {
     this->InvokeEvent(vtkMRMLModelNode::DisplayModifiedEvent, NULL);
@@ -399,23 +408,6 @@ void vtkMRMLFiberBundleNode::SetMeshConnection(vtkAlgorithmOutput *inputPort)
     {
     const vtkIdType numberOfFibers = polyData->GetNumberOfLines();
 
-    std::vector<vtkIdType> idVector;
-    idVector.reserve(numberOfFibers);
-    for(vtkIdType i = 0;  i < numberOfFibers; i++ )
-      idVector.push_back(i);
-
-    if (this->EnableShuffleIDs)
-      std::random_shuffle(idVector.begin(), idVector.end());
-
-    this->ShuffledIds->Initialize();
-
-      { // unsafe block: copy must be paired with allocation
-        //               so that the buffer is sufficient
-      this->ShuffledIds->SetNumberOfTuples(numberOfFibers);
-      std::copy(idVector.begin(), idVector.end(),
-                (vtkIdType*)this->ShuffledIds->GetVoidPointer(0));
-      }
-
     float subsamplingRatio = this->SubsamplingRatio;
 
     if (numberOfFibers > vtkMRMLFiberBundleNode::MaxNumberOfFibersToShowByDefault )
@@ -558,8 +550,37 @@ void vtkMRMLFiberBundleNode::UpdateSubsampling()
   vtkIdType numberOfCellsToKeep = vtkIdType(floor(polyData->GetNumberOfLines() * this->SubsamplingRatio));
 
   if (numberOfCellsToKeep == arr->GetNumberOfTuples())
+    {
     // no change, no-op
     return;
+    }
+
+  const vtkIdType numberOfFibers = polyData->GetNumberOfLines();
+  if (this->ShuffledIds->GetNumberOfTuples() < numberOfFibers)
+    {
+
+    std::vector<vtkIdType> idVector;
+    idVector.reserve(numberOfFibers);
+    for (vtkIdType i = 0;  i < numberOfFibers; i++)
+      idVector.push_back(i);
+
+    if (this->EnableShuffleIDs)
+      std::random_shuffle(idVector.begin(), idVector.end());
+
+    this->ShuffledIds->Initialize();
+
+    /* unsafe block */ {
+
+      // copy must be paired with allocation
+      // so that the buffer is sufficient
+
+      this->ShuffledIds->SetNumberOfTuples(numberOfFibers);
+      std::copy(idVector.begin(), idVector.end(),
+                static_cast<vtkIdType*>(this->ShuffledIds->GetVoidPointer(0)));
+
+    /* end unsafe block */ }
+
+    }
 
   arr->Initialize();
   arr->SetNumberOfTuples(numberOfCellsToKeep);
