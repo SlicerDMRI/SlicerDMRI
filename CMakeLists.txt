@@ -68,6 +68,7 @@ add_subdirectory("Modules/CLI/FiberBundleLabelSelect")
 
 add_subdirectory("Modules/Scripted/DICOM2FullBrainTractography")
 add_subdirectory("Modules/Scripted/FiberBundleToLabelMap")
+add_subdirectory("Modules/Scripted/DICOMPlugins")
 
 if (${SlicerDMRI_ENABLE_TRACTIO})
   add_subdirectory("Modules/Loadable/TractIO")

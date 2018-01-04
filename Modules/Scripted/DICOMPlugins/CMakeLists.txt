@@ -1,4 +1,4 @@
 slicerMacroBuildScriptedModule(
   NAME    DMRIDICOMPlugins
-  SCRIPTS DicomDiffusionVolumePlugin.py
+  SCRIPTS DICOMDiffusionVolumePlugin.py
   )
