@@ -15,7 +15,7 @@ class DICOMDiffusionVolumePluginClass(DICOMPlugin):
 
   def __init__(self):
     super(DICOMDiffusionVolumePluginClass,self).__init__()
-    self.loadType = "Diffusion Volume"
+    self.loadType = "Diffusion Volume (please see DWIConvert module for advanced options and help)"
     # these are the required tags for each vendor
     # TODO: it doesn't seem that DicomToNrrd supports
     # standard DICOM Diffusion, but when it does we should
