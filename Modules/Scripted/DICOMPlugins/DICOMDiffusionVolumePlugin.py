@@ -114,7 +114,7 @@ class DICOMDiffusionVolumePluginClass(DICOMPlugin):
       loadable.name = name + ' - as DWI Volume'
       loadable.selected = True
       loadable.tooltip = "Appears to be DWI from vendor %s" % vendorName
-      loadable.confidence = 0.4
+      loadable.confidence = 0.6
       loadables = [loadable]
     return loadables
 
