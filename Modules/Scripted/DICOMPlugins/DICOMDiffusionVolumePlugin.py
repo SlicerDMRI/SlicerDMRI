@@ -52,6 +52,7 @@ class DICOMDiffusionVolumePluginClass(DICOMPlugin):
         self.tags[tagIndex] = tag
         tagIndex += 1
     self.tags['seriesDescription'] = "0008,103e"
+    self.tags['modality'] = "0008,0060"
 
   def examineForImport(self,fileLists):
     """ Returns a list of DICOMLoadable instances
@@ -68,10 +69,10 @@ class DICOMDiffusionVolumePluginClass(DICOMPlugin):
     corresponding to ways of interpreting the
     files parameter.
     Process is to look for 'known' private tags corresponding
-    to the types of diffusion datasets that the DicomToNrrd utility
-    should be able to process.  Only need to look at one header
-    in the series since all should be the same with respect
-    to this check.
+    to the types of diffusion datasets that the DWIConvert utility
+    should be able to process. We look at the first three
+    headers because some vendors don't write gradient information
+    in the B0.
 
     For testing:
     dv = slicer.modules.dicomPlugins['DICOMDiffusionVolumePlugin']()
@@ -84,6 +85,13 @@ class DICOMDiffusionVolumePluginClass(DICOMPlugin):
       name = "Unknown"
 
     validDWI = False
+    loadables = []
+
+    # The only valid modality is MR
+    modality = slicer.dicomDatabase.fileValue(files[0], self.tags['modality'])
+    if (modality.upper() != "MR"):
+      return loadables
+
     vendorName = ""
     for vendor in self.diffusionTags:
       matchesVendor = True
@@ -99,7 +107,6 @@ class DICOMDiffusionVolumePluginClass(DICOMPlugin):
         validDWI = True
         vendorName = vendor
 
-    loadables = []
     if validDWI:
       # default loadable includes all files for series
       loadable = DICOMLoadable()
