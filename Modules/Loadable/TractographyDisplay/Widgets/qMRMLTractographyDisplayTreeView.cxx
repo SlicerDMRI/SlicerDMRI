@@ -18,6 +18,8 @@
 
 ==============================================================================*/
 
+#include "vtkSlicerConfigure.h"
+
 // Qt includes
 #include <QDebug>
 #include <QHeaderView>
