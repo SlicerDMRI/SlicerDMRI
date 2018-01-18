@@ -642,16 +642,16 @@ void vtkMRMLFiberBundleNode::CreateDefaultDisplayNodes()
   if (!this->GetScene())
     return;
 
-  if (!this->GetTubeDisplayNode())
+  if (!this->GetLineDisplayNode())
   {
-    vtkNew<vtkMRMLFiberBundleTubeDisplayNode> node;
+    vtkNew<vtkMRMLFiberBundleLineDisplayNode> node;
     addDisplayNodeAndDTDPN(this, node.GetPointer());
     node->SetVisibility(1);
   }
 
-  if (!this->GetLineDisplayNode())
+  if (!this->GetTubeDisplayNode())
   {
-    vtkNew<vtkMRMLFiberBundleLineDisplayNode> node;
+    vtkNew<vtkMRMLFiberBundleTubeDisplayNode> node;
     addDisplayNodeAndDTDPN(this, node.GetPointer());
     node->SetVisibility(0);
   }
