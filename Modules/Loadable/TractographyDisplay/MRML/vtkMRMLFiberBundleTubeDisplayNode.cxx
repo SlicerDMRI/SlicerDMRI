@@ -38,7 +38,6 @@ vtkMRMLNodeNewMacro(vtkMRMLFiberBundleTubeDisplayNode);
 //----------------------------------------------------------------------------
 vtkMRMLFiberBundleTubeDisplayNode::vtkMRMLFiberBundleTubeDisplayNode()
 {
-  this->ColorMode = vtkMRMLFiberBundleDisplayNode::colorModeScalar;
   this->ColorLinesByOrientation = vtkPolyDataColorLinesByOrientation::New();
   this->ColorLinesByOrientation->SetInputConnection(
     this->Superclass::GetOutputMeshConnection());

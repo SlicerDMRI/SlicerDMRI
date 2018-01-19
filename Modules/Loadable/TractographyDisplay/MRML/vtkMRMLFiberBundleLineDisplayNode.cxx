@@ -39,7 +39,6 @@ vtkMRMLFiberBundleLineDisplayNode::vtkMRMLFiberBundleLineDisplayNode()
   this->TensorToColor->SetInputConnection(this->Superclass::GetOutputMeshConnection());
   this->ColorLinesByOrientation = vtkPolyDataColorLinesByOrientation::New();
   this->ColorLinesByOrientation->SetInputConnection(this->TensorToColor->GetOutputPort());
-  this->ColorMode = vtkMRMLFiberBundleDisplayNode::colorModeScalar;
 }
 
 //----------------------------------------------------------------------------

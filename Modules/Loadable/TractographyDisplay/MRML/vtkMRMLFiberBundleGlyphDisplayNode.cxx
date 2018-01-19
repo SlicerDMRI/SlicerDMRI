@@ -37,7 +37,6 @@ vtkMRMLFiberBundleGlyphDisplayNode::vtkMRMLFiberBundleGlyphDisplayNode()
   this->DiffusionTensorGlyphFilter = vtkDiffusionTensorGlyph::New();
 
   this->TwoDimensionalVisibility = 0;
-  this->ColorMode = vtkMRMLFiberBundleDisplayNode::colorModeScalar;
 }
 
 //----------------------------------------------------------------------------

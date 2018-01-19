@@ -40,7 +40,7 @@ vtkMRMLFiberBundleDisplayNode::vtkMRMLFiberBundleDisplayNode()
   this->ActiveTensorName = 0;
 
   // Enumerated
-  this->ColorMode = this->colorModeSolid;
+  this->ColorMode = vtkMRMLFiberBundleDisplayNode::colorModeMeanFiberOrientation;
   this->ScalarVisibility = 1;
 
   this->DiffusionTensorDisplayPropertiesNode = NULL;
