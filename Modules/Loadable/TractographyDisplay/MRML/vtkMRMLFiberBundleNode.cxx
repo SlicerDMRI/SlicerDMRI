@@ -40,14 +40,7 @@ Version:   $Revision: 1.3 $
 #include <vtkSelection.h>
 #include <vtkSelectionNode.h>
 #include <vtkVersion.h>
-/*
-#include "vtkObjectFactory.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkInformationVector.h"
-#include "vtkInformation.h"
-#include "vtkDataObject.h"
-#include "vtkSmartPointer.h"
-*/
+
 // STD includes
 #include <algorithm>
 #include <cassert>
