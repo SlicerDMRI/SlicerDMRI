@@ -169,7 +169,7 @@ SP<TrcTractographyResults> create_dicom(std::vector<std::string> files)
 
   if (result.good())
     {
-    result = p_tract->importPatientStudyFoR(files[0].c_str(),
+    result = p_tract->importHierarchy(files[0].c_str(),
                                             true, /* usePatient*/
                                             true, /* useStudy */
                                             true, /* useSeries */
