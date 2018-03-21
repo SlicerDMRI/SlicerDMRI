@@ -23,7 +23,7 @@ class TractographyExportPLY(ScriptedLoadableModule):
   def __init__(self, parent):
     ScriptedLoadableModule.__init__(self, parent)
     self.parent.title = "Export tractography to PLY (mesh)"
-    self.parent.categories = ["Diffusion/Import and Export"]
+    self.parent.categories = ["Diffusion.Import and Export"]
     self.parent.dependencies = []
     self.parent.contributors = ["Steve Pieper (Isomics, Inc.), Andras Lasso (Queen's University), Isaiah Norton (BWH)"]
     self.parent.helpText = """
