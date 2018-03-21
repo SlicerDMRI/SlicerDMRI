@@ -186,24 +186,10 @@ class TractographyExportPLYTest(ScriptedLoadableModuleTest):
     self.test_TractographyExportPLY1()
 
   def test_TractographyExportPLY1(self):
-    """ Ideally you should have several levels of tests.  At the lowest level
-    tests should exercise the functionality of the logic with different inputs
-    (both valid and invalid).  At higher levels your tests should emulate the
-    way the user would interact with your code and confirm that it still works
-    the way you intended.
-    One of the most important features of the tests is that it should alert other
-    developers when their changes will have an impact on the behavior of your
-    module.  For example, if a developer removes a feature that you depend on,
-    your test should break so they know that the feature is needed.
-    """
-
     self.delayDisplay("Starting the test")
-    #
-    # first, get some data
-    #
     import urllib
     downloads = (
-        ('http://slicer.kitware.com/midas3/download?items=5767', 'FA.nrrd', slicer.util.loadVolume),
+        ('https://github.com/SlicerDMRI/DMRITestData/blob/master/Tractography/fiber_ply_export_test.vtk?raw=true', 'fiber_ply_export_test.vtk', slicer.util.loadFiberBundle),
         )
 
     for url,name,loader in downloads:
@@ -214,9 +200,12 @@ class TractographyExportPLYTest(ScriptedLoadableModuleTest):
       if loader:
         logging.info('Loading %s...' % (name,))
         loader(filePath)
+
     self.delayDisplay('Finished with download and loading')
 
-    volumeNode = slicer.util.getNode(pattern="FA")
+    fiberNode = slicer.util.getNode(pattern="fiber_ply_export_test")
     logic = TractographyExportPLYLogic()
-    self.assertIsNotNone( logic.hasImageData(volumeNode) )
+    logic.exportFiberBundleToPLYPath(fiberNode, os.path.join(slicer.app.temporaryPath, "fiber.ply"))
+
+    # If it doesn't throw, it passes...
     self.delayDisplay('Test passed!')
