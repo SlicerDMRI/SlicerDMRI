@@ -845,7 +845,7 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForLabelMap(
   tensorRASToIJKRotation->Invert();
   seed->SetTensorRotationMatrix(tensorRASToIJKRotation.GetPointer());
 
-  // vtkNew<vtkNRRDWriter> iwriter;
+  // vtkNew<vtkTeemNRRDWriter> iwriter;
 
   // 3. Set up ROI (not based on Cl mask), from input now
 

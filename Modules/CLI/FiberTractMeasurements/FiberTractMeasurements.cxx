@@ -2,8 +2,8 @@
 
 // vtkTeem includes
 #include <vtkDiffusionTensorMathematics.h>
-#include <Libs/vtkTeem/vtkNRRDReader.h>
-#include <Libs/vtkTeem/vtkNRRDWriter.h>
+#include <Libs/vtkTeem/vtkTeemNRRDReader.h>
+#include <Libs/vtkTeem/vtkTeemNRRDWriter.h>
 
 // vnl includes
 #include <vnl/vnl_math.h>
