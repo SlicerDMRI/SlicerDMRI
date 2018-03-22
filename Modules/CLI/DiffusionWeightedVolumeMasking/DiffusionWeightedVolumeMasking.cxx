@@ -2,8 +2,8 @@
 #include <vtkMRMLNRRDStorageNode.h>
 
 // vtkTeem includes
-#include <Libs/vtkTeem/vtkNRRDReader.h>
-#include <Libs/vtkTeem/vtkNRRDWriter.h>
+#include <Libs/vtkTeem/vtkTeemNRRDReader.h>
+#include <Libs/vtkTeem/vtkTeemNRRDWriter.h>
 
 // VTK includes
 #include <vtkNew.h>
@@ -45,7 +45,7 @@ int main( int argc, char * argv[] )
 
   PARSE_ARGS;
     {
-    vtkNew<vtkNRRDReader> reader;
+    vtkNew<vtkTeemNRRDReader> reader;
     reader->SetFileName(inputVolume.c_str() );
     reader->Update();
     if( reader->GetReadStatus() )
@@ -167,7 +167,7 @@ int main( int argc, char * argv[] )
     ijkToRasMatrix->Invert();
 
     // Save baseline
-    vtkNew<vtkNRRDWriter> writer;
+    vtkNew<vtkTeemNRRDWriter> writer;
     writer->SetInputConnection(imageWeightedSum->GetOutputPort() );
     writer->SetFileName( outputBaseline.c_str() );
     writer->UseCompressionOn();
@@ -175,7 +175,7 @@ int main( int argc, char * argv[] )
     writer->Write();
 
     // Save mask
-    vtkNew<vtkNRRDWriter> writer2;
+    vtkNew<vtkTeemNRRDWriter> writer2;
     writer2->SetInputConnection(cast2->GetOutputPort() );
 
     writer2->SetFileName( thresholdMask.c_str() );

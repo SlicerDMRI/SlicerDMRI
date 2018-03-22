@@ -4,8 +4,8 @@
 #include <vtkVersion.h>
 
 // vtkTeem includes
-#include <Libs/vtkTeem/vtkNRRDReader.h>
-#include <Libs/vtkTeem/vtkNRRDWriter.h>
+#include <Libs/vtkTeem/vtkTeemNRRDReader.h>
+#include <Libs/vtkTeem/vtkTeemNRRDWriter.h>
 
 // DWIToDTIEstimation includes
 #include "DWIToDTIEstimationCLP.h"
@@ -33,7 +33,7 @@ int main( int argc, char * argv[] )
 
   PARSE_ARGS;
     {
-    vtkNew<vtkNRRDReader> reader;
+    vtkNew<vtkTeemNRRDReader> reader;
     reader->SetFileName(inputVolume.c_str() );
     reader->Update();
     if( reader->GetReadStatus() )
@@ -106,7 +106,7 @@ int main( int argc, char * argv[] )
     vtkNew<vtkImageData> mask;
     if( strlen(inputMaskVolume.c_str() ) > 0 )
       {
-      vtkNew<vtkNRRDReader> maskReader;
+      vtkNew<vtkTeemNRRDReader> maskReader;
       maskReader->SetFileName(inputMaskVolume.c_str() );
       maskReader->Update();
       if( maskReader->GetReadStatus() )
@@ -153,7 +153,7 @@ int main( int argc, char * argv[] )
 
     // Don't save the scalars array, only the tensor array.
     // Save tensor
-    vtkNew<vtkNRRDWriter> writer;
+    vtkNew<vtkTeemNRRDWriter> writer;
     tensorImage->GetPointData()->SetScalars(NULL);
     writer->SetInputData(tensorImage);
     writer->SetFileName( outputTensor.c_str() );
@@ -166,7 +166,7 @@ int main( int argc, char * argv[] )
     writer->Write();
 
     // Save baseline
-    vtkNew<vtkNRRDWriter> writer2;
+    vtkNew<vtkTeemNRRDWriter> writer2;
     writer2->SetInputData(estim->GetBaseline() );
     writer2->SetFileName( outputBaseline.c_str() );
     writer2->UseCompressionOn();
