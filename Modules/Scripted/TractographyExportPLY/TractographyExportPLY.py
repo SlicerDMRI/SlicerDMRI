@@ -87,7 +87,7 @@ class TractographyExportPLYWidget(ScriptedLoadableModuleWidget):
       parametersFormLayout.addRow("Output File: ", self.outputFileSelector)
 
     with It(qt.QPushButton("Export")) as w:
-      self.toolTip = "Run Export"
+      w.toolTip = "Run Export"
       w.connect('clicked(bool)', self.onExport)
       parametersFormLayout.addRow("", w)
 
