@@ -241,9 +241,12 @@ class TractographyExportPLYTest(ScriptedLoadableModuleTest):
 
     self.delayDisplay('Finished with download and loading')
 
+    outputPath = os.path.join(slicer.app.temporaryPath, "fiber.ply")
     fiberNode = slicer.util.getNode(pattern="fiber_ply_export_test")
     logic = TractographyExportPLYLogic()
-    logic.exportFiberBundleToPLYPath(fiberNode, os.path.join(slicer.app.temporaryPath, "fiber.ply"))
+    logic.exportFiberBundleToPLYPath(fiberNode, outputPath)
+
+    slicer.util.loadModel(outputPath)
 
     # If it doesn't throw, it passes...
     self.delayDisplay('Test passed!')
