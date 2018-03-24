@@ -76,8 +76,41 @@ class TractographyExportPLYWidget(ScriptedLoadableModuleWidget):
       w.setToolTip( "Pick the fiber bundle to export." )
       parametersFormLayout.addRow("Input FiberBundleNode: ", self.inputSelector)
 
+
     #
-    # output file selector
+    # tube radius controller
+    #
+    with It(ctk.ctkSliderWidget()) as w:
+      self.radiusSelector = w
+      w.minimum = 0.1
+      w.maximum = 20.0
+      w.singleStep = 0.1
+      w.setToolTip("Select radius for output tubes")
+      parametersFormLayout.addRow("Tube radius: ", self.radiusSelector)
+
+
+    with It(ctk.ctkSliderWidget()) as w:
+      self.numSidesSelector = w
+      w.value = 6
+      w.decimals = 0
+      w.minimum = 3
+      w.maximum = 20
+      w.singleStep = 1
+      w.pageStep = 1
+      w.setToolTip("Select number of sides for output tube; higher number will look nicer, but will take longer to export")
+      parametersFormLayout.addRow("Radius (mm): ", self.numSidesSelector)
+
+    #
+    # separator
+    #
+    with It(qt.QFrame()) as w:
+      w.setFrameShape(qt.QFrame.HLine)
+      w.setFrameShadow(qt.QFrame.Sunken)
+      parametersFormLayout.addRow(w)
+
+
+    #
+    # output file selector, export button, and status frame
     #
     with It(ctk.ctkPathLineEdit()) as w:
       self.outputFileSelector = w
@@ -88,13 +121,15 @@ class TractographyExportPLYWidget(ScriptedLoadableModuleWidget):
 
     with It(qt.QPushButton("Export")) as w:
       w.toolTip = "Run Export"
+      w.styleSheet = "background: lightgray"
       w.connect('clicked(bool)', self.onExport)
       parametersFormLayout.addRow("", w)
 
     with It(qt.QStatusBar()) as w:
       self.statusLabel = w
+      w.setToolTip("CLI status")
       w.styleSheet = "background: lightgray"
-      parametersFormLayout.addRow(w)
+      parametersFormLayout.addRow("Status: ", w)
 
     # Add vertical spacer
     self.layout.addStretch(1)
@@ -109,7 +144,9 @@ class TractographyExportPLYWidget(ScriptedLoadableModuleWidget):
     res = False
     try:
       res = logic.exportFiberBundleToPLYPath(self.inputSelector.currentNode(),
-                                             self.outputFileSelector.currentPath)
+                                             self.outputFileSelector.currentPath,
+                                             radius = self.radiusSelector.value,
+                                             number_of_sides = self.numSidesSelector.value)
       self.statusLabel.showMessage("Export succeeded!")
     except Exception as err:
       self.statusLabel.showMessage("ExportFailed: {}".format(err))
@@ -123,7 +160,7 @@ class TractographyExportPLYWidget(ScriptedLoadableModuleWidget):
 
 class TractographyExportPLYLogic(ScriptedLoadableModuleLogic):
 
-  def exportFiberBundleToPLYPath(self, inputFiberBundle, outputFilePath):
+  def exportFiberBundleToPLYPath(self, inputFiberBundle, outputFilePath, radius = 0.5, number_of_sides = 6):
     """
     Do the actual export
     """
@@ -138,7 +175,8 @@ class TractographyExportPLYLogic(ScriptedLoadableModuleLogic):
       raise Exception("Selected output directory does not exist: {}".format(outputDir))
 
     tuber = vtk.vtkTubeFilter()
-    tuber.SetNumberOfSides(6)
+    tuber.SetNumberOfSides(number_of_sides)
+    tuber.SetRadius(radius)
     tuber.SetInputData(lineDisplayNode.GetOutputPolyData())
     tuber.Update()
     tubes = tuber.GetOutputDataObject(0)
