@@ -1,11 +1,4 @@
-#if defined(_MSC_VER)
-#pragma warning ( disable : 4786 )
-#endif
-
-#ifdef __BORLANDC__
-#define ITK_LEAN_AND_MEAN
-#endif
-
+// generated CLP header
 #include "FiberBundleLabelSelectCLP.h"
 
 #include "itkPluginFilterWatcher.h"
@@ -25,6 +18,7 @@
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataWriter.h>
+#include <vtkPolyDataPointSampler.h>
 #include <vtkSmartPointer.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkTimerLog.h>
@@ -42,8 +36,6 @@
 #include <iostream>
 #include <algorithm>
 #include <string>
-
-#include <vtkPolyDataPointSampler.h>
 
 void write_output(std::string fname, vtkPolyData* polydata)
 {
@@ -67,6 +59,11 @@ void write_output(std::string fname, vtkPolyData* polydata)
     }
 }
 
+typedef enum _operation {
+  op_OR,
+  op_AND
+} Operation;
+
 int main( int argc, char * argv[] )
 {
   PARSE_ARGS;
@@ -74,14 +71,14 @@ int main( int argc, char * argv[] )
   try
   {
   // Label operations
-  int includeOperation = 0; // 0-OR; 1-AND
+  Operation includeOperation = op_OR;
   if (PassOperation == std::string("OR"))
     {
-    includeOperation = 0;
+    includeOperation = op_OR;
     }
   else if (PassOperation == std::string("AND"))
     {
-    includeOperation = 1;
+    includeOperation = op_AND;
     }
   else
     {
@@ -89,14 +86,14 @@ int main( int argc, char * argv[] )
     return EXIT_FAILURE;
     }
 
-  int excludeOperation = 0; // 0-AND; 1-OR
+  Operation excludeOperation = op_OR;
   if (NoPassOperation == std::string("OR"))
     {
-    excludeOperation = 0;
+    excludeOperation = op_OR;
     }
   else if (NoPassOperation == std::string("AND"))
     {
-    excludeOperation = 1;
+    excludeOperation = op_AND;
     }
   else
     {
@@ -166,6 +163,7 @@ int main( int argc, char * argv[] )
 
   if ( !inPts || numPts  < 1 || !inLines || numLines < 1 )
     {
+    std::cerr << "Missing input data (points or lines), exiting!";
     write_output(OutputFibers, input);
     return EXIT_SUCCESS;
     }
