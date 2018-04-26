@@ -97,8 +97,8 @@ class TractographyExportPLYWidget(ScriptedLoadableModuleWidget):
       w.maximum = 20
       w.singleStep = 1
       w.pageStep = 1
-      w.setToolTip("Select number of sides for output tube; higher number will look nicer, but will take longer to export")
-      parametersFormLayout.addRow("Radius (mm): ", self.numSidesSelector)
+      w.setToolTip("Select number of sides for output tube: higher number will look nicer, but will take more memory and time to export.")
+      parametersFormLayout.addRow("Number of sides: ", self.numSidesSelector)
 
     #
     # separator
@@ -120,6 +120,7 @@ class TractographyExportPLYWidget(ScriptedLoadableModuleWidget):
       parametersFormLayout.addRow("Output File: ", self.outputFileSelector)
 
     with It(qt.QPushButton("Export")) as w:
+      self.exportButton = w
       w.toolTip = "Run Export"
       w.styleSheet = "background: lightgray"
       w.connect('clicked(bool)', self.onExport)
@@ -164,6 +165,9 @@ class TractographyExportPLYLogic(ScriptedLoadableModuleLogic):
     """
     Do the actual export
     """
+    if not float(number_of_sides).is_integer():
+        import warnings
+        warnings.warn("Attempted inexact conversion for non-integer number_of_sides {}. This should never happen.".format(number_of_sides))
 
     lineDisplayNode = inputFiberBundle.GetLineDisplayNode()
 
@@ -175,7 +179,7 @@ class TractographyExportPLYLogic(ScriptedLoadableModuleLogic):
       raise Exception("Selected output directory does not exist: {}".format(outputDir))
 
     tuber = vtk.vtkTubeFilter()
-    tuber.SetNumberOfSides(number_of_sides)
+    tuber.SetNumberOfSides(int(number_of_sides))
     tuber.SetRadius(radius)
     tuber.SetInputData(lineDisplayNode.GetOutputPolyData())
     tuber.Update()
@@ -225,28 +229,48 @@ class TractographyExportPLYTest(ScriptedLoadableModuleTest):
 
   def test_TractographyExportPLY1(self):
     self.delayDisplay("Starting the test")
-    import urllib
-    downloads = (
-        ('https://github.com/SlicerDMRI/DMRITestData/blob/master/Tractography/fiber_ply_export_test.vtk?raw=true', 'fiber_ply_export_test.vtk', slicer.util.loadFiberBundle),
-        )
+    try:
+      import urllib
+      downloads = (
+          ('https://github.com/SlicerDMRI/DMRITestData/blob/master/Tractography/fiber_ply_export_test.vtk?raw=true', 'fiber_ply_export_test.vtk', slicer.util.loadFiberBundle),
+          )
 
-    for url,name,loader in downloads:
-      filePath = slicer.app.temporaryPath + '/' + name
-      if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
-        logging.info('Requesting download %s from %s...\n' % (name, url))
-        urllib.urlretrieve(url, filePath)
-      if loader:
-        logging.info('Loading %s...' % (name,))
-        loader(filePath)
+      for url,name,loader in downloads:
+        filePath = slicer.app.temporaryPath + '/' + name
+        if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
+          logging.info('Requesting download %s from %s...\n' % (name, url))
+          urllib.urlretrieve(url, filePath)
+        if loader:
+          logging.info('Loading %s...' % (name,))
+          loader(filePath)
 
-    self.delayDisplay('Finished with download and loading')
+      self.delayDisplay('Finished with download and loading')
 
-    outputPath = os.path.join(slicer.app.temporaryPath, "fiber.ply")
-    fiberNode = slicer.util.getNode(pattern="fiber_ply_export_test")
-    logic = TractographyExportPLYLogic()
-    logic.exportFiberBundleToPLYPath(fiberNode, outputPath)
+      # logic
+      outputPath = os.path.join(slicer.app.temporaryPath, "fiber.ply")
+      fiberNode = slicer.util.getNode(pattern="fiber_ply_export_test")
+      logic = TractographyExportPLYLogic()
+      logic.exportFiberBundleToPLYPath(fiberNode, outputPath)
 
-    slicer.util.loadModel(outputPath)
+      if not slicer.util.loadModel(outputPath):
+        raise Exception("Failed to load expected output PLY file: {}".format(outputPath))
 
-    # If it doesn't throw, it passes...
-    self.delayDisplay('Test passed!')
+      # gui
+      outputPath2 = os.path.join(slicer.app.temporaryPath, "fiber2.ply")
+      widget = slicer.modules.TractographyExportPLYWidget
+      widget.inputSelector.setCurrentNode(fiberNode)
+      widget.outputFileSelector.currentPath = outputPath2
+      widget.exportButton.click()
+
+      if not slicer.util.loadModel(outputPath2):
+        raise Exception("Failed to load expected output PLY file: {}".format(outputPath2))
+
+      # If it doesn't throw, it passes...
+      self.delayDisplay('Test passed!')
+
+    except Exception, e:
+      import traceback
+      traceback.print_exc()
+      self.delayDisplay('Test caused exception!\n' + str(e))
+
+
