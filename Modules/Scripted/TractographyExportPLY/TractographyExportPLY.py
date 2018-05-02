@@ -101,13 +101,13 @@ class TractographyExportPLYWidget(ScriptedLoadableModuleWidget):
       parametersFormLayout.addRow("Number of sides: ", self.numSidesSelector)
 
     #
-    # separator
+    # use native scalar range 
     #
-    with It(qt.QFrame()) as w:
-      w.setFrameShape(qt.QFrame.HLine)
-      w.setFrameShadow(qt.QFrame.Sunken)
-      parametersFormLayout.addRow(w)
-
+    with It(qt.QCheckBox()) as w:
+      self.nativeRangeCheckbox = w
+      w.checked = True
+      w.setToolTip("Checked: set the scalar range of the exported color table to match the scalar range of the selected node. Otherwise, the range will be set to [0,1].")
+      parametersFormLayout.addRow("Restrict scalar range", w)
 
     #
     # output file selector, export button, and status frame
@@ -147,7 +147,8 @@ class TractographyExportPLYWidget(ScriptedLoadableModuleWidget):
       res = logic.exportFiberBundleToPLYPath(self.inputSelector.currentNode(),
                                              self.outputFileSelector.currentPath,
                                              radius = self.radiusSelector.value,
-                                             number_of_sides = self.numSidesSelector.value)
+                                             number_of_sides = self.numSidesSelector.value,
+                                             native_scalar_range = self.nativeRangeCheckbox.checked)
       self.statusLabel.showMessage("Export succeeded!")
     except Exception as err:
       self.statusLabel.showMessage("ExportFailed: {}".format(err))
@@ -161,7 +162,7 @@ class TractographyExportPLYWidget(ScriptedLoadableModuleWidget):
 
 class TractographyExportPLYLogic(ScriptedLoadableModuleLogic):
 
-  def exportFiberBundleToPLYPath(self, inputFiberBundle, outputFilePath, radius = 0.5, number_of_sides = 6):
+  def exportFiberBundleToPLYPath(self, inputFiberBundle, outputFilePath, radius = 0.5, number_of_sides = 6, native_scalar_range = False):
     """
     Do the actual export
     """
@@ -194,7 +195,11 @@ class TractographyExportPLYLogic(ScriptedLoadableModuleLogic):
     colorNode = lineDisplayNode.GetColorNode()
     lookupTable = vtk.vtkLookupTable()
     lookupTable.DeepCopy(colorNode.GetLookupTable())
-    lookupTable.SetTableRange(0,1)
+    if native_scalar_range:
+      scalarRange = lineDisplayNode.GetScalarRange()
+      lookupTable.SetTableRange(scalarRange[0], scalarRange[1])
+    else:
+      lookupTable.SetTableRange(0,1)
 
     plyWriter = vtk.vtkPLYWriter()
     plyWriter.SetInputData(triangles.GetOutput())
@@ -250,7 +255,7 @@ class TractographyExportPLYTest(ScriptedLoadableModuleTest):
       outputPath = os.path.join(slicer.app.temporaryPath, "fiber.ply")
       fiberNode = slicer.util.getNode(pattern="fiber_ply_export_test")
       logic = TractographyExportPLYLogic()
-      logic.exportFiberBundleToPLYPath(fiberNode, outputPath)
+      logic.exportFiberBundleToPLYPath(fiberNode, outputPath, )
 
       if not slicer.util.loadModel(outputPath):
         raise Exception("Failed to load expected output PLY file: {}".format(outputPath))
