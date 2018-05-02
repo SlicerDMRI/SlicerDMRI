@@ -142,6 +142,10 @@ void vtkMRMLFiberBundleTubeDisplayNode::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 vtkAlgorithmOutput* vtkMRMLFiberBundleTubeDisplayNode::GetOutputMeshConnection()
 {
+  if (!this->Visibility)
+    {
+    return nullptr;
+    }
   if (this->GetColorMode () == vtkMRMLFiberBundleDisplayNode::colorModeScalarData)
     {
     return this->TubeFilter->GetOutputPort();

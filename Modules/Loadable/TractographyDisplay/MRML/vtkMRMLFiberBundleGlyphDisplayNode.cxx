@@ -112,6 +112,10 @@ void vtkMRMLFiberBundleGlyphDisplayNode::PrintSelf(ostream& os, vtkIndent indent
 //----------------------------------------------------------------------------
 vtkAlgorithmOutput* vtkMRMLFiberBundleGlyphDisplayNode::GetOutputMeshConnection()
 {
+  if (!this->Visibility)
+    {
+    return nullptr;
+    }
   return this->DiffusionTensorGlyphFilter->GetOutputPort();
 }
 
