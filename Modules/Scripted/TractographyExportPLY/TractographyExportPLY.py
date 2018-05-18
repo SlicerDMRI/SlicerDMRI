@@ -1,6 +1,7 @@
 import os
 import unittest
 import vtk, qt, ctk, slicer
+import numpy as np
 from slicer.ScriptedLoadableModule import *
 import logging
 
@@ -203,8 +204,18 @@ class TractographyExportPLYLogic(ScriptedLoadableModuleLogic):
 
     plyWriter = vtk.vtkPLYWriter()
     plyWriter.SetInputData(triangles.GetOutput())
-    plyWriter.SetLookupTable(lookupTable)
-    plyWriter.SetArrayName("scalars")
+
+    if lineDisplayNode.GetColorMode() == lineDisplayNode.colorModeSolid:
+        # for solid colors we need to set uniform mode in the exporter,
+        # to avoid coloring by the last-used scalar array
+        plyWriter.SetColorModeToUniformPointColor()
+        color = np.array(np.multiply(lineDisplayNode.GetColor(), 255),
+                         dtype=np.uint8) # range clamp
+        #plyWriter.SetColor(int(color[0]), int(color[1]), int(color[2]))
+        plyWriter.SetColor(color[0], color[1], color[2])
+    else:
+        plyWriter.SetLookupTable(lookupTable)
+        plyWriter.SetArrayName("scalars")
 
     plyWriter.SetFileName(outputFilePath)
 
