@@ -211,7 +211,6 @@ class TractographyExportPLYLogic(ScriptedLoadableModuleLogic):
         plyWriter.SetColorModeToUniformPointColor()
         color = np.array(np.multiply(lineDisplayNode.GetColor(), 255),
                          dtype=np.uint8) # range clamp
-        #plyWriter.SetColor(int(color[0]), int(color[1]), int(color[2]))
         plyWriter.SetColor(color[0], color[1], color[2])
     else:
         plyWriter.SetLookupTable(lookupTable)
