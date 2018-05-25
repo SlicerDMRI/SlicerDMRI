@@ -156,17 +156,19 @@ vtkAlgorithmOutput* vtkMRMLFiberBundleTubeDisplayNode::GetOutputMeshConnection()
 //----------------------------------------------------------------------------
 void vtkMRMLFiberBundleTubeDisplayNode::UpdateAssignedAttribute()
 {
+  if (!this->Visibility)
+    {
+    // tube filter can be extremely expensive, so we shouldn't do anything if invisible.
+    this->TubeFilter->SetInputConnection(nullptr);
+    return;
+    }
+
   this->Superclass::UpdateAssignedAttribute();
 
   this->ColorLinesByOrientation->SetInputConnection(
     this->Superclass::GetOutputMeshConnection());
   this->TubeFilter->SetInputConnection(
     this->Superclass::GetOutputMeshConnection());
-
-  if (!this->Visibility)
-    {
-    return;
-    }
 
   vtkDebugMacro("Updating the PolyData Pipeline *****************************");
   // set display properties according to the tensor-specific display properties node for glyphs

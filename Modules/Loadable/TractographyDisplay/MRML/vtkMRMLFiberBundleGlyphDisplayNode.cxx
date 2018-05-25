@@ -122,6 +122,11 @@ vtkAlgorithmOutput* vtkMRMLFiberBundleGlyphDisplayNode::GetOutputMeshConnection(
 //----------------------------------------------------------------------------
 void vtkMRMLFiberBundleGlyphDisplayNode::UpdateAssignedAttribute()
 {
+  if (!this->Visibility)
+    {
+    this->DiffusionTensorGlyphFilter->SetInputConnection(nullptr);
+    return;
+    }
   this->Superclass::UpdateAssignedAttribute();
 
   this->DiffusionTensorGlyphFilter->SetInputConnection(
@@ -137,11 +142,6 @@ void vtkMRMLFiberBundleGlyphDisplayNode::UpdateAssignedAttribute()
     // complaining about missing input port 1.
     this->DiffusionTensorGlyphFilter->SetSourceConnection(
       diffusionTensorDisplayNode->GetGlyphConnection() );
-    }
-
-  if (!this->Visibility)
-    {
-    return;
     }
 
   if (diffusionTensorDisplayNode != NULL)
