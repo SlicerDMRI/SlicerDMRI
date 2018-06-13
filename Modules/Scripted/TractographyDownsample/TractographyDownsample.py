@@ -200,8 +200,8 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
     if not fiberBundleNode:
       logging.debug('hasFiberBundleData failed: no fiberBundle node')
       return False
-    if fiberBundleNode.GetImageData() is None:
-      logging.debug('hasFiberBundleData failed: no image data in fiberBundle node')
+    if fiberBundleNode.GetPolyData() is None:
+      logging.debug('hasFiberBundleData failed: no polydata in fiberBundle node')
       return False
     return True
 
@@ -461,7 +461,8 @@ class TractographyDownsampleTest(ScriptedLoadableModuleTest):
     #
     import urllib
     downloads = (
-        ('http://slicer.kitware.com/midas3/download?items=5767', 'FA.nrrd', slicer.util.loadFiberBundle),
+        ('https://github.com/SlicerDMRI/DMRITestData/blob/master/Tractography/fiber_ply_export_test.vtk?raw=true', 'fiber_ply_export_test.vtk',
+          slicer.util.loadFiberBundle),
         )
 
     for url,name,loader in downloads:
@@ -474,7 +475,7 @@ class TractographyDownsampleTest(ScriptedLoadableModuleTest):
         loader(filePath)
     self.delayDisplay('Finished with download and loading')
 
-    fiberBundleNode = slicer.util.getNode(pattern="FA")
+    fiberBundleNode = slicer.util.getNode(pattern="fiber_ply_export_test")
     logic = TractographyDownsampleLogic()
     self.assertIsNotNone( logic.hasFiberBundleData(fiberBundleNode) )
     self.delayDisplay('Test passed!')
