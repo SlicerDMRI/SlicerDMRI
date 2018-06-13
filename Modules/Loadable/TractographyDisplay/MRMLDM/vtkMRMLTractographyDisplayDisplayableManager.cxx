@@ -292,31 +292,27 @@ void vtkMRMLTractographyDisplayDisplayableManager::DeletePickedFibers(vtkMRMLFib
     return;
   }
 
-  int shuffleIDs = fiberBundleNode->GetEnableShuffleIDs();
-  fiberBundleNode->SetEnableShuffleIDs(0);
-
   vtkPolyData *polyData = vtkPolyData::New();
   polyData->DeepCopy(fiberBundleNode->GetPolyData());
   for (unsigned int i=0; i<cellIDs.size(); i++)
     {
     if (cellIDs[i] >= 0)
       {
+      vtkIdType cellID = fiberBundleNode->GetUnShuffledFiberID(cellIDs[i]);
       polyData->DeleteCell(cellIDs[i]);
       }
     }
   polyData->RemoveDeletedCells();
   fiberBundleNode->SetAndObservePolyData(polyData);
   polyData->Delete();
-
-  fiberBundleNode->SetEnableShuffleIDs(shuffleIDs);
-
 }
 
 //---------------------------------------------------------------------------
 void vtkMRMLTractographyDisplayDisplayableManager::SelectPickedFibers(vtkMRMLFiberBundleNode *fiberBundleNode,
                                                                      std::vector<vtkIdType> &cellIDs)
 {
-  if (!fiberBundleNode)
+  if ((!fiberBundleNode) ||
+      (!fiberBundleNode->GetPolyData()))
     {
     return;
     }

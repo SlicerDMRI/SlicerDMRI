@@ -122,7 +122,7 @@ void qSlicerTractographyEditorROIWidget::
 
   d->FiberBundleNode = fiberBundleNode;
 
-  if (fiberBundleNode && fiberBundleNode->GetNumberOfDisplayNodes() > 1)
+  if (fiberBundleNode && fiberBundleNode->GetNumberOfDisplayNodes() > 0)
   {
     d->AnnotationMRMLNodeForFiberSelection = fiberBundleNode->GetAnnotationNode();
     d->ROIForFiberSelectionMRMLNodeSelector->setCurrentNode(d->AnnotationMRMLNodeForFiberSelection);
@@ -137,9 +137,9 @@ void qSlicerTractographyEditorROIWidget::
 {
   Q_D(qSlicerTractographyEditorROIWidget);
 
+  // make edit widgets active/inactive based on node selection
   if ( !d->FiberBundleNode || !d->AnnotationMRMLNodeForFiberSelection)
   {
-    // make widgest inactive
     d->ConfirmFiberBundleUpdate->setEnabled(false);
     d->CreateNewFiberBundle->setEnabled(false);
     d->DisableROI->setEnabled(false);
@@ -152,7 +152,6 @@ void qSlicerTractographyEditorROIWidget::
   }
   else
   {
-    // make widgest active
     d->ConfirmFiberBundleUpdate->setEnabled(true);
     d->CreateNewFiberBundle->setEnabled(true);
     d->DisableROI->setEnabled(true);
@@ -162,14 +161,23 @@ void qSlicerTractographyEditorROIWidget::
     d->PositiveROI->setEnabled(true);
     d->ROIVisibility->setEnabled(true);
     d->UpdateBundleFromSelection->setEnabled(true);
+    d->EnableFiberEdit->setEnabled(true);
   }
 
-  if ( !d->FiberBundleNode )
+  if (!d->FiberBundleNode)
     {
+    // turn off editing if there is no selection
+    this->setInteractiveFiberEdit(false);
+    d->EnableFiberEdit->setEnabled(false);
+
     return;
     }
+  else
+    {
+    d->EnableFiberEdit->setEnabled(true);
+    }
 
-  if (d->FiberBundleNode->GetNumberOfDisplayNodes() > 1)
+  if (d->FiberBundleNode->GetNumberOfDisplayNodes() > 0)
   {
     if (d->AnnotationMRMLNodeForFiberSelection != d->FiberBundleNode->GetAnnotationNode())
     {
