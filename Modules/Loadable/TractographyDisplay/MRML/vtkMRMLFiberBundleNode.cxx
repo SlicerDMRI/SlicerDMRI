@@ -348,12 +348,10 @@ vtkMRMLFiberBundleDisplayNode* vtkMRMLFiberBundleNode::GetGlyphDisplayNode()
 void vtkMRMLFiberBundleNode::SetMeshToDisplayNode(vtkMRMLModelDisplayNode *modelDisplayNode)
 {
   // overload here to make sure the display node gets our filtered output.
-
-  // TODO: this override is stupid. Logically, if anything, a DisplayableNode pipeline
-  // should form a daisy chain with output from the parent class. However, vtkMRMLModelNode
-  // uses its internal MeshConnection object directly, so here we are.
+  // TODO: vtkMRMLModelNode uses the internally stored connection... change?
 
   assert(modelDisplayNode);
+  this->ExtractSubsample->SetInputConnection(this->MeshConnection);
   modelDisplayNode->SetInputMeshConnection(this->GetFilteredMeshConnection());
 }
 
@@ -389,7 +387,6 @@ void fixupPolyDataTensors(vtkAlgorithmOutput* inputPort) {
 void vtkMRMLFiberBundleNode::SetMeshConnection(vtkAlgorithmOutput *inputPort)
 {
   this->Superclass::SetMeshConnection(inputPort);
-
   this->ExtractSubsample->SetInputConnection(inputPort);
 
   fixupPolyDataTensors(inputPort);
@@ -419,7 +416,6 @@ void vtkMRMLFiberBundleNode::SetMeshConnection(vtkAlgorithmOutput *inputPort)
       {
       this->UpdateROISelection();
       }
-
     }
 }
 
@@ -549,7 +545,7 @@ void vtkMRMLFiberBundleNode::UpdateSubsampling()
     }
 
   const vtkIdType numberOfFibers = polyData->GetNumberOfLines();
-  if (this->ShuffledIds->GetNumberOfTuples() < numberOfFibers)
+  if (this->ShuffledIds->GetNumberOfTuples() != numberOfFibers)
     {
 
     std::vector<vtkIdType> idVector;
