@@ -161,7 +161,6 @@ void qSlicerTractographyEditorROIWidget::
     d->PositiveROI->setEnabled(true);
     d->ROIVisibility->setEnabled(true);
     d->UpdateBundleFromSelection->setEnabled(true);
-    d->EnableFiberEdit->setEnabled(true);
   }
 
   if (!d->FiberBundleNode)
@@ -297,7 +296,7 @@ void qSlicerTractographyEditorROIWidget::setInteractiveFiberEdit(bool arg)
   {
     vtkMRMLInteractionNode *interactionNode =
       vtkMRMLInteractionNode::SafeDownCast(
-          this->mrmlScene()->GetNthNodeByClass(0, "vtkMRMLInteractionNode"));
+          this->mrmlScene()->GetSingletonNode("Singleton", "vtkMRMLInteractionNode"));
     if (interactionNode)
     {
       interactionNode->SetEnableFiberEdit((int)arg);
