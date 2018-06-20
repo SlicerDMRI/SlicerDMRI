@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<executable>
+  <category>Diffusion.Utilities.WIP</category>
+  <title>Extract DWI Shells</title>
+  <description><![CDATA[TBD]]></description>
+  <version>0.1</version>
+  <documentation-url>http://dmri.slicer.org</documentation-url>
+  <license/>
+  <contributor>Isaiah Norton</contributor>
+  <acknowledgements><![CDATA[TBD]]></acknowledgements>
+  <parameters>
+    <label>Input and Output</label>
+    <description><![CDATA[Input/output parameters]]></description>
+    <file>
+      <name>inputDWI</name>
+      <longflag>inputDWI</longflag>
+      <label>Input DWI Volume</label>
+      <channel>input</channel>
+      <description><![CDATA[Input Diffusion Weighted Image (NRRD) path]]></description>
+    </file>
+    <integer-vector>
+      <name>bvalues</name>
+      <longflag>bvalues</longflag>
+      <label>b values to include</label>
+      <description><![CDATA[Comma-separated list of target b-values to keep (including B0 or B0-like volumes).]]></description>
+    </integer-vector>
+    <integer>
+      <name>tolerance</name>
+      <longflag>tolerance</longflag>
+      <default>10</default>
+      <label>b value tolerance</label>
+      <description><![CDATA[b values within +/- tolerance of any target value will be included.]]></description>
+    </integer>
+    <file>
+      <name>outputDWI</name>
+      <longflag>outputDWI</longflag>
+      <label>Output DWI Volume</label>
+      <channel>output</channel>
+      <description><![CDATA[Output Diffusion Weighted Image (NRRD) path]]></description>
+    </file>
+  </parameters>
+</executable>
