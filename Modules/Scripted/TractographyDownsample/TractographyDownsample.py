@@ -440,7 +440,7 @@ class TractographyDownsampleTest(ScriptedLoadableModuleTest):
     """
     self.setUp()
     # Uncomment when we have test data for download and this function is done
-    #self.test_TractographyDownsample1()
+    self.test_TractographyDownsample1()
     self.test_TractographyDownsample2()
 
   def test_TractographyDownsample1(self):
@@ -461,7 +461,7 @@ class TractographyDownsampleTest(ScriptedLoadableModuleTest):
     #
     import urllib
     downloads = (
-        ('https://github.com/SlicerDMRI/DMRITestData/blob/master/Tractography/fiber_ply_export_test.vtk?raw=true', 'fiber_ply_export_test.vtk',
+        ('https://github.com/SlicerDMRI/DMRITestData/blob/master/Tractography/tractography_testset_.2mm.vtk?raw=true', 'tractography_p2mm_testest.vtk',
           slicer.util.loadFiberBundle),
         )
 
@@ -475,7 +475,7 @@ class TractographyDownsampleTest(ScriptedLoadableModuleTest):
         loader(filePath)
     self.delayDisplay('Finished with download and loading')
 
-    fiberBundleNode = slicer.util.getNode(pattern="fiber_ply_export_test")
+    fiberBundleNode = slicer.util.getNode(pattern="tractography_p2mm_testest")
     logic = TractographyDownsampleLogic()
     self.assertIsNotNone( logic.hasFiberBundleData(fiberBundleNode) )
     self.delayDisplay('Test passed!')
