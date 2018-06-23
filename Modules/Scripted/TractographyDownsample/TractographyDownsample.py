@@ -16,10 +16,10 @@ class TractographyDownsample(ScriptedLoadableModule):
 
   def __init__(self, parent):
     ScriptedLoadableModule.__init__(self, parent)
-    self.parent.title = "TractographyDownsample" # TODO make this more human readable by adding spaces
-    self.parent.categories = ["Examples"]
+    self.parent.title = "Tractography Downsample"
+    self.parent.categories = ["Diffusion/Utilities"]
     self.parent.dependencies = []
-    self.parent.contributors = ["Lauren O'Donnell (BWH / HMS)"] # replace with "Firstname Lastname (Organization)"
+    self.parent.contributors = ["Lauren O'Donnell (BWH / HMS)"]
     self.parent.helpText = """
 This module downsamples large tractography datasets by removing excess points or fibers (polylines) as requested.
 """
@@ -75,6 +75,7 @@ class TractographyDownsampleWidget(ScriptedLoadableModuleWidget):
     self.outputSelector.selectNodeUponCreation = True
     self.outputSelector.addEnabled = True
     self.outputSelector.removeEnabled = True
+    self.outputSelector.renameEnabled = True
     self.outputSelector.noneEnabled = True
     self.outputSelector.showHidden = False
     self.outputSelector.showChildNodeTypes = False
@@ -116,7 +117,7 @@ class TractographyDownsampleWidget(ScriptedLoadableModuleWidget):
     self.fiberMinimumPointsWidget.setToolTip("Set minimum length of input fibers (in points) to retain in output. This is best used as a sanity check to remove any very short fibers where the algorithm was not successful in tracing. For example, a minimum length of 3 points means that any spurious fibers with only 1 or 2 points will be removed.")
     parametersFormLayout.addRow("Output min points:", self.fiberMinimumPointsWidget)
 
-    # fiber minimum length to keep the fiber 
+    # fiber minimum length to keep the fiber
     self.fiberMinimumLengthWidget = qt.QDoubleSpinBox()
     self.fiberMinimumLengthWidget.singleStep = 1
     self.fiberMinimumLengthWidget.maximum = 250.0
@@ -125,7 +126,7 @@ class TractographyDownsampleWidget(ScriptedLoadableModuleWidget):
     self.fiberMinimumLengthWidget.setToolTip("Set minimum length of input fibers (in mm) to retain in output. For example, a minimum length of 10mm means that any fibers under 10mm in length will be removed.")
     parametersFormLayout.addRow("Output min length (mm):", self.fiberMinimumLengthWidget)
 
-    # fiber maximum length to keep the fiber 
+    # fiber maximum length to keep the fiber
     self.fiberMaximumLengthWidget = qt.QDoubleSpinBox()
     self.fiberMaximumLengthWidget.singleStep = 0.1
     self.fiberMaximumLengthWidget.maximum = 250.0
@@ -161,6 +162,28 @@ class TractographyDownsampleWidget(ScriptedLoadableModuleWidget):
     # Refresh Apply button state
     self.onSelect()
 
+    #
+    # Advanced Area
+    #
+    advancedCollapsibleButton = ctk.ctkCollapsibleButton()
+    advancedCollapsibleButton.text = "Advanced"
+    self.layout.addWidget(advancedCollapsibleButton)
+
+    # Layout within the dummy collapsible button
+    advancedFormLayout = qt.QFormLayout(advancedCollapsibleButton)
+
+    #
+    # Apply Button
+    #
+    self.advancedApplyButton = qt.QPushButton("Apply to ALL tractography (fiber bundles)")
+    self.advancedApplyButton.toolTip = "Downsample ALL fiber bundles in the Slicer scene. Be careful when saving the scene to choose a NEW directory to avoid over-writing your input data."
+    self.advancedApplyButton.enabled = True
+    advancedFormLayout.addRow(self.advancedApplyButton)
+
+    # connections
+    self.advancedApplyButton.connect('clicked(bool)', self.onAdvancedApplyButton)
+
+
   def cleanup(self):
     pass
 
@@ -170,13 +193,22 @@ class TractographyDownsampleWidget(ScriptedLoadableModuleWidget):
   def onApplyButton(self):
     logic = TractographyDownsampleLogic()
     enableScreenshotsFlag = self.enableScreenshotsFlagCheckBox.checked
-    #fiberStepSize = self.fiberStepSizeSliderWidget.value
     fiberStepSize = self.fiberStepSizeWidget.value
     fiberPercentage = self.fiberPercentageWidget.value
     fiberMinPoints = self.fiberMinimumPointsWidget.value
     fiberMinLength = self.fiberMinimumLengthWidget.value
     fiberMaxLength = self.fiberMaximumLengthWidget.value
     logic.run(self.inputSelector.currentNode(), self.outputSelector.currentNode(), fiberStepSize, fiberPercentage, fiberMinPoints, fiberMinLength, fiberMaxLength, enableScreenshotsFlag)
+
+  def onAdvancedApplyButton(self):
+    logic = TractographyDownsampleLogic()
+    enableScreenshotsFlag = self.enableScreenshotsFlagCheckBox.checked
+    fiberStepSize = self.fiberStepSizeWidget.value
+    fiberPercentage = self.fiberPercentageWidget.value
+    fiberMinPoints = self.fiberMinimumPointsWidget.value
+    fiberMinLength = self.fiberMinimumLengthWidget.value
+    fiberMaxLength = self.fiberMaximumLengthWidget.value
+    logic.runAdvanced(fiberStepSize, fiberPercentage, fiberMinPoints, fiberMinLength, fiberMaxLength, enableScreenshotsFlag)
 
 #
 # TractographyDownsampleLogic
@@ -276,7 +308,7 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
     # In case all fibers in the brain are really short, treat it the same as no fibers.
     if ptids.GetNumberOfIds() < 5:
         return 0
-    
+
     # Use points from the middle of the fiber to estimate step length.
     # This is because the step size may vary near endpoints (in order to include
     # endpoints when downsampling the fiber to reduce file size).
@@ -292,13 +324,13 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
 
   def downsampleFibers(self, inpd, outpd, outstep, outpercent, outminpts, outminlen, outmaxlen):
     """
-    Remove points from inpd to create outpd with step size approximately outstep. 
+    Remove points from inpd to create outpd with step size approximately outstep.
     Output step size will be the greatest multiple of input fiber
-    step size that is less than outstep. So if input step size is 1 and output 
-    requested step size is 2.5, then final output step size will be 2. 
+    step size that is less than outstep. So if input step size is 1 and output
+    requested step size is 2.5, then final output step size will be 2.
     All endpoints are retained.
     """
-    # compute input step size 
+    # compute input step size
     instep = self.computeStepSize(inpd)
     logging.info('Input Step Size:')
     logging.info(instep)
@@ -341,7 +373,7 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
     outlines.InitTraversal()
     outpoints = vtk.vtkPoints()
     ptids = vtk.vtkIdList()
-    
+
     # loop over all lines, inserting into output only
     # the lines (fibers) and points to be kept
     kept = 0
@@ -368,15 +400,16 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
     # put data into output polydata
     outpd.SetLines(outlines)
     outpd.SetPoints(outpoints)
-  
-  def run(self, inputFiberBundle, outputFiberBundle, fiberStepSize, fiberPercentage, fiberMinPoints, fiberMinLength, fiberMaxLength, enableScreenshots=0):
+
+  def run(self, inputFiberBundle, outputFiberBundle, fiberStepSize, fiberPercentage, fiberMinPoints, fiberMinLength, fiberMaxLength, enableScreenshots=0, advanced=0):
     """
     Run the actual algorithm
     """
 
-    if not self.isValidInputOutputData(inputFiberBundle, outputFiberBundle):
-      slicer.util.errorDisplay('Input fiberBundle is the same as output fiberBundle. Choose a different output fiberBundle.')
-      return False
+    if not advanced:
+      if not self.isValidInputOutputData(inputFiberBundle, outputFiberBundle):
+        slicer.util.errorDisplay('Input fiberBundle is the same as output fiberBundle. Choose a different output fiberBundle.')
+        return False
 
     logging.info('Processing started')
 
@@ -413,7 +446,7 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
     # register the output data with the scene node to view it
     # and to increment reference count to preserve output
     outputFiberBundle.SetAndObservePolyData(outpd)
-    
+
     # Capture screenshot
     if enableScreenshots:
       self.takeScreenshot('TractographyDownsampleTest-Start','MyScreenshot',-1)
@@ -422,6 +455,25 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
 
     return True
 
+  def runAdvanced(self, fiberStepSize, fiberPercentage, fiberMinPoints, fiberMinLength, fiberMaxLength, enableScreenshots=0):
+    """
+    Run the actual algorithm
+    """
+
+    nodeCollection = slicer.mrmlScene.GetNodesByClass("vtkMRMLFiberBundleNode")
+    nodes = [nodeCollection.GetItemAsObject(i) for i in xrange(0, nodeCollection.GetNumberOfItems())]
+
+    if not nodes:
+      slicer.util.errorDisplay('No input fiberBundles in scene. Please load fiber bundles first.')
+      return False
+
+    logging.info('ADVANCED Processing started. Downsampling all fiber bundles in Slicer scene.')
+    logging.info(nodes)
+    for node in nodes:
+      self.run(node, node, fiberStepSize, fiberPercentage, fiberMinPoints, fiberMinLength, fiberMaxLength, enableScreenshots=0, advanced=1)
+    logging.info('ADVANCED Processing completed')
+
+    return True
 
 class TractographyDownsampleTest(ScriptedLoadableModuleTest):
   """
@@ -461,7 +513,7 @@ class TractographyDownsampleTest(ScriptedLoadableModuleTest):
     #
     import urllib
     downloads = (
-        ('https://github.com/SlicerDMRI/DMRITestData/blob/master/Tractography/tractography_testset_.2mm.vtk?raw=true', 'tractography_p2mm_testest.vtk',
+        ('https://github.com/SlicerDMRI/DMRITestData/blob/master/Tractography/fiber_ply_export_test.vtk?raw=true', 'fiber_ply_export_test.vtk',
           slicer.util.loadFiberBundle),
         )
 
@@ -475,10 +527,10 @@ class TractographyDownsampleTest(ScriptedLoadableModuleTest):
         loader(filePath)
     self.delayDisplay('Finished with download and loading')
 
-    fiberBundleNode = slicer.util.getNode(pattern="tractography_p2mm_testest")
+    fiberBundleNode = slicer.util.getNode(pattern="fiber_ply_export_test")
     logic = TractographyDownsampleLogic()
     self.assertIsNotNone( logic.hasFiberBundleData(fiberBundleNode) )
-    self.delayDisplay('Test passed!')
+    self.delayDisplay('Test test_TractographyDownsample1 passed!')
 
   def test_TractographyDownsample2(self):
     logging.info('Running test_TractographyDownsample2')
@@ -515,7 +567,7 @@ class TractographyDownsampleTest(ScriptedLoadableModuleTest):
       logging.info('TEST2 synthetic data passed, number of points is reduced')
     else:
       logging.info('TEST 2 synthetic data failed, number of points is not reduced')
-    
+
     logging.info('Finished test_TractographyDownsample2')
 
   def makeTestData(self, pd):
