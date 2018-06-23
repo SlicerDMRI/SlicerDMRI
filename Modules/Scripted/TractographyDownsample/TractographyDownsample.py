@@ -167,6 +167,7 @@ class TractographyDownsampleWidget(ScriptedLoadableModuleWidget):
     #
     advancedCollapsibleButton = ctk.ctkCollapsibleButton()
     advancedCollapsibleButton.text = "Advanced"
+    advancedCollapsibleButton.collapsed = True
     self.layout.addWidget(advancedCollapsibleButton)
 
     # Layout within the dummy collapsible button
