@@ -72,8 +72,9 @@ def main(sysargs):
     bvals_out[new_i]     = bvals_in[index]
 
   print("selected bvals: ", bvals_out)
-  print("  grads_out shape: ", grads_out.shape)
-  print("  vol_out shape:   ", vol_out.shape)
+  print("  grads_out shape:  ", grads_out.shape)
+  print("  vol_out shape:    ", vol_out.shape)
+  print("  output gradients: ", grads_out)
 
   # write output
   sn_out = slicer.vtkMRMLNRRDStorageNode()
