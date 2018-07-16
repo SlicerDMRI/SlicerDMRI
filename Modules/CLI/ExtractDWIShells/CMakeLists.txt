@@ -1,5 +1,6 @@
 set(CLI_DEST "${CMAKE_BINARY_DIR}/${Slicer_CLIMODULES_LIB_DIR}")
 
+# TODO should probably add permissions option to macro
 ctkMacroCompilePythonScript(
   TARGET_NAME ExtractDWIShells 
   SCRIPTS ExtractDWIShells.py
