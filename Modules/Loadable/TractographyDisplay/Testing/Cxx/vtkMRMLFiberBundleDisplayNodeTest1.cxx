@@ -26,7 +26,7 @@ public:
 
   vtkTypeMacro(vtkMRMLFiberBundleDisplayNodeTestHelper1,vtkMRMLFiberBundleDisplayNode);
 
-  virtual vtkMRMLNode* CreateNodeInstance()
+  virtual vtkMRMLNode* CreateNodeInstance() VTK_OVERRIDE
     {
     return vtkMRMLFiberBundleDisplayNodeTestHelper1::New();
     }
@@ -42,7 +42,7 @@ public:
     return EXIT_SUCCESS;
     }
 
-  virtual const char* GetNodeTagName()
+  virtual const char* GetNodeTagName() VTK_OVERRIDE
     {
     return "Testing is good";
     }

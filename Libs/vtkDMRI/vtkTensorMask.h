@@ -41,7 +41,7 @@ public:
   vtkTypeMacro(vtkTensorMask,vtkImageMask);
 
   static vtkTensorMask *New();
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkTensorMask();
@@ -52,14 +52,14 @@ protected:
   /// We override this in order to allocate output tensors
   /// before threading happens.  This replaces the superclass
   /// vtkImageAlgorithm's Execute function.
-  void ExecuteData(vtkDataObject *out);
+  void ExecuteData(vtkDataObject *out) VTK_OVERRIDE;
 
   virtual void ThreadedRequestData(vtkInformation *request,
                                    vtkInformationVector **inputVector,
                                    vtkInformationVector *outputVector,
                                    vtkImageData ***inData,
                                    vtkImageData **outData,
-                                   int extent[6], int threadId);
+                                   int extent[6], int threadId) VTK_OVERRIDE;
 };
 
 #endif

@@ -31,8 +31,8 @@ class vtkDMRI_EXPORT vtkTensorImplicitFunctionToFunctionSet : public vtkFunction
 public:
   static vtkTensorImplicitFunctionToFunctionSet *New();
   vtkTypeMacro(vtkTensorImplicitFunctionToFunctionSet, vtkFunctionSet );
-  virtual void PrintSelf(ostream& os, vtkIndent indent);
-  virtual int FunctionValues(double* x, double* f);
+  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  virtual int FunctionValues(double* x, double* f) VTK_OVERRIDE;
   int GetTensor(double *x, double * f);
   virtual void AddDataSet(vtkDataSet* ) {}
   void AddImplicitFunction(vtkImplicitFunction * func, int numcomp ) {
