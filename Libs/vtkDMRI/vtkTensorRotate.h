@@ -34,7 +34,7 @@ class vtkDMRI_EXPORT vtkTensorRotate : public vtkThreadedImageAlgorithm
 public:
   static vtkTensorRotate *New();
   vtkTypeMacro(vtkTensorRotate,vtkThreadedImageAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /// Set the tensor type for the filter
   void SetTensorTypeToFloat(){this->SetTensorType(VTK_FLOAT);};
@@ -52,14 +52,14 @@ protected:
   vtkTensorRotate(const vtkTensorRotate&);
   void operator=(const vtkTensorRotate&);
 
-  virtual int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *) VTK_OVERRIDE;
   void ThreadedExecute(vtkImageData *inData, vtkImageData *outData,
-        int extent[6], int id);
+        int extent[6], int id) VTK_OVERRIDE;
 
   /// This also copies other arrays from point and cell data from input to output.
-  virtual void AllocateOutputData(vtkImageData *out, vtkInformation* outInfo, int *uExtent){
+  virtual void AllocateOutputData(vtkImageData *out, vtkInformation* outInfo, int *uExtent) VTK_OVERRIDE {
       vtkThreadedImageAlgorithm::AllocateOutputData(out, outInfo, uExtent);};
-  virtual vtkImageData *AllocateOutputData(vtkDataObject *out, vtkInformation* outInfo);
+  virtual vtkImageData *AllocateOutputData(vtkDataObject *out, vtkInformation* outInfo) VTK_OVERRIDE;
   void AllocateTensors(vtkImageData *data);
 
   int TensorType;

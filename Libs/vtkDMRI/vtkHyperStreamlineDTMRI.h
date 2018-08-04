@@ -42,11 +42,12 @@
 ///
 /// \sa vtkTensorGlyph
 /// \sa vtkStreamer
+
 class vtkDMRI_EXPORT vtkHyperStreamlineDTMRI : public vtkHyperStreamline
 {
 public:
   vtkTypeMacro(vtkHyperStreamlineDTMRI,vtkHyperStreamline);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   ///
   /// Construct object with initial starting position (0,0,0); integration
@@ -59,12 +60,18 @@ public:
   /// This is how tight of a turn is allowed.
   /// The units are degrees per mm. (Actually per units of measurement
   /// in your data).
-  vtkGetMacro(RadiusOfCurvature,double);
-  vtkSetMacro(RadiusOfCurvature,double);
+  vtkGetMacro(RadiusOfCurvature, double);
+  vtkSetMacro(RadiusOfCurvature, double);
 
   ///
   /// This is in mm, unlike superclass value which is a fraction of a cell.
-  vtkSetMacro(IntegrationStepLength,double);
+  /// Implement here instead of vtkSetMacro to use VTK_OVERRIDE
+  void SetIntegrationStepLength(double length) VTK_OVERRIDE {
+    if (this->IntegrationStepLength != length) {
+      this->IntegrationStepLength = length;
+      this->Modified();
+    }
+  }
 
   ///
   /// Type of anisotropy used to stop tractography.
@@ -105,7 +112,7 @@ protected:
   ~vtkHyperStreamlineDTMRI();
 
   /// Integrate data
-  virtual int RequestData(vtkInformation *,vtkInformationVector**, vtkInformationVector *);
+  virtual int RequestData(vtkInformation *,vtkInformationVector**, vtkInformationVector *) VTK_OVERRIDE;
   void BuildLines(vtkDataSet *input, vtkPolyData *output);
   void BuildLinesForSingleTrajectory(vtkDataSet *input, vtkPolyData *output);
   void BuildLinesForTwoTrajectories(vtkDataSet *input, vtkPolyData *output);

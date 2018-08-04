@@ -31,21 +31,21 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleStorag
   vtkTypeMacro(vtkMRMLFiberBundleStorageNode,vtkMRMLModelStorageNode);
   //void PrintSelf(ostream& os, vtkIndent indent);
 
-  virtual vtkMRMLNode* CreateNodeInstance();
+  virtual vtkMRMLNode* CreateNodeInstance() VTK_OVERRIDE;
 
   ///
   /// Get node XML tag name (like Storage, Model)
-  virtual const char* GetNodeTagName()  {return "FiberBundleStorage";};
+  virtual const char* GetNodeTagName()  VTK_OVERRIDE {return "FiberBundleStorage";};
 
   ///
   /// Check to see if this storage node can handle the file type in the input
   /// string. If input string is null, check URI, then check FileName.
   /// Subclasses should implement this method.
-  virtual int SupportedFileType(const char *fileName);
+  virtual int SupportedFileType(const char *fileName) VTK_OVERRIDE;
 
   ///
   /// Initialize all the supported write file types
-  virtual void InitializeSupportedWriteFileTypes();
+  virtual void InitializeSupportedWriteFileTypes() VTK_OVERRIDE;
 
 protected:
   vtkMRMLFiberBundleStorageNode();

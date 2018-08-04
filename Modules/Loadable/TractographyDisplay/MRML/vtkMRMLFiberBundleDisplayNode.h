@@ -34,7 +34,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleDispla
 {
  public:
   vtkTypeMacro(vtkMRMLFiberBundleDisplayNode, vtkMRMLModelDisplayNode);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //--------------------------------------------------------------------------
   /// MRMLNode methods
@@ -42,32 +42,32 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleDispla
 
   ///
   /// Read node attributes from XML (MRML) file
-  virtual void ReadXMLAttributes ( const char** atts );
+  virtual void ReadXMLAttributes ( const char** atts ) VTK_OVERRIDE;
 
   ///
   /// Write this node's information to a MRML file in XML format.
-  virtual void WriteXML ( ostream& of, int indent );
+  virtual void WriteXML ( ostream& of, int indent ) VTK_OVERRIDE;
 
   ///
   /// Copy the node's attributes to this object
-  virtual void Copy ( vtkMRMLNode *node );
+  virtual void Copy ( vtkMRMLNode *node ) VTK_OVERRIDE;
 
   ///
   /// Get node XML tag name (like Volume, FiberBundle)
-  virtual const char* GetNodeTagName() = 0;
+  virtual const char* GetNodeTagName() VTK_OVERRIDE = 0;
 
   ///
   /// Updates this node if it depends on other nodes
   /// when the node is deleted in the scene
-  virtual void UpdateReferences();
+  virtual void UpdateReferences() VTK_OVERRIDE;
 
   ///
   /// Finds the storage node and read the data
-  virtual void UpdateScene(vtkMRMLScene *scene);
+  virtual void UpdateScene(vtkMRMLScene *scene) VTK_OVERRIDE;
 
   ///
   /// Update the stored reference to another node in the scene
-  virtual void UpdateReferenceID(const char *oldID, const char *newID);
+  virtual void UpdateReferenceID(const char *oldID, const char *newID) VTK_OVERRIDE;
 
   //--------------------------------------------------------------------------
   /// Display Information: Geometry to display (not mutually exclusive)
@@ -183,13 +183,13 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleDispla
   static int GetNthScalarInvariant(int i);
 
   /// Update the pipeline based on this node attributes
-  virtual void UpdateAssignedAttribute();
+  virtual void UpdateAssignedAttribute() VTK_OVERRIDE;
 
   virtual void ProcessMRMLEvents ( vtkObject *caller,
                                  unsigned long event,
-                                 void *callData );
+                                 void *callData ) VTK_OVERRIDE;
 
-  virtual void SetInputMeshConnection (vtkAlgorithmOutput*);
+  virtual void SetInputMeshConnection (vtkAlgorithmOutput*) VTK_OVERRIDE;
 
  protected:
   vtkMRMLFiberBundleDisplayNode ( );
