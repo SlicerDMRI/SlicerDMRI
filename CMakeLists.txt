@@ -65,7 +65,7 @@ add_subdirectory("Modules/CLI/DiffusionTensorScalarMeasurements")
 add_subdirectory("Modules/CLI/FiberTractMeasurements")
 add_subdirectory("Modules/CLI/TractographyLabelMapSeeding")
 add_subdirectory("Modules/CLI/FiberBundleLabelSelect")
-add_subdirectory("Modules/CLI/ExtractDWIShells")
+#add_subdirectory("Modules/CLI/ExtractDWIShells")
 
 add_subdirectory("Modules/Scripted/DICOM2FullBrainTractography")
 add_subdirectory("Modules/Scripted/FiberBundleToLabelMap")
