@@ -17,7 +17,7 @@ class TractographyDownsample(ScriptedLoadableModule):
   def __init__(self, parent):
     ScriptedLoadableModule.__init__(self, parent)
     self.parent.title = "Tractography Downsample"
-    self.parent.categories = ["Diffusion/Utilities"]
+    self.parent.categories = ["Diffusion.Utilities"]
     self.parent.dependencies = []
     self.parent.contributors = ["Lauren O'Donnell (BWH / HMS)"]
     self.parent.helpText = """
