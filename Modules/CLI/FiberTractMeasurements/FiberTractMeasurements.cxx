@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iostream>
 
 // vtkTeem includes
 #include <vtkDiffusionTensorMathematics.h>
@@ -874,9 +875,9 @@ int main( int argc, char * argv[] )
 
   std::ostringstream ofs;
   std::ofstream outputfilestream(outputFile.c_str());
-  if (ofs.fail())
+  if (outputfilestream.fail())
     {
-    std::cerr << "Output file doesn't exist: " <<  outputFile << std::endl;
+    std::cerr << "Unable to output file, or base path doesn't exist: " <<  outputFile << std::endl;
     return EXIT_FAILURE;
     }
 
