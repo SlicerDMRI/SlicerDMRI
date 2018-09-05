@@ -11,29 +11,29 @@
   <parameters>
     <label>IO</label>
     <description><![CDATA[Input/output parameters]]></description>
-    <image type="diffusion-weighted">
+    <file>
       <name>inputVolume</name>
       <label>Input DWI Volume</label>
       <channel>input</channel>
       <index>0</index>
       <description><![CDATA[Input DWI volume]]></description>
-    </image>
-    <image reference="inputVolume">
-      <name>outputBaseline</name>
-      <label>Output Baseline Volume</label>
-      <channel>output</channel>
+    </file>
+    <string>
+      <name>outputBaselineFile</name>
+      <label>Output Baseline Volume File Name</label>
+      <channel>input</channel>
+      <index>1</index>
+      <description><![CDATA[Extracted Baseline Volume]]></description>
+    </string>
+    <string>
+      <name>outputMaskFile</name>
+      <label>Output Diffusion Brain Mask File Name</label>
+      <channel>input</channel>
       <index>2</index>
-      <description><![CDATA[Extracted baseline volume]]></description>
-    </image>
-    <image type="label" reference="inputVolume">
-      <name>thresholdMask</name>
-      <label>Output Diffusion Brain Mask</label>
-      <channel>output</channel>
-      <index>3</index>
       <description><![CDATA[Output Diffusion Brain Mask]]></description>
-    </image>
-  </parameters>
-  <parameters advanced="true">
+    </string>
+  </parameters>  
+  <parameters advanced="true">  
     <label>Mask Settings</label> 
     <double>
       <name>baselineBValueThreshold</name>
