@@ -69,7 +69,7 @@ add_subdirectory("Modules/CLI/ExtractDWIShells")
 
 add_subdirectory("Modules/Scripted/DICOM2FullBrainTractography")
 add_subdirectory("Modules/Scripted/FiberBundleToLabelMap")
-add_subdirectory("Modules/Scripted/DICOMPlugins")
+add_subdirectory("Modules/Scripted/DMRIPlugins")
 add_subdirectory("Modules/Scripted/TractographyExportPLY")
 add_subdirectory("Modules/Scripted/TractographyDownsample")
 
