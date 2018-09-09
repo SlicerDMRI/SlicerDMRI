@@ -1,9 +1,10 @@
-import os
-import unittest
+import unittest, os, logging
+from itertools import ifilter
+
 import vtk, qt, ctk, slicer
 from vtk.numpy_interface import dataset_adapter as dsa
 from slicer.ScriptedLoadableModule import *
-import logging
+
 import numpy as np
 
 
@@ -138,13 +139,27 @@ class TemplateKeyLogic(ScriptedLoadableModuleLogic):
     if not inputFB.GetPolyData():
       logging.warn("Missing PolyData")
 
+    # get proxy object to access underlying array
     fb_numpy = dsa.WrapDataObject(inputFB.GetPolyData())
-    tensors = fb_numpy.PointData['Tensor_0'] # TODO don't hard-code
 
-    # calculate the max eigenvalue of each tensor at each point
+    # get first tensor key
+    ten_key = next(ifilter(lambda x: "Tensor_" in x, fb_numpy.PointData.keys()), None)
+    if not ten_key:
+      warnings.warn("No tensor data found")
+      return
+
+    # get array of tensor data. Should be [total_points 3 3]
+    tensors = fb_numpy.PointData[ten_key]
+
+    # calculate the max eigenvalue of tensor at each point
     maxeigs = np.max(np.linalg.eigvals(tensors),axis=1)
-    fb_numpy.PointData.append(maxeigs, "MaxEigenvalue")
+    fb_numpy.PointData.append(maxeigs, "CalculatedMaxEigenvalue")
     inputFB.Modified()
+
+    inputFB_dn = inputFB.GetDisplayNode()
+    if inputFB_dn:
+      inputFB_dn.SetColorModeToScalarData()
+      inputFB_dn.SetActiveScalarName("CalculatedMaxEigenvalue")
 
     logging.info('Processing completed')
 
