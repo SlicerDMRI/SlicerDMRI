@@ -1,4 +1,4 @@
-import unittest, os, logging
+import unittest, os, logging, warnings
 from itertools import ifilter
 
 import vtk, qt, ctk, slicer

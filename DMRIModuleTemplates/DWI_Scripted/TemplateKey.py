@@ -1,5 +1,4 @@
-import os
-import unittest
+import os, unittest, warnings
 import vtk, qt, ctk, slicer
 from slicer.ScriptedLoadableModule import *
 import logging

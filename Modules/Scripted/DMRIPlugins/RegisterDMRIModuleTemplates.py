@@ -37,7 +37,11 @@ class RegisterDMRIModuleTemplates:
 
             userkey = ExtensionWizardLib.TemplatePathUtilities.userTemplatePathKey()
             modules_key = userkey + "/modules"
-            updated_value = settings.value(modules_key) + (dmri_template_path,)
+            existing_value = settings.value(modules_key)
+            if existing_value:
+              updated_value = existing_value + (dmri_template_path,)
+            else:
+              updated_value = (dmri_template_path,)
             settings.setValue(modules_key, updated_value)
         except Exception as exc:
             warnings.warn("Exception during attempt to register DMRI module templates: " + str(exc))
