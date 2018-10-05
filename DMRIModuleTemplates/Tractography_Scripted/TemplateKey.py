@@ -58,7 +58,7 @@ class TemplateKeyWidget(ScriptedLoadableModuleWidget):
     parametersFormLayout = qt.QFormLayout(parametersCollapsibleButton)
 
     #
-    # input volume selector
+    # Input fiberbundle selector
     #
     self.inputSelector = slicer.qMRMLNodeComboBox()
     self.inputSelector.nodeTypes = ["vtkMRMLFiberBundleNode"]
@@ -73,6 +73,22 @@ class TemplateKeyWidget(ScriptedLoadableModuleWidget):
     parametersFormLayout.addRow("Input Fiberbundle: ", self.inputSelector)
 
     #
+    # Output fiberbundle selector
+    #
+    self.outputSelector = slicer.qMRMLNodeComboBox()
+    self.outputSelector.nodeTypes = ["vtkMRMLFiberBundleNode"]
+    self.outputSelector.selectNodeUponCreation = True
+    self.outputSelector.addEnabled = True
+    self.outputSelector.removeEnabled = True
+    self.outputSelector.renameEnabled = True
+    self.outputSelector.noneEnabled = True
+    self.outputSelector.showHidden = False
+    self.outputSelector.showChildNodeTypes = False
+    self.outputSelector.setMRMLScene( slicer.mrmlScene )
+    self.outputSelector.setToolTip( "Pick the output to the algorithm." )
+    parametersFormLayout.addRow("Output Fiberbundle: ", self.outputSelector)
+
+    #
     # Apply Button
     #
     self.applyButton = qt.QPushButton("Apply")
@@ -83,6 +99,7 @@ class TemplateKeyWidget(ScriptedLoadableModuleWidget):
     # connections
     self.applyButton.connect('clicked(bool)', self.onApplyButton)
     self.inputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.onSelect)
+    self.outputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.onSelect)
 
     # Add vertical spacer
     self.layout.addStretch(1)
@@ -98,7 +115,7 @@ class TemplateKeyWidget(ScriptedLoadableModuleWidget):
 
   def onApplyButton(self):
     logic = TemplateKeyLogic()
-    logic.run(self.inputSelector.currentNode())
+    logic.run(self.inputSelector.currentNode(), self.outputSelector.currentNode())
 
 #
 # TemplateKeyLogic
@@ -128,7 +145,7 @@ class TemplateKeyLogic(ScriptedLoadableModuleLogic):
     return True
 
 
-  def run(self, inputFB):
+  def run(self, inputFB, outputFB):
     """
     Run the actual algorithm
     """
@@ -136,30 +153,16 @@ class TemplateKeyLogic(ScriptedLoadableModuleLogic):
     logging.info('Processing started')
 
     assert inputFB and inputFB.IsA("vtkMRMLFiberBundleNode")
-    if not inputFB.GetPolyData():
+    assert outputFB and outputFB.IsA("vtkMRMLFiberBundleNode")
+    if not inputFB.GetPolyData() or not outputFB.GetPolyData():
       logging.warn("Missing PolyData")
 
-    # get proxy object to access underlying array
-    fb_numpy = dsa.WrapDataObject(inputFB.GetPolyData())
+    # Create a new vtkPolyData from input
+    pd = vtk.vtkPolyData()
+    pd.DeepCopy(inputFB.GetPolyData())
 
-    # get first tensor key
-    ten_key = next(ifilter(lambda x: "Tensor_" in x, fb_numpy.PointData.keys()), None)
-    if not ten_key:
-      warnings.warn("No tensor data found")
-      return
-
-    # get array of tensor data. Should be [total_points 3 3]
-    tensors = fb_numpy.PointData[ten_key]
-
-    # calculate the max eigenvalue of tensor at each point
-    maxeigs = np.max(np.linalg.eigvals(tensors),axis=1)
-    fb_numpy.PointData.append(maxeigs, "CalculatedMaxEigenvalue")
-    inputFB.Modified()
-
-    inputFB_dn = inputFB.GetDisplayNode()
-    if inputFB_dn:
-      inputFB_dn.SetColorModeToScalarData()
-      inputFB_dn.SetActiveScalarName("CalculatedMaxEigenvalue")
+    # Set the output PolyData
+    outputFB.SetAndObservePolyData(pd)
 
     logging.info('Processing completed')
 
