@@ -21,6 +21,7 @@ add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test
     --outputfile ${TEMP}/fibermeasurementstestingoutputfolder.txt
     --format Column_Hierarchy
     --separator Tab
+    --moreStatistics
   )
 set_property(TEST ${testname} PROPERTY LABELS ${CLP})
 
@@ -32,6 +33,7 @@ add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test
     --outputfile ${TEMP}/fibermeasurementstestingoutputhierarchy.txt
     --format Column_Hierarchy
     --separator Tab
+    --moreStatistics
   )
 set_property(TEST ${testname} PROPERTY LABELS ${CLP})
 
@@ -44,6 +46,19 @@ add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test
     --format Column_Hierarchy
     --separator Tab
     --printAllStatistics
+    --moreStatistics
+  )
+set_property(TEST ${testname} PROPERTY LABELS ${CLP})
+
+set(testname ${CLP}TestScalarOnlyFolder)
+add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test>
+  ${CLP}Test
+    --inputtype Fibers_File_Folder
+    --inputdirectory "${TEST_DATA}/../ScalarOnlyInput"
+    --outputfile ${TEMP}/fibermeasurementstestingoutputfolder_scalaronly.txt
+    --format Column_Hierarchy
+    --separator Tab
+    --moreStatistics
   )
 set_property(TEST ${testname} PROPERTY LABELS ${CLP})
 
@@ -76,3 +91,11 @@ add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:CompareTxt
   )
 set_property(TEST ${testname} PROPERTY LABELS ${CLP})
 set_property(TEST ${testname} PROPERTY DEPENDS ${CLP}TestHierarchy)
+
+set(testname ${CLP}CompareTxtsScalarOnlyFolder)
+add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:CompareTxtsMeasures>
+  ${TEMP}/fibermeasurementstestingoutputfolder_scalaronly.txt
+  ${BASELINE}/baseline_measurements_folder_scalaronly.txt
+  )
+set_property(TEST ${testname} PROPERTY LABELS ${CLP})
+set_property(TEST ${testname} PROPERTY DEPENDS ${CLP}TestFolder)

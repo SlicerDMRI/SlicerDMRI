@@ -65,7 +65,7 @@ class vtkDMRI_EXPORT vtkPreciseHyperStreamline : public vtkPolyDataAlgorithm
 {
  public:
   vtkTypeMacro(vtkPreciseHyperStreamline,vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   ///
   /// Construct object with initial starting position (0,0,0); integration
@@ -258,7 +258,7 @@ class vtkDMRI_EXPORT vtkPreciseHyperStreamline : public vtkPolyDataAlgorithm
   ~vtkPreciseHyperStreamline();
 
   /// Integrate data
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) VTK_OVERRIDE;
   void BuildTube();
 
   /// Flag indicates where streamlines start from (either position or location)

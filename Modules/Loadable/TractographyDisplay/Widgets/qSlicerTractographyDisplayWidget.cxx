@@ -199,20 +199,9 @@ void qSlicerTractographyDisplayWidget::setFiberBundleNode(vtkMRMLFiberBundleNode
     this->setFiberBundleDisplayNode((vtkMRMLFiberBundleDisplayNode*)NULL);
     this->updateWidgetFromMRML();
     }
-  else if (d->FiberBundleDisplayNode)
+  else if (fiberBundleNode->GetDisplayNode())
     {
-      if (d->FiberBundleDisplayNode->IsA("vtkMRMLFiberBundleLineDisplayNode"))
-        {
-        this->setFiberBundleDisplayNode(fiberBundleNode->GetLineDisplayNode());
-        }
-      else if (d->FiberBundleDisplayNode->IsA("vtkMRMLFiberBundleTubeDisplayNode"))
-        {
-        this->setFiberBundleDisplayNode(fiberBundleNode->GetTubeDisplayNode());
-        }
-      else if (d->FiberBundleDisplayNode->IsA("vtkMRMLFiberBundleGlyphDisplayNode"))
-        {
-        this->setFiberBundleDisplayNode(fiberBundleNode->GetGlyphDisplayNode());
-        }
+    this->setFiberBundleDisplayNode(fiberBundleNode->GetDisplayNode());
     }
 }
 
@@ -293,6 +282,7 @@ void qSlicerTractographyDisplayWidget::setVisibility(bool state)
     {
     return;
     }
+
   d->FiberBundleDisplayNode->SetVisibility(state);
 }
 
@@ -373,10 +363,7 @@ void qSlicerTractographyDisplayWidget::setColorByScalar()
 void qSlicerTractographyDisplayWidget::onColorByScalarChanged(int scalarIndex)
 {
   Q_D(qSlicerTractographyDisplayWidget);
-  if (
-      !d->FiberBundleDisplayNode || !d->FiberBundleNode ||
-      !d->FiberBundleNode->GetPolyData() || !d->FiberBundleNode->GetPolyData()->GetPointData()
-      )
+  if (!d->FiberBundleDisplayNode || !d->FiberBundleNode)
     {
     return;
     }
@@ -418,20 +405,12 @@ void qSlicerTractographyDisplayWidget::setColorByScalarInvariant()
     {
     return;
     }
-  d->FiberBundleDisplayNode->SetColorModeToScalar();
-  d->FiberBundleDisplayNode->SetScalarVisibility(1);
 
-  vtkMRMLDiffusionTensorDisplayPropertiesNode* displayPropertiesNode =
-                          vtkMRMLDiffusionTensorDisplayPropertiesNode::
-                          SafeDownCast(d->FiberBundleDisplayNode->GetDiffusionTensorDisplayPropertiesNode());
-  if (displayPropertiesNode)
-    {
-    if (displayPropertiesNode->GetColorGlyphBy() == vtkMRMLDiffusionTensorDisplayPropertiesNode::ColorOrientation)
-      d->ColorByScalarsColorTableComboBox->setEnabled(0);
-    else
-      d->ColorByScalarsColorTableComboBox->setEnabled(1);
-    }
-  this->updateScalarRange();
+  d->FiberBundleDisplayNode->SetScalarVisibility(1);
+  d->FiberBundleDisplayNode->SetColorModeToScalar();
+  d->FiberBundleDisplayNode->UpdateAssignedAttribute();
+
+  this->onColorByScalarInvariantChanged(d->ColorByScalarInvariantComboBox->currentIndex());
 }
 
 //------------------------------------------------------------------------------
@@ -442,6 +421,7 @@ void qSlicerTractographyDisplayWidget::onColorByScalarInvariantChanged(int scala
     {
     return;
     }
+
   vtkMRMLDiffusionTensorDisplayPropertiesNode* displayPropertiesNode =
                           vtkMRMLDiffusionTensorDisplayPropertiesNode::
                           SafeDownCast(d->FiberBundleDisplayNode->GetDiffusionTensorDisplayPropertiesNode());
@@ -468,6 +448,7 @@ void qSlicerTractographyDisplayWidget::setColorByCellScalars()
     }
   d->FiberBundleDisplayNode->SetColorModeToUseCellScalars();
   d->FiberBundleDisplayNode->SetScalarVisibility(1);
+  this->updateScalarRange();
 }
 
 //------------------------------------------------------------------------------
@@ -654,7 +635,7 @@ void qSlicerTractographyDisplayWidget::updateScalarRange()
 {
   Q_D(qSlicerTractographyDisplayWidget);
 
-  if ( !d->FiberBundleNode || !d->FiberBundleDisplayNode || !d->FiberBundleDisplayNode->GetOutputPolyData())
+  if ( !d->FiberBundleNode || !d->FiberBundleDisplayNode || !d->FiberBundleDisplayNode->GetOutputMesh())
     {
     return;
     }
@@ -665,23 +646,25 @@ void qSlicerTractographyDisplayWidget::updateScalarRange()
 
   if (d->FiberBundleDisplayNode->GetVisibility() )
     {
-    d->FiberBundleDisplayNode->GetOutputPolyDataConnection()->GetProducer()->Update();
+    d->FiberBundleDisplayNode->GetOutputMeshConnection()->GetProducer()->Update();
     }
+
   d->FiberBundleDisplayNode->GetScalarRange(range);
+
   if (d->FiberBundleDisplayNode->GetAutoScalarRange())
     {
+    d->FiberBundleColorRangeWidget->setRange(range[0], range[1]);
     d->FiberBundleColorRangeWidget->setMinimumValue(range[0]);
     d->FiberBundleColorRangeWidget->setMaximumValue(range[1]);
-    d->FiberBundleColorRangeWidget->setRange(range[0], range[1]);
     }
   else
     {
-    d->FiberBundleColorRangeWidget->setMinimumValue(range[0]);
-    d->FiberBundleColorRangeWidget->setMaximumValue(range[1]);
-
     if ((d->FiberBundleColorRangeWidget->minimum() > range[0]) ||
         (d->FiberBundleColorRangeWidget->maximum() < range[1]))
       d->FiberBundleColorRangeWidget->setRange(range[0], range[1]);
+
+    d->FiberBundleColorRangeWidget->setMinimumValue(range[0]);
+    d->FiberBundleColorRangeWidget->setMaximumValue(range[1]);
     }
   const double step = (range[1] - range[0]) / 100.;
   d->FiberBundleColorRangeWidget->setSingleStep(step);
@@ -722,7 +705,7 @@ void qSlicerTractographyDisplayWidget::updateWidgetFromMRML()
   bool wasBlocking = d->ActiveTensorComboBox->blockSignals(true);
 
   QStringList tensorItems;
-  d->getPolyDataTensors(d->FiberBundleDisplayNode->GetInputPolyData(), tensorItems);
+  d->getPolyDataTensors(d->FiberBundleNode->GetPolyData(), tensorItems);
   d->ActiveTensorComboBox->clear();
   d->ActiveTensorComboBox->addItems(tensorItems);
 

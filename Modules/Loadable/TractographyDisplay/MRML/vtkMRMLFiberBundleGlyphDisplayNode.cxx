@@ -37,7 +37,6 @@ vtkMRMLFiberBundleGlyphDisplayNode::vtkMRMLFiberBundleGlyphDisplayNode()
   this->DiffusionTensorGlyphFilter = vtkDiffusionTensorGlyph::New();
 
   this->TwoDimensionalVisibility = 0;
-  this->ColorMode = vtkMRMLFiberBundleDisplayNode::colorModeScalar;
 }
 
 //----------------------------------------------------------------------------
@@ -111,18 +110,27 @@ void vtkMRMLFiberBundleGlyphDisplayNode::PrintSelf(ostream& os, vtkIndent indent
 }
 
 //----------------------------------------------------------------------------
-vtkAlgorithmOutput* vtkMRMLFiberBundleGlyphDisplayNode::GetOutputPolyDataConnection()
+vtkAlgorithmOutput* vtkMRMLFiberBundleGlyphDisplayNode::GetOutputMeshConnection()
 {
+  if (!this->Visibility)
+    {
+    return nullptr;
+    }
   return this->DiffusionTensorGlyphFilter->GetOutputPort();
 }
 
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleGlyphDisplayNode::UpdatePolyDataPipeline()
+void vtkMRMLFiberBundleGlyphDisplayNode::UpdateAssignedAttribute()
 {
-  this->Superclass::UpdatePolyDataPipeline();
+  if (!this->Visibility)
+    {
+    this->DiffusionTensorGlyphFilter->SetInputConnection(nullptr);
+    return;
+    }
+  this->Superclass::UpdateAssignedAttribute();
 
   this->DiffusionTensorGlyphFilter->SetInputConnection(
-    this->Superclass::GetOutputPolyDataConnection());
+    this->Superclass::GetOutputMeshConnection());
 
   // set display properties according to the tensor-specific display properties node for glyphs
   vtkMRMLDiffusionTensorDisplayPropertiesNode * diffusionTensorDisplayNode =
@@ -134,11 +142,6 @@ void vtkMRMLFiberBundleGlyphDisplayNode::UpdatePolyDataPipeline()
     // complaining about missing input port 1.
     this->DiffusionTensorGlyphFilter->SetSourceConnection(
       diffusionTensorDisplayNode->GetGlyphConnection() );
-    }
-
-  if (!this->Visibility)
-    {
-    return;
     }
 
   if (diffusionTensorDisplayNode != NULL)
@@ -187,8 +190,8 @@ void vtkMRMLFiberBundleGlyphDisplayNode::UpdatePolyDataPipeline()
             {
             vtkDebugMacro("coloring with orientation ====================");
             this->DiffusionTensorGlyphFilter->ColorGlyphsByOrientation( );
-            vtkMRMLNode* ColorNode = this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow");
-            if (ColorNode)
+            vtkMRMLNode* colorNode = this->GetScene() ? this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow") : NULL;
+            if (colorNode)
               {
               this->SetAndObserveColorNodeID(ColorNode->GetID());
               }
@@ -277,7 +280,7 @@ void vtkMRMLFiberBundleGlyphDisplayNode::UpdatePolyDataPipeline()
         }
       else if (this->GetInputPolyData())
         {
-        this->GetOutputPolyDataConnection()->GetProducer()->Update();
+        this->GetOutputMeshConnection()->GetProducer()->Update();
         vtkPointData *pointData = this->GetOutputPolyData()->GetPointData();
         if (pointData)
           {

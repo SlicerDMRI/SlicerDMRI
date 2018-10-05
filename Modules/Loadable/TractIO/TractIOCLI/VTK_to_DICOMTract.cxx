@@ -32,13 +32,16 @@
 #include "VTK_to_DICOMTractCLP.h"
 
 // Shared ptr aliases
-#define SP std::shared_ptr
+#define SP OFshared_ptr
 #define vtkSP vtkSmartPointer
 
 #define TIO_MANUFACTURER "libTractIO";
 #define TIO_MANUFACTURER_MODELNAME "vtktodicom";
 #define TIO_DEVICESERIALNUMBER "0000";
 #define TIO_SOFTWAREVERSIONS "TractIO 0.1\\DCMTK 3.6.1";
+
+// Derived from Isaiah's Medical Connections UID root
+#define SLICERDMRI_UID_SERIES_ROOT "1.2.826.0.1.3680043.9.7239.2.1"
 
 // Forward declaration
 SP<TrcTractographyResults> create_dicom(std::vector<std::string> files);
@@ -95,12 +98,19 @@ int main(int argc, char *argv[])
     return EXIT_FAILURE;
     }
 
+  // rewrite the SeriesInstanceUID to be unique
+  IODGeneralSeriesModule series_mod = dicom->getSeries();
+  char uid[65];
+  series_mod.setSeriesInstanceUID(dcmGenerateUniqueIdentifier(uid, SLICERDMRI_UID_SERIES_ROOT));
+
   // add tracks from polydata
   if ( add_tracts(dicom, polydata) != 0)
     {
     std::cerr << "Error: Failed to add tracks from polydata." << std::endl;
     return EXIT_FAILURE;
     }
+
+
 
   // write DICOM to disk
   OFCondition ofresult;
@@ -159,7 +169,7 @@ SP<TrcTractographyResults> create_dicom(std::vector<std::string> files)
 
   if (result.good())
     {
-    result = p_tract->importPatientStudyFoR(files[0].c_str(),
+    result = p_tract->importHierarchy(files[0].c_str(),
                                             true, /* usePatient*/
                                             true, /* useStudy */
                                             true, /* useSeries */
@@ -249,7 +259,7 @@ int add_tracts(SP<TrcTractographyResults> dcmtract,
 
   OFCondition result;
 
-  CodeWithModifiers anatomyCode;
+  CodeWithModifiers anatomyCode("3");
   anatomyCode.set("T-A0095", "SRT", "White matter of brain and spinal cord");
   CodeSequenceMacro diffusionModelCode("113231", "DCM", "Single Tensor");
   CodeSequenceMacro algorithmCode("113211", "DCM", "Deterministic");

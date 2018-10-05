@@ -1,9 +1,14 @@
 #include <algorithm>
+#include <iostream>
 
 // vtkTeem includes
 #include <vtkDiffusionTensorMathematics.h>
-#include <Libs/vtkTeem/vtkNRRDReader.h>
-#include <Libs/vtkTeem/vtkNRRDWriter.h>
+#include <Libs/vtkTeem/vtkTeemNRRDReader.h>
+#include <Libs/vtkTeem/vtkTeemNRRDWriter.h>
+
+// vnl includes
+#include <vnl/vnl_math.h>
+#include <vnl/vnl_double_3.h>
 
 // VTK includes
 #include <vtkAssignAttribute.h>
@@ -75,7 +80,7 @@ void computeFiberStats(vtkSmartPointer<vtkPolyData> input,
 
 void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> input,
                                std::string &id,
-                               std::string &operation, 
+                               std::string &operation,
                                bool moreStatistics);
 
 int computeTensorMeasurement(vtkSmartPointer<vtkPolyData> input,
@@ -109,6 +114,18 @@ void printCluster(const std::string &id,
                   std::stringstream &measureNames,
                   std::stringstream &measureValues);
 
+namespace {
+  double median_of_sorted(vtkDoubleArray* d)
+  {
+    size_t n = d->GetNumberOfValues();
+    double mid_floorth = d->GetComponent(n/2, 0);
+    if (n % 2 != 0) // odd number of points
+      return mid_floorth;
+    else
+      return (mid_floorth + d->GetComponent(n/2 - 1, 0)) / 2;
+  }
+};
+
 //=============================================================================
 // Function definitions
 void getPathFromParentToChild(vtkMRMLHierarchyNode *parent,
@@ -135,6 +152,40 @@ void getPathFromParentToChild(vtkMRMLHierarchyNode *parent,
     }
 }
 
+double computeMeanLineLength(vtkSmartPointer<vtkPolyData> poly)
+{
+  size_t total_measured_lines = 0;
+  double total_length = 0.0;
+  vnl_double_3 prev, next;
+  vtkNew<vtkIdList> pointIds;
+
+  poly->GetLines()->InitTraversal();
+
+  while(poly->GetLines()->GetNextCell(pointIds.GetPointer()))
+    {
+    // get first point
+    poly->GetPoints()->GetPoint(pointIds->GetId(0), prev.data_block());
+
+    // count by segments
+    size_t n = 1;
+
+    for ( ; n < pointIds->GetNumberOfIds(); n++)
+      {
+      // get next point
+      poly->GetPoints()->GetPoint(pointIds->GetId(n), next.data_block());
+
+      // add segment length to total
+      total_length += (next - prev).two_norm();
+      prev = next;
+      }
+
+    // only count line if actually measured
+    if (n > 1) { total_measured_lines++; }
+    }
+
+  return total_length / total_measured_lines;
+}
+
 void computeFiberStats(vtkSmartPointer<vtkPolyData> poly,
                        std::string &id)
 {
@@ -143,8 +194,9 @@ void computeFiberStats(vtkSmartPointer<vtkPolyData> poly,
     return;
   }
 
-  int npoints = poly->GetNumberOfPoints();
-  int npolys = poly->GetNumberOfCells();
+  size_t npoints = poly->GetNumberOfPoints();
+  size_t npolys = poly->GetNumberOfCells();
+  double mean_length = computeMeanLineLength(poly);
 
   //if (npoints > 0 && npolys > 0)
   //  {
@@ -154,8 +206,9 @@ void computeFiberStats(vtkSmartPointer<vtkPolyData> poly,
       OutTable[id] = std::map<std::string, double>();
       it = OutTable.find(id);
       }
-    it->second[std::string("Num_Points")] = npoints;
-    it->second[std::string("Num_Fibers")] = npolys;
+    it->second["Num_Points"] = npoints;
+    it->second["Num_Fibers"] = npolys;
+    it->second["Mean_Length"] = mean_length;
    // }
 }
 
@@ -203,7 +256,7 @@ void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
         op_max = op_iter->second.second;
         }
       }
-    
+
     vtkDoubleArray *vals = vtkDoubleArray::New();
     double val;
     double sum = 0;
@@ -243,7 +296,7 @@ void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
         {
         min = (double) vals->GetComponent(0, 0);
         max = (double) vals->GetComponent(npoints_final - 1, 0);
-        median = (double) vals->GetComponent((int) (npoints_final / 2), 0);
+        median = median_of_sorted(vals);
 
         for (int n = 0; n < npoints_final; n++)
           {
@@ -276,18 +329,18 @@ void computeScalarMeasurements(vtkSmartPointer<vtkPolyData> poly,
 
     std::string name_mean = name + "." + MEAN_PRINT;
     it->second[name_mean] = mean;
-    
+
     if (moreStatistics)
       {
       std::string name_min = name + "." + MIN_PRINT;
       std::string name_max = name + "." + MAX_PRINT;
-      std::string name_mediam = name + "." + MEDIAN_PRINT;
+      std::string name_median = name + "." + MEDIAN_PRINT;
       std::string name_variance = name + "." + VARIANCE_PRINT;
       std::string nanid = name + "." + INVALID_NUMBER_PRINT;
 
       it->second[name_min] = min;
       it->second[name_max] = max;
-      it->second[name_mediam] = median;
+      it->second[name_median] = median;
       it->second[name_variance] = variance;
       it->second[nanid] = npoints - npoints_final; // record the number of NaNs for this measurement
 
@@ -325,6 +378,10 @@ int computeTensorMeasurement(vtkSmartPointer<vtkPolyData> poly,
     if( operation == std::string("Trace") )
       {
       math->ColorGlyphsByTrace();
+      }
+    else if( operation == "MeanDiffusivity")
+      {
+      math->ColorGlyphsByMeanDiffusivity();
       }
     else if( operation == std::string("RelativeAnisotropy") )
       {
@@ -818,15 +875,16 @@ int main( int argc, char * argv[] )
 
   std::ostringstream ofs;
   std::ofstream outputfilestream(outputFile.c_str());
-  if (ofs.fail())
+  if (outputfilestream.fail())
     {
-    std::cerr << "Output file doesn't exist: " <<  outputFile << std::endl;
+    std::cerr << "Unable to output file, or base path doesn't exist: " <<  outputFile << std::endl;
     return EXIT_FAILURE;
     }
 
   vtkNew<vtkPolyDataTensorToColor> math;
   std::vector<std::string> operations;
   operations.push_back(std::string("Trace"));
+  operations.push_back(std::string("MeanDiffusivity"));
   operations.push_back(std::string("RelativeAnisotropy"));
   operations.push_back(std::string("FractionalAnisotropy"));
   operations.push_back(std::string("LinearMeasure"));
@@ -845,6 +903,7 @@ int main( int argc, char * argv[] )
 
   aggregate_names.push_back("Num_Points");
   aggregate_names.push_back("Num_Fibers");
+  aggregate_names.push_back("Mean_Length");
   aggregate_names.push_back(EXCLUDED_NUMBER_PRINT);
 
   if (inputType == std::string("Fibers_Hierarchy") )
@@ -966,13 +1025,15 @@ int main( int argc, char * argv[] )
       reader->Update();
 
       vtkSmartPointer<vtkPolyData> data = reader->GetOutput();
+      computeFiberStats(data, fileName);
+      computeScalarMeasurements(data, fileName, EMPTY_OP, moreStatistics);
+
       if( !setTensors(data) )
         {
         std::cout << argv[0] << " : No tensor data for file " << fileName << std::endl;
         continue;
         }
-      computeFiberStats(data, fileName);
-      computeScalarMeasurements(data, fileName, EMPTY_OP, moreStatistics);
+
       computeAllTensorMeasurements(data, fileName, operations, moreStatistics);
       }
 
@@ -988,14 +1049,14 @@ int main( int argc, char * argv[] )
       reader->Update();
 
       vtkSmartPointer<vtkPolyData> data = reader->GetOutput();
+      computeFiberStats(data, fileName);
+      computeScalarMeasurements(data, fileName, EMPTY_OP, moreStatistics);
       if( !setTensors(data) )
         {
         std::cout << argv[0] << " : No tensor data for file " << fileName << std::endl;
         continue;
         }
 
-      computeFiberStats(data, fileName);
-      computeScalarMeasurements(data, fileName, EMPTY_OP, moreStatistics);
       computeAllTensorMeasurements(data, fileName, operations, moreStatistics);
       }
     } //if (inputType == std::string("Fibers File Folder") )

@@ -120,7 +120,7 @@ void qSlicerTractographyDisplayModuleWidget::setFiberBundleNode(vtkMRMLFiberBund
 {
   Q_D(qSlicerTractographyDisplayModuleWidget);
 
-  if (fiberBundleNode == 0)
+  if (fiberBundleNode == nullptr)
     {
     d->TractDisplayModesTabWidget->setEnabled(false);
     d->ROIEditorWidget->setEnabled(false);

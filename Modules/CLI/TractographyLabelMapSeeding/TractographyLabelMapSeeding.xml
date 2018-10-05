@@ -39,7 +39,7 @@
     <description><![CDATA[Options for seed placement]]></description>
     <double>
       <name>ClTh</name>
-      <label>Linear Measure Start Threshold</label>
+      <label>Start Threshold</label>
       <flag>-c</flag>
       <longflag>--clthreshold</longflag>
       <description><![CDATA[Minimum Linear Measure for the seeding to start.]]></description>
@@ -144,13 +144,14 @@
   </parameters>
 
   <parameters advanced="true">
+    <label>Advanced</label>
     <boolean>
       <name>UseIndexSpace</name>
       <label>Use Index Space</label>
       <flag>-x</flag>
       <longflag>--useindexspace</longflag>
       <description><![CDATA[Seed at IJK voxel grid]]></description>
-      <default>false</default>
+      <default>true</default>
     </boolean>
 
     <double>

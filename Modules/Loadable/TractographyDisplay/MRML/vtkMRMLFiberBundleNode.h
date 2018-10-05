@@ -34,7 +34,8 @@ class vtkMRMLAnnotationNode;
 class vtkIdTypeArray;
 class vtkExtractPolyDataGeometry;
 class vtkPlanes;
-class vtkCleanPolyData;
+class vtMRMLModelDisplayNode;
+class vtkPassThrough;
 
 class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleNode : public vtkMRMLModelNode
 {
@@ -42,50 +43,45 @@ public:
   static vtkMRMLFiberBundleNode *New();
   vtkTypeMacro(vtkMRMLFiberBundleNode,vtkMRMLModelNode);
   //vtkTypeMacro(vtkMRMLFiberBundleNode,vtkMRMLTransformableNode);
-  void PrintSelf(ostream& os, vtkIndent indent);
-
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //--------------------------------------------------------------------------
   /// MRMLNode methods
   //--------------------------------------------------------------------------
 
-  virtual vtkMRMLNode* CreateNodeInstance();
+  virtual vtkMRMLNode* CreateNodeInstance() VTK_OVERRIDE;
 
   ///
   /// Read node attributes from XML (MRML) file
-  virtual void ReadXMLAttributes ( const char** atts );
+  virtual void ReadXMLAttributes ( const char** atts ) VTK_OVERRIDE;
 
   ///
   /// Write this node's information to a MRML file in XML format.
-  virtual void WriteXML ( ostream& of, int indent );
+  virtual void WriteXML ( ostream& of, int indent ) VTK_OVERRIDE;
 
 
   ///
   /// Copy the node's attributes to this object
-  virtual void Copy ( vtkMRMLNode *node );
+  virtual void Copy ( vtkMRMLNode *node ) VTK_OVERRIDE;
 
   ///
   /// alternative method to propagate events generated in Display nodes
   virtual void ProcessMRMLEvents ( vtkObject * /*caller*/,
                                    unsigned long /*event*/,
-                                   void * /*callData*/ );
+                                   void * /*callData*/ ) VTK_OVERRIDE;
 
   ///
   /// Updates this node if it depends on other nodes
   /// when the node is deleted in the scene
-  virtual void UpdateReferences();
-
-  ///
-  /// Finds the storage node and read the data
-  virtual void UpdateScene(vtkMRMLScene *scene);
+  virtual void UpdateReferences() VTK_OVERRIDE;
 
   ///
   /// Update the stored reference to another node in the scene
-  virtual void UpdateReferenceID(const char *oldID, const char *newID);
+  virtual void UpdateReferenceID(const char *oldID, const char *newID) VTK_OVERRIDE;
 
   ///
   /// Get node XML tag name (like Volume, Model)
-  virtual const char* GetNodeTagName() {return "FiberBundle";};
+  virtual const char* GetNodeTagName() VTK_OVERRIDE {return "FiberBundle";};
 
   /// Get the subsampling ratio for the polydata
   vtkGetMacro(SubsamplingRatio, float);
@@ -123,38 +119,31 @@ public:
 
   ///
   /// Enable or disable the selection with an annotation node
-  virtual void SetSelectWithAnnotationNode(int);
-  vtkGetMacro(SelectWithAnnotationNode, int);
-  vtkBooleanMacro(SelectWithAnnotationNode, int);
+  virtual void SetSelectWithAnnotation(bool);
+  vtkGetMacro(SelectWithAnnotation, bool);
 
-  enum
+  enum SelectionModeEnum
   {
-    PositiveAnnotationNodeSelection,
-    NegativeAnnotationNodeSelection
+    NoSelection,
+    PositiveSelection,
+    NegativeSelection
   };
 
 
   ///
   /// Set the mode (positive or negative) of the selection with the annotation node
-  vtkGetMacro(SelectionWithAnnotationNodeMode, int);
-  virtual void SetSelectionWithAnnotationNodeMode(int);
-  virtual void SetSelectionWithAnnotationNodeModeToPositive()
-  {
-    this->SetSelectionWithAnnotationNodeMode(PositiveAnnotationNodeSelection);
-  }
-  virtual void SetSelectionWithAnnotationNodeModeToNegative()
-  {
-    this->SetSelectionWithAnnotationNodeMode(NegativeAnnotationNodeSelection);
-  }
+  vtkGetMacro(AnnotationSelectionMode, SelectionModeEnum);
+  virtual void SetAnnotationSelectionMode(SelectionModeEnum);
 
   ///
   /// Reimplemented from internal reasons
-  virtual void SetPolyDataConnection(vtkAlgorithmOutput* inputPort);
+  virtual void SetMeshConnection(vtkAlgorithmOutput* inputPort) VTK_OVERRIDE;
 
   ///
   /// Gets the subsampled PolyData converted from the real data in the node
-  virtual vtkPolyData* GetFilteredPolyData();
-  virtual vtkAlgorithmOutput* GetFilteredPolyDataConnection();
+  virtual vtkPointSet* GetFilteredPolyData();
+  virtual vtkAlgorithmOutput* GetFilteredMeshConnection();
+  void SetMeshToDisplayNode(vtkMRMLModelDisplayNode*) VTK_OVERRIDE;
 
   ///
   /// get associated line display node or NULL if not set
@@ -169,23 +158,11 @@ public:
   vtkMRMLFiberBundleDisplayNode* GetGlyphDisplayNode();
 
   ///
-  /// add line display node if not already present and return it
-  vtkMRMLFiberBundleDisplayNode* AddLineDisplayNode();
-
-  ///
-  /// add tube display node if not already present and return it
-  vtkMRMLFiberBundleDisplayNode* AddTubeDisplayNode();
-
-  ///
-  /// add glyph display node if not already present and return it
-  vtkMRMLFiberBundleDisplayNode* AddGlyphDisplayNode();
-
-  ///
   /// Create and return default storage node or NULL if does not have one
-  virtual vtkMRMLStorageNode* CreateDefaultStorageNode();
+  virtual vtkMRMLStorageNode* CreateDefaultStorageNode() VTK_OVERRIDE;
 
   /// Create default display nodes
-  virtual void CreateDefaultDisplayNodes();
+  virtual void CreateDefaultDisplayNodes() VTK_OVERRIDE;
 
    // Description:
   // Get the maximum number of fibers to show by default when a new fiber bundle node is set
@@ -203,13 +180,9 @@ public:
   }
 
   // Description:
-  // Enable, Disapble shuffle of IDs
-  vtkGetMacro(EnableShuffleIDs, int);
-  void SetEnableShuffleIDs(int value)
-  {
-    this->EnableShuffleIDs = value;
-  }
-
+  // Enable, Disable shuffle of IDs
+  vtkGetMacro(EnableShuffleIDs, bool);
+  vtkSetMacro(EnableShuffleIDs, bool);
 
 protected:
   vtkMRMLFiberBundleNode();
@@ -217,38 +190,37 @@ protected:
   vtkMRMLFiberBundleNode(const vtkMRMLFiberBundleNode&);
   void operator=(const vtkMRMLFiberBundleNode&);
 
-  void SetPolyDataToDisplayNode(vtkMRMLModelDisplayNode* modelDisplayNode);
-
   // Description:
   // Maximum number of fibers to show per bundle when it is loaded.
   static vtkIdType MaxNumberOfFibersToShowByDefault;
   vtkIdTypeArray* ShuffledIds;
 
-  vtkExtractSelectedPolyDataIds* ExtractSelectedPolyDataIds;
-  vtkCleanPolyData* CleanPolyDataPostSubsampling;
-  vtkCleanPolyData* CleanPolyDataPostROISelection;
   float SubsamplingRatio;
 
-  virtual void PrepareSubsampling();
-  virtual void UpdateSubsampling();
-  virtual void CleanSubsampling();
 
   /// ALL MRML nodes
-  int SelectWithAnnotationNode;
-  int SelectionWithAnnotationNodeMode;
-  int EnableShuffleIDs;
+  bool EnableShuffleIDs;
+  bool SelectWithAnnotation;
+  SelectionModeEnum AnnotationSelectionMode;
 
   vtkMRMLAnnotationNode *AnnotationNode;
   char *AnnotationNodeID;
-  vtkExtractPolyDataGeometry *ExtractPolyDataGeometry;
-  vtkPlanes *Planes;
-
-  virtual void PrepareROISelection();
-  virtual void UpdateROISelection();
-  virtual void CleanROISelection();
 
   virtual void SetAnnotationNodeID(const char* id);
 
+private:
+  // Pipeline filter objects
+  vtkExtractPolyDataGeometry* ExtractFromROI;
+  vtkExtractSelectedPolyDataIds* ExtractSubsample;
+  vtkPlanes *Planes;
+  vtkPassThrough* LocalPassThrough;
+
+  // Internal methods
+  void UpdateSubsampling();
+  void UpdateROISelection();
+
+  void PrepareROISelection();
+  void PrepareSubsampling();
 };
 
 #endif

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.5)
 
 #-----------------------------------------------------------------------------
 set(EXTENSION_NAME SlicerDMRI)
@@ -15,6 +15,9 @@ set(EXTENSION_DEPENDS "UKFTractography") # Specified as a space separated list o
 set(EXTENSION_BUILD_SUBDIRECTORY inner-build)
 
 set(SUPERBUILD_TOPLEVEL_PROJECT inner)
+
+option(SlicerDMRI_ENABLE_TRACTIO "Enable TractIO module" ON)
+mark_as_advanced(SlicerDMRI_ENABLE_TRACTIO)
 
 #-----------------------------------------------------------------------------
 # Extension dependencies
@@ -62,13 +65,25 @@ add_subdirectory("Modules/CLI/DiffusionTensorScalarMeasurements")
 add_subdirectory("Modules/CLI/FiberTractMeasurements")
 add_subdirectory("Modules/CLI/TractographyLabelMapSeeding")
 add_subdirectory("Modules/CLI/FiberBundleLabelSelect")
+add_subdirectory("Modules/CLI/ExtractDWIShells")
 
 add_subdirectory("Modules/Scripted/DICOM2FullBrainTractography")
 add_subdirectory("Modules/Scripted/FiberBundleToLabelMap")
+add_subdirectory("Modules/Scripted/DMRIPlugins")
+add_subdirectory("Modules/Scripted/TractographyExportPLY")
+add_subdirectory("Modules/Scripted/TractographyDownsample")
 
 if (${SlicerDMRI_ENABLE_TRACTIO})
   add_subdirectory("Modules/Loadable/TractIO")
 endif()
+
+#-----------------------------------------------------------------------------
+# include module templates in the distribution package
+install(
+  DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/DMRIModuleTemplates"
+  DESTINATION ${Slicer_INSTALL_ROOT}${Slicer_BUNDLE_EXTENSIONS_LOCATION}
+  COMPONENT RuntimeLibraries
+  )
 
 #-----------------------------------------------------------------------------
 set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_BINARY_DIR};${EXTENSION_NAME};ALL;/")

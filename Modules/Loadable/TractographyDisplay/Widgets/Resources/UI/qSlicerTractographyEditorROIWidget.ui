@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>410</width>
-    <height>172</height>
+    <height>232</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -40,9 +40,6 @@
      <property name="showHidden">
       <bool>true</bool>
      </property>
-     <property name="selectNodeUponCreation">
-      <bool>true</bool>
-     </property>
      <property name="noneEnabled">
       <bool>true</bool>
      </property>
@@ -50,6 +47,9 @@
       <bool>true</bool>
      </property>
      <property name="renameEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="selectNodeUponCreation">
       <bool>true</bool>
      </property>
     </widget>
@@ -85,14 +85,14 @@
     </widget>
    </item>
    <item row="2" column="0">
-     <widget class="QCheckBox" name="InteractiveROI">
-       <property name="text">
-         <string>Interactive ROI</string>
-       </property>
-       <property name="checked">
-         <bool>true</bool>
-       </property>
-     </widget>
+    <widget class="QCheckBox" name="InteractiveROI">
+     <property name="text">
+      <string>Interactive ROI Updates</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
    <item row="2" column="1">
     <widget class="QCheckBox" name="ROIVisibility">
@@ -140,9 +140,6 @@ QCheckBox::indicator:unchecked {
      <property name="showHidden">
       <bool>true</bool>
      </property>
-     <property name="selectNodeUponCreation">
-      <bool>true</bool>
-     </property>
      <property name="noneEnabled">
       <bool>true</bool>
      </property>
@@ -150,6 +147,9 @@ QCheckBox::indicator:unchecked {
       <bool>true</bool>
      </property>
      <property name="renameEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="selectNodeUponCreation">
       <bool>true</bool>
      </property>
     </widget>
@@ -170,17 +170,24 @@ QCheckBox::indicator:unchecked {
       <string>Confirm update</string>
      </property>
      <property name="checked">
-       <bool>true</bool>
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QCheckBox" name="EnableFiberEdit">
+     <property name="text">
+      <string>Enable Interactive Edit (mouse-over for help)</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
      </property>
     </widget>
    </item>
    <item row="5" column="0">
-    <widget class="QCheckBox" name="EnableFiberEdit">
-     <property name="text">
-      <string>Enable Interactive Edit</string>
-     </property>
-     <property name="checked">
-       <bool>false</bool>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>

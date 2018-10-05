@@ -21,20 +21,14 @@
 
 #include "vtkTensorGlyph.h"
 
-/// \brief Extracts points whose scalar value satisfies threshold criterion.
-///
-/// vtkPolyDataTensorToColor is a filter that extracts points from a dataset that
-/// satisfy a threshold criterion. The criterion can take three forms:
-/// 1) greater than a particular value; 2) less than a particular value; or
-/// 3) between a particular value. The output of the filter is polygonal data.
-///
-/// \sa vtkThreshold
+/// \brief Calculates scalar values from vtkPolyData tensors.
+
 class vtkDMRI_EXPORT vtkPolyDataTensorToColor : public vtkPolyDataAlgorithm
 {
 public:
   static vtkPolyDataTensorToColor *New();
   vtkTypeMacro(vtkPolyDataTensorToColor,vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   vtkSetClampMacro(ColorMode, int, vtkTensorGlyph::COLOR_BY_SCALARS, vtkTensorGlyph::COLOR_BY_EIGENVALUES);
   vtkGetMacro(ColorMode, int);
@@ -64,6 +58,7 @@ public:
   void ColorGlyphsByPlanarMeasure();
   void ColorGlyphsByParallelDiffusivity();
   void ColorGlyphsByPerpendicularDiffusivity();
+  void ColorGlyphsByMeanDiffusivity();
   void ColorGlyphsByMaxEigenvalue();
   void ColorGlyphsByMidEigenvalue();
   void ColorGlyphsByMinEigenvalue();
@@ -77,9 +72,9 @@ protected:
   ~vtkPolyDataTensorToColor() {};
 
   /// Usual data generation method
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) VTK_OVERRIDE;
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation *info) VTK_OVERRIDE;
 
   void ColorGlyphsBy(int measure);
   int ColorMode; /// The coloring mode to use for the glyphs.

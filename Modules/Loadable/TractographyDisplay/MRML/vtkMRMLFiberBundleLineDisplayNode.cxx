@@ -36,10 +36,9 @@ vtkMRMLNodeNewMacro(vtkMRMLFiberBundleLineDisplayNode);
 vtkMRMLFiberBundleLineDisplayNode::vtkMRMLFiberBundleLineDisplayNode()
 {
   this->TensorToColor = vtkPolyDataTensorToColor::New();
-  this->TensorToColor->SetInputConnection(this->Superclass::GetOutputPolyDataConnection());
+  this->TensorToColor->SetInputConnection(this->Superclass::GetOutputMeshConnection());
   this->ColorLinesByOrientation = vtkPolyDataColorLinesByOrientation::New();
   this->ColorLinesByOrientation->SetInputConnection(this->TensorToColor->GetOutputPort());
-  this->ColorMode = vtkMRMLFiberBundleDisplayNode::colorModeScalar;
 }
 
 //----------------------------------------------------------------------------
@@ -57,13 +56,8 @@ void vtkMRMLFiberBundleLineDisplayNode::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-vtkAlgorithmOutput* vtkMRMLFiberBundleLineDisplayNode::GetOutputPolyDataConnection()
+vtkAlgorithmOutput* vtkMRMLFiberBundleLineDisplayNode::GetOutputMeshConnection()
 {
-  //if (this->ColorLinesByOrientation)
-  //  {
-  //  return this->OutputPolyData;
-  //  }
-  // return NULL;
   vtkMRMLDiffusionTensorDisplayPropertiesNode * diffusionTensorDisplayPropertiesNode =
     this->GetDiffusionTensorDisplayPropertiesNode();
 
@@ -84,7 +78,7 @@ vtkAlgorithmOutput* vtkMRMLFiberBundleLineDisplayNode::GetOutputPolyDataConnecti
           }
         else
           {
-          outputPort = this->Superclass::GetOutputPolyDataConnection();
+          outputPort = this->Superclass::GetOutputMeshConnection();
           }
         break;
       case vtkMRMLFiberBundleDisplayNode::colorModeMeanFiberOrientation:
@@ -92,10 +86,10 @@ vtkAlgorithmOutput* vtkMRMLFiberBundleLineDisplayNode::GetOutputPolyDataConnecti
         outputPort = this->ColorLinesByOrientation->GetOutputPort();
         break;
       case vtkMRMLFiberBundleDisplayNode::colorModeScalarData:
-        outputPort = this->Superclass::GetOutputPolyDataConnection();
+        outputPort = this->Superclass::GetOutputMeshConnection();
         break;
       default:
-        outputPort = this->Superclass::GetOutputPolyDataConnection();
+        outputPort = this->Superclass::GetOutputMeshConnection();
       }
     }
   else
@@ -107,11 +101,11 @@ vtkAlgorithmOutput* vtkMRMLFiberBundleLineDisplayNode::GetOutputPolyDataConnecti
 }
 
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleLineDisplayNode::UpdatePolyDataPipeline()
+void vtkMRMLFiberBundleLineDisplayNode::UpdateAssignedAttribute()
 {
-  this->Superclass::UpdatePolyDataPipeline();
+  this->Superclass::UpdateAssignedAttribute();
   this->TensorToColor->SetInputConnection(
-    this->Superclass::GetOutputPolyDataConnection());
+    this->Superclass::GetOutputMeshConnection());
 
   if (!this->Visibility)
     {
@@ -138,7 +132,7 @@ void vtkMRMLFiberBundleLineDisplayNode::UpdatePolyDataPipeline()
           this->GetActiveScalarName() == this->ColorLinesByOrientation->GetScalarArrayName())
         {
         this->SetActiveScalarName(this->ColorLinesByOrientation->GetScalarArrayName());
-        vtkMRMLNode* colorNode = this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow");
+        vtkMRMLNode* colorNode = this->GetScene() ? this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow") : NULL;
         if (colorNode)
           {
           this->SetAndObserveColorNodeID(colorNode->GetID());
@@ -149,7 +143,7 @@ void vtkMRMLFiberBundleLineDisplayNode::UpdatePolyDataPipeline()
       {
       vtkDebugMacro("Color by mean fiber orientation");
       this->ColorLinesByOrientation->SetColorMode(ColorLinesByOrientation->colorModeMeanFiberOrientation);
-      vtkMRMLNode* colorNode = this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow");
+      vtkMRMLNode* colorNode = this->GetScene() ? this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow") : NULL;
       if (colorNode)
         {
         this->SetAndObserveColorNodeID(colorNode->GetID());
@@ -160,7 +154,7 @@ void vtkMRMLFiberBundleLineDisplayNode::UpdatePolyDataPipeline()
       vtkDebugMacro("Color by mean fiber orientation");
       this->ColorLinesByOrientation->SetColorMode(
         this->ColorLinesByOrientation->colorModePointFiberOrientation);
-      vtkMRMLNode* colorNode = this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow");
+      vtkMRMLNode* colorNode = this->GetScene() ? this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow") : NULL;
       if (colorNode)
         {
         this->SetAndObserveColorNodeID(colorNode->GetID());
@@ -198,7 +192,7 @@ void vtkMRMLFiberBundleLineDisplayNode::UpdatePolyDataPipeline()
           {
           vtkDebugMacro("coloring with orientation ");
           this->TensorToColor->ColorGlyphsByOrientation( );
-          vtkMRMLNode* colorNode = this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow");
+          vtkMRMLNode* colorNode = this->GetScene() ? this->GetScene()->GetNodeByID("vtkMRMLColorTableNodeFullRainbow") : NULL;
           if (colorNode)
             {
             this->SetAndObserveColorNodeID(colorNode->GetID());
@@ -268,65 +262,41 @@ void vtkMRMLFiberBundleLineDisplayNode::UpdatePolyDataPipeline()
     this->TensorToColor->SetExtractScalar(0);
     }
 
-    if (this->GetAutoScalarRange() &&
-      this->GetScalarVisibility())
+  if (this->GetAutoScalarRange() &&
+     this->GetScalarVisibility())
+    {
+    double range[2] = {0., 1.};
+    if ((this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModeScalar) ||
+        (this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModeFunctionOfScalar))
       {
-      double range[2] = {0., 1.};
-      if ((this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModeScalar) ||
-          (this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModeFunctionOfScalar))
+      int scalarInvariant = 0;
+      if (DiffusionTensorDisplayPropertiesNode)
         {
-        int scalarInvariant = 0;
-        if (DiffusionTensorDisplayPropertiesNode)
-          {
-          scalarInvariant = DiffusionTensorDisplayPropertiesNode->GetColorGlyphBy( );
-          }
-        if (DiffusionTensorDisplayPropertiesNode &&
-            vtkMRMLDiffusionTensorDisplayPropertiesNode::ScalarInvariantHasKnownScalarRange(
-              scalarInvariant))
-          {
-          vtkMRMLDiffusionTensorDisplayPropertiesNode::ScalarInvariantKnownScalarRange(
-            scalarInvariant, range);
-          }
-        else if (this->GetInputPolyData())
-          {
-          this->GetOutputPolyDataConnection()->GetProducer()->Update();
-          vtkPointData *pointData = this->GetOutputPolyData()->GetPointData();
-          if (pointData)
-            {
-            double *activeScalarRange = 0;
-            if (pointData->GetArray(this->GetActiveScalarName()))
-              {
-              activeScalarRange = pointData->GetArray(
-                                  this->GetActiveScalarName())->GetRange();
-              }
-            else if (pointData->GetArray(0))
-              {
-              activeScalarRange = pointData->GetArray(0)->GetRange();
-              }
-            if (activeScalarRange)
-              {
-              range[0] = activeScalarRange[0];
-              range[1] = activeScalarRange[1];
-              }
-            }
-          }
+        scalarInvariant = DiffusionTensorDisplayPropertiesNode->GetColorGlyphBy( );
         }
-      if ((this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModeMeanFiberOrientation) ||
-          (this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModePointFiberOrientation))
+      if (DiffusionTensorDisplayPropertiesNode &&
+          vtkMRMLDiffusionTensorDisplayPropertiesNode::ScalarInvariantHasKnownScalarRange(
+            scalarInvariant))
         {
-          vtkMRMLDiffusionTensorDisplayPropertiesNode::ScalarInvariantKnownScalarRange(
-            vtkMRMLDiffusionTensorDisplayPropertiesNode::ColorOrientation, range);
+        vtkMRMLDiffusionTensorDisplayPropertiesNode::ScalarInvariantKnownScalarRange(
+          scalarInvariant, range);
         }
-      else if (this->GetColorMode() == vtkMRMLFiberBundleDisplayNode::colorModeScalarData &&
-               this->GetInputPolyData())
+      else if (this->GetInputPolyData())
         {
-        this->GetInputPolyDataConnection()->GetProducer()->Update();
+        this->GetOutputMeshConnection()->GetProducer()->Update();
         vtkPointData *pointData = this->GetOutputPolyData()->GetPointData();
-        if (pointData &&
-            pointData->GetArray(this->GetActiveScalarName()))
+        if (pointData)
           {
-          double *activeScalarRange = pointData->GetArray(
-            this->GetActiveScalarName())->GetRange();
+          double *activeScalarRange = 0;
+          if (pointData->GetArray(this->GetActiveScalarName()))
+            {
+            activeScalarRange = pointData->GetArray(
+                                this->GetActiveScalarName())->GetRange();
+            }
+          else if (pointData->GetArray(0))
+            {
+            activeScalarRange = pointData->GetArray(0)->GetRange();
+            }
           if (activeScalarRange)
             {
             range[0] = activeScalarRange[0];
@@ -334,9 +304,33 @@ void vtkMRMLFiberBundleLineDisplayNode::UpdatePolyDataPipeline()
             }
           }
         }
-      //this->ScalarRange[0] = range[0];
-      //this->ScalarRange[1] = range[1];
-      this->SetScalarRange(range);
       }
+    if ((this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModeMeanFiberOrientation) ||
+        (this->GetColorMode ( ) == vtkMRMLFiberBundleDisplayNode::colorModePointFiberOrientation))
+      {
+        vtkMRMLDiffusionTensorDisplayPropertiesNode::ScalarInvariantKnownScalarRange(
+          vtkMRMLDiffusionTensorDisplayPropertiesNode::ColorOrientation, range);
+      }
+    else if (this->GetColorMode() == vtkMRMLFiberBundleDisplayNode::colorModeScalarData &&
+             this->GetInputPolyData())
+      {
+      this->GetInputMeshConnection()->GetProducer()->Update();
+      vtkPointData *pointData = this->GetOutputPolyData()->GetPointData();
+      if (pointData &&
+          pointData->GetArray(this->GetActiveScalarName()))
+        {
+        double *activeScalarRange = pointData->GetArray(
+          this->GetActiveScalarName())->GetRange();
+        if (activeScalarRange)
+          {
+          range[0] = activeScalarRange[0];
+          range[1] = activeScalarRange[1];
+          }
+        }
+      }
+    //this->ScalarRange[0] = range[0];
+    //this->ScalarRange[1] = range[1];
+    this->SetScalarRange(range);
+    }
 }
 

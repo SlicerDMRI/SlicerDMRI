@@ -35,32 +35,33 @@ class VTK_SLICER_TRACTOGRAPHYINTERACTIVESEEDING_MODULE_LOGIC_EXPORT vtkMRMLTract
 public:
   static vtkMRMLTractographyInteractiveSeedingNode *New();
   vtkTypeMacro(vtkMRMLTractographyInteractiveSeedingNode,vtkMRMLNode);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   // Description:
   // Create instance of a GAD node.
-  virtual vtkMRMLNode* CreateNodeInstance();
+  virtual vtkMRMLNode* CreateNodeInstance() VTK_OVERRIDE;
 
   // Description:
   // Set node attributes from name/value pairs
-  virtual void ReadXMLAttributes( const char** atts);
+  virtual void ReadXMLAttributes( const char** atts) VTK_OVERRIDE;
 
   // Description:
   // Write this node's information to a MRML file in XML format.
-  virtual void WriteXML(ostream& of, int indent);
+  virtual void WriteXML(ostream& of, int indent) VTK_OVERRIDE;
 
   // Description:
   // Copy the node's attributes to this object
-  virtual void Copy(vtkMRMLNode *node);
+  virtual void Copy(vtkMRMLNode *node) VTK_OVERRIDE;
 
   // Description:
   // Get unique node XML tag name (like Volume, Model)
-  virtual const char* GetNodeTagName() {return "FiducialSeedingParameters";};
+  virtual const char* GetNodeTagName() VTK_OVERRIDE {return "FiducialSeedingParameters";};
 
   // Description:
   // Get/Set Threshold Mode (module parameter)
   // 0 - FA
   // 1 - Linear Measure
+  enum { FractionalAnisotropy = 0, LinearMeasure = 1, PlanarMeasure = 2 };
   vtkGetMacro(ThresholdMode, int);
   vtkSetMacro(ThresholdMode, int);
 
@@ -116,6 +117,7 @@ public:
   // Get/Set Display Mode (module parameter)
   // 0 - Lines
   // 1 - Tubes
+  enum { Lines = 0, Tubes = 1 };
   vtkGetMacro(DisplayMode, int);
   vtkSetMacro(DisplayMode, int);
 
@@ -186,7 +188,7 @@ public:
 
   // Description:
   // Update the stored reference to another node in the scene
-  virtual void UpdateReferenceID(const char *oldID, const char *newID);
+  virtual void UpdateReferenceID(const char *oldID, const char *newID) VTK_OVERRIDE;
 
   void StringToROILabels(std::string labels);
 

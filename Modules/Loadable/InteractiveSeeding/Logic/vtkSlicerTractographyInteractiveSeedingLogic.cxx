@@ -25,8 +25,9 @@
 #include <vtkMRMLMarkupsFiducialNode.h>
 #include <vtkMRMLScene.h>
 #include <vtkMRMLScalarVolumeNode.h>
-#include "vtkMRMLTractographyInteractiveSeedingNode.h"
 #include <vtkMRMLTransformNode.h>
+#include <vtkMRMLSubjectHierarchyNode.h>
+#include "vtkMRMLTractographyInteractiveSeedingNode.h"
 
 // vtkTeem includes
 #include <vtkDiffusionTensorMathematics.h>
@@ -107,7 +108,6 @@ void vtkSlicerTractographyInteractiveSeedingLogic::AddMRMLNodesObservers()
     {
     vtkMRMLDiffusionTensorVolumeNode *dtiNode = vtkMRMLDiffusionTensorVolumeNode::SafeDownCast(
           this->GetMRMLScene()->GetNodeByID(this->TractographyInteractiveSeedingNode->GetInputVolumeRef()));
-    vtkSetAndObserveMRMLNodeMacro(this->DiffusionTensorVolumeNode, dtiNode);
 
     vtkMRMLNode *seedinNode = this->GetMRMLScene()->GetNodeByID(this->TractographyInteractiveSeedingNode->GetInputFiducialRef());
 
@@ -187,6 +187,25 @@ int vtkSlicerTractographyInteractiveSeedingLogic::IsObservedNode(vtkMRMLNode *no
   std::vector<vtkMRMLTransformableNode *>::const_iterator observedNodeIt =
     std::find(this->ObservedNodes.begin(), this->ObservedNodes.end(),node);
   return observedNodeIt != this->ObservedNodes.end();
+}
+
+//----------------------------------------------------------------------------
+// DRY local helper function
+void setStreamerThresholdMode(vtkSmartPointer<vtkHyperStreamlineDTMRI> streamer,
+                              int thresholdMode)
+{
+  if ( thresholdMode == vtkMRMLTractographyInteractiveSeedingNode::LinearMeasure )
+    {
+     streamer->SetThresholdModeToLinearMeasure();
+    }
+  else if ( thresholdMode == vtkMRMLTractographyInteractiveSeedingNode::FractionalAnisotropy )
+    {
+    streamer->SetThresholdModeToFractionalAnisotropy();
+    }
+  else if ( thresholdMode == vtkMRMLTractographyInteractiveSeedingNode::PlanarMeasure )
+    {
+    streamer->SetThresholdModeToPlanarMeasure();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -282,18 +301,7 @@ void vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForOneSeed(vtkSee
   seed->SetVtkHyperStreamlinePointsSettings(streamer.GetPointer());
   seed->SetMinimumPathLength(minPathLength);
 
-  if ( thresholdMode == 0 )
-    {
-     streamer->SetThresholdModeToLinearMeasure();
-    }
-  else if ( thresholdMode == 1 )
-    {
-    streamer->SetThresholdModeToFractionalAnisotropy();
-    }
-  else if ( thresholdMode == 2 )
-    {
-    streamer->SetThresholdModeToPlanarMeasure();
-    }
+  setStreamerThresholdMode(streamer.GetPointer(), thresholdMode);
 
   //streamer->SetMaximumPropagationDistance(this->MaximumPropagationDistance);
   streamer->SetStoppingThreshold(stoppingValue);
@@ -513,110 +521,11 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTracts(vtkMRMLTractograp
                                  sampleStep, maxNumberOfSeeds, seedSelectedFiducials);
     }
 
-  //6. Extra5ct PolyData in RAS
-  if( !parametersNode->GetWriteToFile()  )
-  {
-    vtkNew<vtkPolyData> outFibers;
+  //6. Extract PolyData in RAS
+  vtkNew<vtkPolyData> outFibers;
 
-    seed->TransformStreamlinesToRASAndAppendToPolyData(outFibers.GetPointer());
-
-    int wasModifying = fiberNode->StartModify();
-
-    std::vector< vtkMRMLFiberBundleDisplayNode * > dnodes;
-    int newNode = 0;
-    vtkMRMLFiberBundleDisplayNode *dnode = fiberNode->GetTubeDisplayNode();
-    if (dnode == NULL || oldPoly == NULL)
-      {
-      dnode = fiberNode->AddTubeDisplayNode();
-      dnode->DisableModifiedEventOn();
-      dnode->SetScalarVisibility(1);
-      dnode->SetOpacity(1);
-      dnode->SetVisibility(1);
-      dnode->DisableModifiedEventOff();
-      newNode = 1;
-      }
-   dnode->DisableModifiedEventOn();
-   dnodes.push_back(dnode);
-   if (oldPoly == NULL && displayMode == 1)
-      {
-      dnode->SetVisibility(1);
-      }
-    else if (oldPoly == NULL && displayMode == 0)
-      {
-      dnode->SetVisibility(0);
-      }
-
-    dnode = fiberNode->GetLineDisplayNode();
-    if (dnode == NULL || oldPoly == NULL)
-      {
-      dnode = fiberNode->AddLineDisplayNode();
-      if (newNode)
-        {
-        dnode->DisableModifiedEventOn();
-        dnode->SetVisibility(0);
-        dnode->SetOpacity(1);
-        dnode->SetScalarVisibility(1);
-        dnode->DisableModifiedEventOff();
-        }
-      }
-    dnode->DisableModifiedEventOn();
-    dnodes.push_back(dnode);
-    if (oldPoly == NULL && displayMode == 0)
-      {
-      dnode->SetVisibility(1);
-      }
-    else if (oldPoly == NULL && displayMode == 1)
-      {
-      dnode->SetVisibility(0);
-      }
-
-    dnode = fiberNode->GetGlyphDisplayNode();
-    if (dnode == NULL || oldPoly == NULL)
-      {
-      dnode = fiberNode->AddGlyphDisplayNode();
-      if (newNode)
-        {
-        dnode->DisableModifiedEventOn();
-        dnode->SetVisibility(0);
-        dnode->SetScalarVisibility(1);
-        dnode->SetOpacity(1);
-        dnode->DisableModifiedEventOff();
-        }
-      }
-    dnode->DisableModifiedEventOn();
-    dnodes.push_back(dnode);
-
-    if (fiberNode->GetStorageNode() == NULL)
-      {
-      vtkNew<vtkMRMLFiberBundleStorageNode> storageNode;
-      fiberNode->GetScene()->AddNode(storageNode.GetPointer());
-      fiberNode->SetAndObserveStorageNodeID(storageNode->GetID());
-      }
-
-    if (vxformNode != NULL )
-      {
-      fiberNode->SetAndObserveTransformNodeID(vxformNode->GetID());
-      }
-    else
-      {
-      fiberNode->SetAndObserveTransformNodeID(NULL);
-      }
-
-    //For the results to reflect the paremeters, we make sure that there is no subsampling in the fibers
-    fiberNode->SetSubsamplingRatio(1.);
-
-    for (unsigned int i=0; i<dnodes.size(); i++)
-      {
-      dnodes[i]->DisableModifiedEventOff();
-      }
-
-    fiberNode->SetAndObservePolyData(outFibers.GetPointer());
-
-    fiberNode->EndModify(wasModifying);
-
-    // count on fiberNode->SetAndObservePolyData() sending PolyDataModifiedEvent
-    //fiberNode->InvokeEvent(vtkMRMLFiberBundleNode::PolyDataModifiedEvent, NULL);
-  }
+  seed->TransformStreamlinesToRASAndAppendToPolyData(outFibers.GetPointer());
+  fiberNode->SetAndObservePolyData(outFibers.GetPointer());
 
   return 1;
 }
@@ -639,12 +548,15 @@ void vtkSlicerTractographyInteractiveSeedingLogic::ProcessMRMLNodesEvents(vtkObj
     return;
     }
 
-  if (event == vtkMRMLHierarchyNode::ChildNodeAddedEvent ||
+  if (event == vtkMRMLModelNode::PolyDataModifiedEvent ||
+      event == vtkMRMLMarkupsNode::PointModifiedEvent)
+    {
+    this->UpdateOnce();
+    }
+  else if (event == vtkMRMLHierarchyNode::ChildNodeAddedEvent ||
       event == vtkMRMLHierarchyNode::ChildNodeRemovedEvent ||
       event == vtkMRMLNode::HierarchyModifiedEvent ||
       event == vtkMRMLTransformableNode::TransformModifiedEvent ||
-      event == vtkMRMLModelNode::PolyDataModifiedEvent ||
-      event == vtkMRMLMarkupsNode::PointModifiedEvent ||
       event == vtkMRMLMarkupsNode::MarkupAddedEvent ||
       event == vtkMRMLMarkupsNode::MarkupRemovedEvent)
     {
@@ -753,6 +665,14 @@ void vtkSlicerTractographyInteractiveSeedingLogic
                      snode->GetSeedSelectedFiducials(),
                      snode->GetDisplayMode()
                      );
+
+  // Make sure output fiber node is under the DTI volume in subject hierarchy
+  vtkMRMLSubjectHierarchyNode* shNode =
+    vtkMRMLSubjectHierarchyNode::GetSubjectHierarchyNode(this->GetMRMLScene());
+  if (shNode)
+    {
+    shNode->CreateItem(shNode->GetItemByDataNode(volumeNode), fiberNode);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -842,7 +762,8 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForLabelMap(
   else
     {
     math->SetInputConnection(volumeNode->GetImageDataConnection());
-    if ( thresholdMode == 0 )
+    if ( thresholdMode ==
+         vtkMRMLTractographyInteractiveSeedingNode::LinearMeasure )
       {
       math->SetOperationToLinearMeasure();
       }
@@ -924,7 +845,7 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForLabelMap(
   tensorRASToIJKRotation->Invert();
   seed->SetTensorRotationMatrix(tensorRASToIJKRotation.GetPointer());
 
-  // vtkNew<vtkNRRDWriter> iwriter;
+  // vtkNew<vtkTeemNRRDWriter> iwriter;
 
   // 3. Set up ROI (not based on Cl mask), from input now
 
@@ -998,18 +919,7 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForLabelMap(
   vtkNew<vtkHyperStreamlineDTMRI> streamer;
   seed->SetVtkHyperStreamlinePointsSettings(streamer.GetPointer());
 
-  if ( thresholdMode == 0 )
-    {
-     streamer->SetThresholdModeToLinearMeasure();
-    }
-  else if ( thresholdMode == 1 )
-    {
-    streamer->SetThresholdModeToFractionalAnisotropy();
-    }
-  else if ( thresholdMode == 2 )
-    {
-    streamer->SetThresholdModeToPlanarMeasure();
-    }
+  setStreamerThresholdMode(streamer.GetPointer(), thresholdMode);
 
   streamer->SetStoppingThreshold(stoppingValue);
   streamer->SetMaximumPropagationDistance(maxPathLength);

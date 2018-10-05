@@ -196,7 +196,8 @@ class FiberBundleToLabelMapLogic:
     for startCellId in xrange(0, cellCount, CELLS_TO_PROCESS):
       # generate list of cell Ids to sample
       cellIdsAr = numpy.arange(startCellId,
-                               min(cellCount, startCellId + CELLS_TO_PROCESS))
+                               min(cellCount, startCellId + CELLS_TO_PROCESS),
+                               dtype=vtk.util.numpy_support.ID_TYPE_CODE)
       cellIds.SetVoidArray(cellIdsAr, cellIdsAr.size, 1)
 
       # update the selection node to extract those cells

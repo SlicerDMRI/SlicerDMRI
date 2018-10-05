@@ -38,14 +38,20 @@ public:
   /// Get current DTI volume node
   vtkMRMLDiffusionTensorVolumeNode* diffusionTensorVolumeNode();
 
-  /// Get current fiber bundlde node
+  /// Get current fiber bundle node
   vtkMRMLFiberBundleNode* fiberBundleNode();
+
+  /// Support of node editing. Select node in GUI that the user wants to edit.
+  /// No need for roles, as node type unambiguously determines role in this module
+  virtual bool setEditedNode(
+    vtkMRMLNode* node, QString role=QString(), QString context=QString() );
+  /// Return confidence value for nodes based on how suitable they are to edit
+  virtual double nodeEditable(vtkMRMLNode* node);
 
   virtual void enter();
 
 public slots:
 
-  ///
   /// Set the current MRML scene to the widget
   virtual void setMRMLScene(vtkMRMLScene*);
 
@@ -56,8 +62,8 @@ public slots:
 
   /// Set parameter node to one of resets:
   /// 0 - Slicer4
-  /// 1- Slicer3 FiducialSeeding module
-  /// 2- Slicer3 Labe Map Seeding module
+  /// 1 - Slicer3 FiducialSeeding module
+  /// 2 - Slicer3 LabelMap Seeding module
   void setParametersPreset(int index);
 
   /// Set current parameter node
@@ -73,10 +79,10 @@ public slots:
   void setFiberBundleNode(vtkMRMLNode *node);
 
   /// Set stopping criteria 0-Linear Measure, 1 - FA
-  void setStoppingCriteria(int value);
+  void setStoppingCriteria(const QString&);
 
   /// Set display mode 0-line 1-tube
-  void setTrackDisplayMode(int value);
+  void setTrackDisplayMode(const QString&);
 
   /// Set stopping curvature
   void setStoppingCurvature(double value);
@@ -111,7 +117,7 @@ public slots:
   /// Set [ThresholdMode] start threshold
   void setStartThreshold(double value);
 
-  /// Set RPO label from Qt widgjet
+  /// Set RPO label from Qt widget
   void setROILabels();
 
   /// Set RPO label from string
