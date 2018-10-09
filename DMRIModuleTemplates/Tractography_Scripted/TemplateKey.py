@@ -161,8 +161,31 @@ class TemplateKeyLogic(ScriptedLoadableModuleLogic):
     pd = vtk.vtkPolyData()
     pd.DeepCopy(inputFB.GetPolyData())
 
+    # Get proxy object to access underlying array
+    fb_numpy = dsa.WrapDataObject(pd)
+
+    # Get first tensor key
+    ten_key = next(ifilter(lambda x: "Tensor_" in x, fb_numpy.PointData.keys()), None)
+    if not ten_key:
+      warnings.warn("No tensor data found")
+      return
+
+    # Get array of tensor data. Should be [total_points 3 3]
+    tensors = fb_numpy.PointData[ten_key]
+
+    # Calculate the mean diffusivity at each point
+    md = np.mean(np.linalg.eigvals(tensors),axis=1) / 3
+    fb_numpy.PointData.append(md, "CalculatedMD")
+    pd.Modified()
+
     # Set the output PolyData
     outputFB.SetAndObservePolyData(pd)
+
+    # Set active scalar
+    outputFB_dn = outputFB.GetDisplayNode()
+    if outputFB_dn:
+      outputFB_dn.SetColorModeToScalarData()
+      outputFB_dn.SetActiveScalarName("CalculatedMD")
 
     logging.info('Processing completed')
 
