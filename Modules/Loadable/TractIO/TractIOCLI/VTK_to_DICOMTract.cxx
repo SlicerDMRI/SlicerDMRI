@@ -329,12 +329,19 @@ int add_tracts(SP<TrcTractographyResults> dcmtract,
 
   CodeSequenceMacro diffusionModelCode("113231", "DCM", "Single Tensor");
 
-  ContentItemMacro* algorithmId = new ContentItemMacro;
-    CodeSequenceMacro* algorithmFamily = new CodeSequenceMacro(CODE_DCM_DeterministicTrackingAlgorithm.CodeValue,
-                        CODE_DCM_DeterministicTrackingAlgorithm.CodingSchemeDesignator,
-                        CODE_DCM_DeterministicTrackingAlgorithm.CodeMeaning);
+  AlgorithmIdentificationMacro algorithmId;
+  //ContentItemMacro* algorithmId = new ContentItemMacro;
+  //CodeSequenceMacro* algorithmFamily = new CodeSequenceMacro(CODE_DCM_DeterministicTrackingAlgorithm.CodeValue,
+  //                      CODE_DCM_DeterministicTrackingAlgorithm.CodingSchemeDesignator,
+  //                      CODE_DCM_DeterministicTrackingAlgorithm.CodeMeaning);
   
-  algorithmId->getEntireConceptCodeSequence().push_back(algorithmFamily);
+  algorithmId.getAlgorithmFamilyCode().set("113211", "DCM", "Deterministic");
+  algorithmId.setAlgorithmName("FOoo");
+  algorithmId.setAlgorithmVersion("0.0");
+  algorithmId.setAlgorithmParameters("na");
+  algorithmId.setAlgorithmSource("deity");
+
+  //algorithmId->getEntireConceptCodeSequence().push_back(algorithmFamily);
 
   char buf_label[100];
   sprintf(buf_label, "%s", info.label.c_str());

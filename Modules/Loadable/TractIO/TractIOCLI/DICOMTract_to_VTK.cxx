@@ -153,7 +153,7 @@ vtkSmartPointer<vtkPolyData> trackset_to_vtk(TrcTrackSet* trackset)
 
   OFVector<TrcTrack*> tracks = trackset->getTracks();
 
-  std::cout << trackset->getTrackingAlgorithmIdentification()[0]->toString() << std::endl;
+  //std::cout << trackset->getTrackingAlgorithmIdentification()[0]->toString() << std::endl;
 
   if (tracks.size() < 1) // TODO coverage
     return result_pd; // no tracks in trackset
