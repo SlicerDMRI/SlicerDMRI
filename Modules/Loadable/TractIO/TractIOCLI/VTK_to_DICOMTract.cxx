@@ -22,6 +22,7 @@ using std::string;
 #include "dcmtk/ofstd/ofstdinc.h"
 #include "dcmtk/ofstd/ofcond.h"
 #include "dcmtk/dcmiod/iodreferences.h"
+#include "dcmtk/dcmiod/iodcontentitemmacro.h"
 #include "dcmtk/dcmtract/trctractographyresults.h"
 #include "dcmtk/dcmtract/trctrackset.h"
 #include "dcmtk/dcmtract/trcmeasurement.h"
@@ -76,11 +77,18 @@ std::map<string, DSRBasicCodedEntry> diffusionValue_keys = {
   { "VolumetricDiffusionDzzComponent", CODE_DCM_VolumetricDiffusionDzzComponent }
 };
 
+typedef struct {
+  std::string label;
+  DSRBasicCodedEntry algorithmFamily;
+  std::string algorithmVersion;
+  std::string laterality;
+} TrackInfo;
+
 // Forward declaration
 SP<TrcTractographyResults> create_dicom(std::vector<std::string> files);
 int add_tracts(SP<TrcTractographyResults> dcmtract,
                vtkSP<vtkPolyData> polydata,
-               std::string label = "TRACKSET");
+               TrackInfo info);
 vtkSP<vtkPolyData> load_polydata(std::string polydata_file);
 
 int main(int argc, char *argv[])
@@ -98,6 +106,30 @@ int main(int argc, char *argv[])
   std::string output_file = output_tmp.str();
 
   std::vector<std::string> ref_files = reference_dicom;
+
+  // validate the algorithmFamily and set corresponding code
+  auto findAlgoFamily = algorithmFamily_keys.find(algorithmFamily);
+  if (findAlgoFamily == algorithmFamily_keys.end())
+    {
+    std::cerr << "Invalid or missing 'algorithmFamily', please see value enumeration in --help." << std::endl;
+    return EXIT_FAILURE;
+    }
+  DSRBasicCodedEntry algorithmFamilyCode = findAlgoFamily->second;
+
+  if (algorithmVersion.empty())
+    {
+    std::cerr << "Missing required 'algorithmVersion' argument";
+    return EXIT_FAILURE;
+    }
+
+//TrackInfo info(algorithmFamilyCode, algorithmVersion, "TRACKSET" /*TODO*/, "RightAndLeft");
+
+  TrackInfo info{
+    "TRACKSET" /*TODO*/,
+    algorithmFamilyCode,
+    algorithmVersion,
+    "RightAndLeft"
+  };
 
   // read polydata file
   vtkSP<vtkPolyData> polydata = load_polydata(polydata_file);
@@ -121,7 +153,7 @@ int main(int argc, char *argv[])
   pd_xfm->Update();
   polydata = pd_xfm->GetOutput();
 
-  // OFLog::configure(OFLogger::TRACE_LOG_LEVEL);
+  OFLog::configure(OFLogger::TRACE_LOG_LEVEL);
 
   // create DICOM object associated to reference files
   SP<TrcTractographyResults> dicom = create_dicom(ref_files);
@@ -137,7 +169,7 @@ int main(int argc, char *argv[])
   series_mod.setSeriesInstanceUID(dcmGenerateUniqueIdentifier(uid, SLICERDMRI_UID_SERIES_ROOT));
 
   // add tracks from polydata
-  if ( add_tracts(dicom, polydata) != 0)
+  if ( add_tracts(dicom, polydata, info) != 0)
     {
     std::cerr << "Error: Failed to add tracks from polydata." << std::endl;
     return EXIT_FAILURE;
@@ -167,7 +199,7 @@ SP<TrcTractographyResults> create_dicom(std::vector<std::string> files)
   ContentIdentificationMacro* contentID = NULL;
   result = ContentIdentificationMacro::create("1", "TRACT_TEST_LABEL",
                                               "Tractography from VTK file",
-                                              "TractIO",
+                                              "TractIO^Library",
                                               contentID);
 
   if (result.bad())
@@ -286,19 +318,26 @@ int insert_polydata_tracts(TrcTrackSet *trackset,
 
 int add_tracts(SP<TrcTractographyResults> dcmtract,
                vtkSP<vtkPolyData> polydata,
-               std::string label)
+               TrackInfo info)
 {
   assert(polydata);
 
   OFCondition result;
-
+ 
   CodeWithModifiers anatomyCode("3");
-  anatomyCode.set("T-A0095", "SRT", "White matter of brain and spinal cord");
+    anatomyCode.set("T-A0095", "SRT", "White matter of brain and spinal cord");
+
   CodeSequenceMacro diffusionModelCode("113231", "DCM", "Single Tensor");
-  CodeSequenceMacro algorithmCode("113211", "DCM", "Deterministic");
+
+  ContentItemMacro* algorithmId = new ContentItemMacro;
+    CodeSequenceMacro* algorithmFamily = new CodeSequenceMacro(CODE_DCM_DeterministicTrackingAlgorithm.CodeValue,
+                        CODE_DCM_DeterministicTrackingAlgorithm.CodingSchemeDesignator,
+                        CODE_DCM_DeterministicTrackingAlgorithm.CodeMeaning);
+  
+  algorithmId->getEntireConceptCodeSequence().push_back(algorithmFamily);
 
   char buf_label[100];
-  sprintf(buf_label, "%s", label.c_str());
+  sprintf(buf_label, "%s", info.label.c_str());
 
   TrcTrackSet *trackset = NULL;
   result = dcmtract->addTrackSet(
@@ -306,7 +345,7 @@ int add_tracts(SP<TrcTractographyResults> dcmtract,
     buf_label,
     anatomyCode,
     diffusionModelCode,
-    algorithmCode,
+    algorithmId,
     trackset);
 
   if (result.bad())

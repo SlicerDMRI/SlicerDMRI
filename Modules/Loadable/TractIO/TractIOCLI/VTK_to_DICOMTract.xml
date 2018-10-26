@@ -58,6 +58,50 @@
       <longflag>ras_to_lps</longflag>
       <description><![CDATA[Change coordinate system from RAS (Slicer) to LPS (DICOM) ]]></description>
     </boolean>
+
+    <string-enumeration>
+      <name>algorithmFamily</name>
+      <longflag>algorithmFamily</longflag>
+      <description>Supplement 181: MR Diffusion Tractography Algorithm Family</description>
+      <label>Algorithm Family</label>
+      <default>Deterministic</default>
+      <element>Probabilistic</element>
+      <element>Global</element>
+      <element>FACT</element>
+      <element>Streamline</element>
+      <element>TEND</element>
+      <element>Bootstrap</element>
+      <element>Euler</element>
+      <element>RungeKutta</element>
+    </string-enumeration>
+
+    <string-enumeration>
+      <name>Laterality</name>
+      <longflag>laterality</longflag>
+      <description>Track set laterality</description>
+      <label>Laterality</label>
+      <element>Right</element>
+      <element>Left</element>
+      <default>RightAndLeft</default>
+      <element>Unilateral</element>
+    </string-enumeration>
+
+    <string>
+      <name>algorithmName</name>
+      <label>Algorithm Name</label>
+      <longflag>--algorithmName</longflag>
+      <description><![CDATA[Algorithm name]]></description>
+      <default>Unspecified</default>
+    </string>
+
+    <string>
+      <name>algorithmVersion</name>
+      <label>Algorithm Version</label>
+      <longflag>--algorithmVersion</longflag>
+      <description><![CDATA[Algorithm version]]></description>
+      <default>0.0</default>
+    </string>
+
   </parameters>
 
 </executable>
