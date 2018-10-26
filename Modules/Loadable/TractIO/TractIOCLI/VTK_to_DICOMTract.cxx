@@ -1,6 +1,7 @@
 // std includes
 #include <memory>
 #include <sstream>
+using std::string;
 
 // VTK includes
 #include "vtkSmartPointer.h"
@@ -17,6 +18,7 @@
 #include "dcmtk/config/osconfig.h"    /* make sure OS specific configuration is included first */
 
 #define INCLUDE_CMATH
+#include "dcmtk/dcmsr/codes/dcm.h"
 #include "dcmtk/ofstd/ofstdinc.h"
 #include "dcmtk/ofstd/ofcond.h"
 #include "dcmtk/dcmiod/iodreferences.h"
@@ -42,6 +44,37 @@
 
 // Derived from Isaiah's Medical Connections UID root
 #define SLICERDMRI_UID_SERIES_ROOT "1.2.826.0.1.3680043.9.7239.2.1"
+
+// Mapping from text keys to Supplement 181 family codes in DCMTK dictionary
+std::map<string, DSRBasicCodedEntry> algorithmFamily_keys = {
+  { "Deterministic", CODE_DCM_DeterministicTrackingAlgorithm },
+  { "Probabilistic", CODE_DCM_ProbabilisticTrackingAlgorithm },
+  { "Global", CODE_DCM_GlobalTrackingAlgorithm },
+  { "FACT", CODE_DCM_FACT },
+  { "Streamline", CODE_DCM_Streamline },
+  { "TEND", CODE_DCM_TEND },
+  { "Bootstrap", CODE_DCM_BootstrapTrackingAlgorithm },
+  { "Euler", CODE_DCM_Euler },
+  { "RungeKutta", CODE_DCM_RungeKutta }
+};
+
+std::map<string, DSRBasicCodedEntry> diffusionValue_keys = {
+  { "Trace", CODE_DCM_Trace },
+  { "MeanDiffusivity", CODE_DCM_MeanDiffusivity },
+  { "RadialDiffusivity", CODE_DCM_RadialDiffusivity },
+  { "AxialDiffusivity", CODE_DCM_AxialDiffusivity },
+  { "MeanKurtosis", CODE_DCM_MeanKurtosis },
+  { "ApparentKurtosisCoefficient", CODE_DCM_ApparentKurtosisCoefficient },
+  { "RadialKurtosis", CODE_DCM_RadialKurtosis },
+  { "AxialKurtosis", CODE_DCM_AxialKurtosis },
+  { "FractionalKurtosisAnisotropy", CODE_DCM_FractionalKurtosisAnisotropy },
+  { "VolumetricDiffusionDxxComponent", CODE_DCM_VolumetricDiffusionDxxComponent },
+  { "VolumetricDiffusionDxyComponent", CODE_DCM_VolumetricDiffusionDxyComponent },
+  { "VolumetricDiffusionDxzComponent", CODE_DCM_VolumetricDiffusionDxzComponent },
+  { "VolumetricDiffusionDyyComponent", CODE_DCM_VolumetricDiffusionDyyComponent },
+  { "VolumetricDiffusionDyzComponent", CODE_DCM_VolumetricDiffusionDyzComponent },
+  { "VolumetricDiffusionDzzComponent", CODE_DCM_VolumetricDiffusionDzzComponent }
+};
 
 // Forward declaration
 SP<TrcTractographyResults> create_dicom(std::vector<std::string> files);
