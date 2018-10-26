@@ -18,8 +18,10 @@
 #include <vtkMRMLScene.h>
 
 // VTK includes
+#include <vtkFloatArray.h>
 #include <vtkMath.h>
 #include <vtkNew.h>
+#include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkXMLPolyDataWriter.h>
 #include <vtkTransform.h>
@@ -28,6 +30,7 @@
 // DCMTK includes
 #include "dcmtk/dcmtract/trctrack.h"
 #include "dcmtk/dcmtract/trctrackset.h"
+#include "dcmtk/dcmtract/trcmeasurement.h"
 #include "dcmtk/dcmtract/trctractographyresults.h"
 
 #ifndef NDEBUG
@@ -42,18 +45,9 @@
 #endif
 #include "DICOMTract_to_VTKCLP.h"
 
-
+// Shared ptr aliases
+#define SP OFshared_ptr
 #define vtkSP vtkSmartPointer
-
-// Use an anonymous namespace to keep class types and function names
-// from colliding when module is used as shared object module.  Every
-// thing should be in an anonymous namespace except for the module
-// entry point, e.g. main()
-//
-namespace
-{
-
-} // end of anonymous namespace
 
 std::vector<vtkSmartPointer< vtkPolyData> > extract_tracks(TrcTractographyResults*);
 vtkSmartPointer<vtkPolyData> trackset_to_vtk(TrcTrackSet*);
@@ -80,10 +74,10 @@ int main(int argc, char * argv[])
     pdtracks = extract_tracks(track_dataset);
     }
 
-  static double lps_to_ras[16] = { -1, 0, 0, 0,
-                                  0,-1, 0, 0,
-                                  0, 0, 1, 0,
-                                  0, 0, 0, 1 };
+  static double lps_to_ras[16] = { -1,  0, 0, 0,
+                                    0, -1, 0, 0,
+                                    0,  0, 1, 0,
+                                    0,  0, 0, 1 };
   vtkSP<vtkTransform> lps_to_ras_xfm = vtkSP<vtkTransform>::New();
   lps_to_ras_xfm->SetMatrix(lps_to_ras);
   vtkSP<vtkTransformPolyDataFilter> pd_xfm = vtkSP<vtkTransformPolyDataFilter>::New();
@@ -110,10 +104,7 @@ size_t count_points(OFVector<TrcTrack*> tracks)
        iter != tracks.end(); iter++)
     {
     points += (*iter)->getNumDataPoints();
-    if (count > 10)
-      exit(1);
     }
-
   return points;
   }
 
@@ -122,6 +113,7 @@ extract_tracks(TrcTractographyResults *trackdataset)
   {
   std::vector< vtkSmartPointer<vtkPolyData> > results;
 
+  // roughly equivalent to vtkPolyData - can have multiple per DICOM file
   OFVector<TrcTrackSet*> tracksets = trackdataset->getTrackSets();
   if (tracksets.size() < 1)
     {
@@ -152,16 +144,17 @@ vtkSmartPointer<vtkPolyData> trackset_to_vtk(TrcTrackSet* trackset)
   vtkSmartPointer<vtkPolyData> result_pd = vtkSmartPointer<vtkPolyData>::New();
 
   OFVector<TrcTrack*> tracks = trackset->getTracks();
-
+  //std::cout << "number of tracks: " << trackset->getNumberOfTracks() << std::endl;
   //std::cout << trackset->getTrackingAlgorithmIdentification()[0]->toString() << std::endl;
 
   if (tracks.size() < 1) // TODO coverage
     return result_pd; // no tracks in trackset
 
   // pre-allocate output
+  size_t total_pts = count_points(tracks);
   vtkSmartPointer<vtkPoints> result_pts = vtkSmartPointer<vtkPoints>::New();
   result_pd->SetPoints(result_pts);
-  result_pts->SetNumberOfPoints(count_points(tracks));
+  result_pts->SetNumberOfPoints(total_pts);
 
   vtkSmartPointer<vtkCellArray> result_lines = vtkSmartPointer<vtkCellArray>::New();
   result_pd->SetLines(result_lines);
@@ -181,6 +174,89 @@ vtkSmartPointer<vtkPolyData> trackset_to_vtk(TrcTrackSet* trackset)
       result_lines->InsertCellPoint(cur_cell_id);
       cur_cell_id++;
       }
+    }
+
+  /****
+   * get along-track Measurements (pointwise scalars)
+   *
+   * each measurement is stored in a TrcMeasurement object in the trackset
+   *   - measurement id is stored as CodeSequenceMacro
+   *   - values can be queried directly with TrcMeasurement::get
+   *     or by taking the vector of TrcMeasurement::Values (method used below)
+   *
+   * one quirk to be aware of: faulty writers *could* write measurement without
+   * specifying the value for each point. DCMTK debug mode will only *warn* about
+   * this, and will return the smaller number in case of a mismatch
+   *
+   *   see "trcmeasurement.cc/TrcMeasurement::Values::get" in DCMTK
+   *
+   * to avoid problems, we use TrcMeasurement::checkValuesComplete and ignore any
+   * incomplete measurement.
+   ****/
+
+  for (size_t i = 0; i < trackset->getNumberOfMeasurements(); i++)
+    {
+    TrcMeasurement* measurement;
+    OFCondition res = trackset->getMeasurement(i, measurement);
+
+    if (!measurement->checkValuesComplete())
+      {
+      // NOTE: THIS INVARIANT IS IMPORTANT! Many assumptions below
+      //       based on the fact that the measurement data is complete.
+      continue;
+      }
+
+    CodeSequenceMacro type = measurement->getType();
+
+    // this is the name of the measurement, e.g. "Fractional Anisotropy"
+    OFString meaning;
+    if (type.getCodeMeaning(meaning).bad())
+      {
+      // skip this measurement if unnamed or incomplete
+      // TODO debug output
+      continue;
+      }
+
+    // create and pre-allocate VTK array to hold output point scalars
+    vtkSP<vtkFloatArray> data = vtkSP<vtkFloatArray>::New();
+    data->SetNumberOfComponents(1);
+
+    // because checkValuesComplete passed above, we know total number is
+    // equal to number of points in the TrcTrack count from above.
+    data->SetNumberOfValues(total_pts);
+    data->SetName(meaning.c_str());
+
+    size_t insert_idx = 0;
+
+    OFVector<TrcMeasurement::Values*> values = measurement->getValues();
+    OFVector<TrcMeasurement::Values*>::iterator values_iter = values.begin();
+    for (; values_iter != values.end(); values_iter++)
+      {
+      const float* dataValues = OFnullptr;
+      unsigned long numValues = 0;
+      const Uint32* trackPointIndices = OFnullptr;
+
+      res = (*values_iter)->get(dataValues, numValues, trackPointIndices);
+
+      if (res.bad())
+        {
+        // panic TODO refactor
+        std::cerr << "failed reading measurement from track" << std::endl;
+        exit(1);
+        }
+
+      for (size_t i = 0; i < numValues; i++)
+        {
+        // note: we are again using the invariant that checkValuesComplete
+        //       passed above, because that means the indices are linear
+        data->SetValue(insert_idx + i, dataValues[i]);
+        }
+      insert_idx += numValues;
+
+      }
+
+    // add point scalars to polydata
+    result_pd->GetPointData()->AddArray(data);
     }
 
   return result_pd;
