@@ -27,6 +27,7 @@ using std::string;
 #include "dcmtk/dcmtract/trctrackset.h"
 #include "dcmtk/dcmtract/trcmeasurement.h"
 #include "dcmtk/dcmtract/trctrack.h"
+#include "dcmtk/dcmtract/trctypes.h"
 
 // Slicer includes
 #ifdef HAVE_SSTREAM
@@ -77,11 +78,20 @@ std::map<string, DSRBasicCodedEntry> diffusionValue_keys = {
   { "VolumetricDiffusionDzzComponent", CODE_DCM_VolumetricDiffusionDzzComponent }
 };
 
+std::map<string, TrcTypes::E_TrackSetLaterality> laterality_keys = {
+  {"Unknown", TrcTypes::LAT_UNKNOWN },
+  {"Left", TrcTypes::LAT_LEFT },
+  {"Right", TrcTypes::LAT_RIGHT },
+  {"RightAndLeft", TrcTypes::LAT_RIGHT_AND_LEFT },
+  {"Unilateral", TrcTypes::LAT_UNILATERAL }
+};
+
 typedef struct {
   std::string label;
-  DSRBasicCodedEntry algorithmFamily;
-  std::string algorithmVersion;
-  std::string laterality;
+  DSRBasicCodedEntry AlgorithmFamily;
+  std::string AlgorithmVersion;
+  std::string AlgorithmName;
+  std::string Laterality;
 } TrackInfo;
 
 // Forward declaration
@@ -108,27 +118,26 @@ int main(int argc, char *argv[])
   std::vector<std::string> ref_files = reference_dicom;
 
   // validate the algorithmFamily and set corresponding code
-  auto findAlgoFamily = algorithmFamily_keys.find(algorithmFamily);
+  auto findAlgoFamily = algorithmFamily_keys.find(AlgorithmFamily);
   if (findAlgoFamily == algorithmFamily_keys.end())
     {
     std::cerr << "Invalid or missing 'algorithmFamily', please see value enumeration in --help." << std::endl;
     return EXIT_FAILURE;
     }
-  DSRBasicCodedEntry algorithmFamilyCode = findAlgoFamily->second;
+  DSRBasicCodedEntry AlgorithmFamilyCode = findAlgoFamily->second;
 
-  if (algorithmVersion.empty())
+  if (AlgorithmVersion.empty())
     {
-    std::cerr << "Missing required 'algorithmVersion' argument";
+    std::cerr << "Missing required 'AlgorithmVersion' argument";
     return EXIT_FAILURE;
     }
 
-//TrackInfo info(algorithmFamilyCode, algorithmVersion, "TRACKSET" /*TODO*/, "RightAndLeft");
-
   TrackInfo info{
     "TRACKSET" /*TODO*/,
-    algorithmFamilyCode,
-    algorithmVersion,
-    "RightAndLeft"
+    AlgorithmFamilyCode,
+    AlgorithmVersion,
+    AlgorithmName,
+    Laterality
   };
 
   // read polydata file
@@ -330,18 +339,11 @@ int add_tracts(SP<TrcTractographyResults> dcmtract,
   CodeSequenceMacro diffusionModelCode("113231", "DCM", "Single Tensor");
 
   AlgorithmIdentificationMacro algorithmId;
-  //ContentItemMacro* algorithmId = new ContentItemMacro;
-  //CodeSequenceMacro* algorithmFamily = new CodeSequenceMacro(CODE_DCM_DeterministicTrackingAlgorithm.CodeValue,
-  //                      CODE_DCM_DeterministicTrackingAlgorithm.CodingSchemeDesignator,
-  //                      CODE_DCM_DeterministicTrackingAlgorithm.CodeMeaning);
-  
   algorithmId.getAlgorithmFamilyCode().set("113211", "DCM", "Deterministic");
-  algorithmId.setAlgorithmName("FOoo");
-  algorithmId.setAlgorithmVersion("0.0");
-  algorithmId.setAlgorithmParameters("na");
-  algorithmId.setAlgorithmSource("deity");
-
-  //algorithmId->getEntireConceptCodeSequence().push_back(algorithmFamily);
+  algorithmId.setAlgorithmName(info.AlgorithmName.c_str());
+  algorithmId.setAlgorithmVersion(info.AlgorithmVersion.c_str());
+  algorithmId.setAlgorithmParameters("");
+  algorithmId.setAlgorithmSource("");
 
   char buf_label[100];
   sprintf(buf_label, "%s", info.label.c_str());
@@ -354,6 +356,8 @@ int add_tracts(SP<TrcTractographyResults> dcmtract,
     diffusionModelCode,
     algorithmId,
     trackset);
+
+  trackset->setLaterality(laterality_keys[info.Laterality], false);
 
   if (result.bad())
     return 1;
