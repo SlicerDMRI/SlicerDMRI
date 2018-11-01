@@ -4,15 +4,16 @@
 using std::string;
 
 // VTK includes
-#include "vtkSmartPointer.h"
-#include "vtkPolyData.h"
-#include "vtkCell.h"
-#include "vtkPoints.h"
-#include "vtkFloatArray.h"
-#include "vtkDataArray.h"
-#include "vtkTransform.h"
-#include "vtkTransformPolyDataFilter.h"
-#include "vtkXMLPolyDataReader.h"
+#include <vtkPolyData.h>
+#include <vtkCell.h>
+#include <vtkCellData.h>
+#include <vtkPoints.h>
+#include <vtkPointData.h>
+#include <vtkFloatArray.h>
+#include <vtkDataArray.h>
+#include <vtkTransform.h>
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkXMLPolyDataReader.h>
 
 // DCMTK includes
 #include "dcmtk/config/osconfig.h"    /* make sure OS specific configuration is included first */
@@ -289,6 +290,13 @@ int insert_polydata_tracts(TrcTrackSet *trackset,
 {
   OFCondition result;
   vtkPoints *points = polydata->GetPoints();
+
+  if (!points)
+    {
+    std::cerr << "PolyData fibertrack missing points!" << std::endl;
+    return 1;
+    }
+
   vtkSP<vtkFloatArray> pointdata = vtkSP<vtkFloatArray>::New();
 
   // ShallowCopy will do a type-correct conversion if types do match.
@@ -302,7 +310,7 @@ int insert_polydata_tracts(TrcTrackSet *trackset,
 
 
   /* add points for each track */
-  for (int i = 0; i < polydata->GetNumberOfCells(); i++)
+  for (size_t i = 0; i < polydata->GetNumberOfCells(); i++)
     {
     vtkCell *cell = polydata->GetCell(i);
     vtkIdType numPoints   = cell->GetNumberOfPoints();
@@ -322,8 +330,67 @@ int insert_polydata_tracts(TrcTrackSet *trackset,
       return 1;
       }
     }
+
   return 0;
 }
+
+
+int insert_polydata_scalars(TrcTrackSet* trackset,
+                            vtkSP<vtkPolyData> polydata)
+  {
+  /* add measurements (scalars) for each track, if any */
+  vtkSP<vtkCellData> cells(polydata->GetCellData());
+  vtkSP<vtkPointData> pointdata = vtkSP<vtkPointData>(polydata->GetPointData());
+  std::vector<float> tmp_float;
+
+  size_t numarrays = pointdata->GetNumberOfArrays();
+  if (numarrays < 1)
+    return -1;
+
+  for (size_t scalar_idx = 0;
+       scalar_idx < numarrays;
+       scalar_idx++)
+    {
+    vtkCellArray* lines = polydata->GetLines();
+    vtkDataArray* array = pointdata->GetArray(scalar_idx);
+    size_t numtracks = polydata->GetNumberOfLines();
+
+    if ((lines == nullptr) || (numtracks < 1))
+      continue;
+
+    // TODO make this generic (at least up to standard measures + "custom")
+    CodeSequenceMacro typeCode("110808", "DCM", "Fractional Anisotropy");
+    CodeSequenceMacro unitCode("1", "UCUM", "no units");
+
+    TrcMeasurement* measurement;
+    //OFCondition res = TrcMeasurement::create(typeCode, unitCode, measurement);
+    OFCondition res = trackset->addMeasurement(typeCode, unitCode, measurement);
+
+    vtkIdType* ptids;
+    vtkIdType numpts;
+    lines->InitTraversal();
+    size_t track_idx = 0;
+
+    while (lines->GetNextCell(numpts, ptids))
+      {
+      //= ptids->GetNumberOfIds();
+      tmp_float.reserve(numpts);
+
+      // copy the measures to tmp array. (no contiguity assumption for cells)
+      for (size_t pt_idx = 0; pt_idx < numpts; pt_idx++)
+        tmp_float.push_back(*array->GetTuple(pt_idx));
+
+      // copy the data into the TrcMeasurement
+      measurement->setTrackValues(track_idx, tmp_float.data(), numpts);
+
+      track_idx++;
+      }
+
+    }
+
+  return 0;
+  }
+
 
 int add_tracts(SP<TrcTractographyResults> dcmtract,
                vtkSP<vtkPolyData> polydata,
@@ -332,7 +399,7 @@ int add_tracts(SP<TrcTractographyResults> dcmtract,
   assert(polydata);
 
   OFCondition result;
- 
+
   CodeWithModifiers anatomyCode("3");
     anatomyCode.set("T-A0095", "SRT", "White matter of brain and spinal cord");
 
@@ -365,6 +432,9 @@ int add_tracts(SP<TrcTractographyResults> dcmtract,
   /* required by standard */
   trackset->setRecommendedDisplayCIELabValue(1,1,1);
 
-  return insert_polydata_tracts(trackset, polydata);
+  // TODO check error
+  insert_polydata_tracts(trackset, polydata);
+
+  return insert_polydata_scalars(trackset, polydata);
 }
 
