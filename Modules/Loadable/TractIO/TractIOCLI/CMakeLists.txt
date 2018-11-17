@@ -38,5 +38,5 @@ SEMMacroBuildCLI(
 
 #-----------------------------------------------------------------------------
 if(BUILD_TESTING)
-    # TODO  add_subdirectory(Testing)
+  add_subdirectory(Testing)
 endif()

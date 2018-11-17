@@ -52,12 +52,58 @@
     <label>Advanced</label>
 
     <boolean>
-      <name>ras_to_lps</name>
+      <name>RAS_to_LPS</name>
+      <longflag>RAS_to_LPS</longflag>
       <label>RAS to LPS</label>
       <default>true</default>
-      <longflag>ras_to_lps</longflag>
       <description><![CDATA[Change coordinate system from RAS (Slicer) to LPS (DICOM) ]]></description>
     </boolean>
+
+    <string-enumeration>
+      <name>AlgorithmFamily</name>
+      <longflag>AlgorithmFamily</longflag>
+      <description>Supplement 181: MR Diffusion Tractography Algorithm Family</description>
+      <label>Algorithm Family</label>
+      <default>Deterministic</default>
+      <element>Deterministic</element>
+      <element>Probabilistic</element>
+      <element>Global</element>
+      <element>FACT</element>
+      <element>Streamline</element>
+      <element>TEND</element>
+      <element>Bootstrap</element>
+      <element>Euler</element>
+      <element>RungeKutta</element>
+    </string-enumeration>
+
+    <string-enumeration>
+      <name>Laterality</name>
+      <longflag>Laterality</longflag>
+      <description>Track set laterality</description>
+      <label>Laterality</label>
+      <default>RightAndLeft</default>
+      <element>Right</element>
+      <element>Left</element>
+      <element>Unilateral</element>
+      <element>RightAndLeft</element>
+    </string-enumeration>
+
+    <string>
+      <name>AlgorithmName</name>
+      <longflag>AlgorithmName</longflag>
+      <label>Algorithm Name</label>
+      <description><![CDATA[Algorithm name]]></description>
+      <default>Unspecified</default>
+    </string>
+
+    <string>
+      <name>AlgorithmVersion</name>
+      <longflag>AlgorithmVersion</longflag>
+      <label>Algorithm Version</label>
+      <description><![CDATA[Algorithm version]]></description>
+      <default>0.0</default>
+    </string>
+
   </parameters>
 
 </executable>
