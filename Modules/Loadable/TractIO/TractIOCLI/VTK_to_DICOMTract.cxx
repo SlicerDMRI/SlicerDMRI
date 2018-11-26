@@ -389,10 +389,20 @@ int insert_polydata_scalars(TrcTrackSet* trackset,
 
     // convert the DSRBasicCodedEntry to a CodeSequenceMacro
     //   see https://github.com/QIICR/dcmqi/issues/343#issuecomment-381430240
-    DSRBasicCodedEntry bce(msrmap_iter->second);
-    CodeSequenceMacro typeCode(bce.CodeValue, bce.CodingSchemeDesignator, bce.CodeMeaning);
+    DSRBasicCodedEntry codedEntry(msrmap_iter->second);
+    CodeSequenceMacro typeCode(codedEntry.CodeValue, codedEntry.CodingSchemeDesignator, codedEntry.CodeMeaning);
     // TODO some of these do have units
-    CodeSequenceMacro unitCode("1", "UCUM", "no units");
+    CodeSequenceMacro unitCode;
+
+    if ((arrayName == "Trace") ||
+        (arrayName.find("Diffusivity") != std::string::npos))
+      {
+      unitCode = CodeSequenceMacro("mm2/s", "UCUM", "mm2/s");
+      }
+    else
+      {
+      unitCode = CodeSequenceMacro("1", "UCUM", "no units");
+      }
 
     TrcMeasurement* measurement;
     //OFCondition res = TrcMeasurement::create(typeCode, unitCode, measurement);
