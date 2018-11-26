@@ -64,6 +64,9 @@ std::map<string, DSRBasicCodedEntry> algorithmFamily_keys = {
 std::map<string, DSRBasicCodedEntry> diffusionValue_keys = {
   { "Trace", CODE_DCM_Trace },
   { "MeanDiffusivity", CODE_DCM_MeanDiffusivity },
+  { "ApparentDiffusionCoefficient", CODE_DCM_ApparentDiffusionCoefficient },
+  { "FractionalAnisotropy", CODE_DCM_FractionalAnisotropy },
+  { "RelativeAnisotropy", CODE_DCM_RelativeAnisotropy },
   { "RadialDiffusivity", CODE_DCM_RadialDiffusivity },
   { "AxialDiffusivity", CODE_DCM_AxialDiffusivity },
   { "MeanKurtosis", CODE_DCM_MeanKurtosis },
@@ -353,13 +356,42 @@ int insert_polydata_scalars(TrcTrackSet* trackset,
     {
     vtkCellArray* lines = polydata->GetLines();
     vtkDataArray* array = pointdata->GetArray(scalar_idx);
+    std::string arrayName(pointdata->GetArrayName(scalar_idx));
     size_t numtracks = polydata->GetNumberOfLines();
 
     if ((lines == nullptr) || (numtracks < 1))
       continue;
 
-    // TODO make this generic (at least up to standard measures + "custom")
-    CodeSequenceMacro typeCode("110808", "DCM", "Fractional Anisotropy");
+    std::map<string, DSRBasicCodedEntry>::iterator msrmap_iter =
+      diffusionValue_keys.find(arrayName);
+
+    if (msrmap_iter == diffusionValue_keys.end())
+      {
+      // HACK/TODO: also check without whitespace until we regularize VTK output names
+      std::string arrayName_no_ws;
+      arrayName_no_ws.reserve(arrayName.size());
+      std::remove_copy_if(
+        begin(arrayName), end(arrayName),
+        std::back_inserter(arrayName_no_ws),
+        [](char ch) { return ch == ' '; }
+      );
+
+      std::cout << "Trying array name without whitespace: " << arrayName_no_ws << std::endl;
+
+      msrmap_iter = diffusionValue_keys.find(arrayName_no_ws);
+
+      if (msrmap_iter == diffusionValue_keys.end())
+        {
+        std::cerr << "Skipping array due to no measurement code mapping available for array name: " << arrayName << std::endl;
+        continue;
+        }
+      }
+
+    // convert the DSRBasicCodedEntry to a CodeSequenceMacro
+    //   see https://github.com/QIICR/dcmqi/issues/343#issuecomment-381430240
+    DSRBasicCodedEntry bce(msrmap_iter->second);
+    CodeSequenceMacro typeCode(bce.CodeValue, bce.CodingSchemeDesignator, bce.CodeMeaning);
+    // TODO some of these do have units
     CodeSequenceMacro unitCode("1", "UCUM", "no units");
 
     TrcMeasurement* measurement;
