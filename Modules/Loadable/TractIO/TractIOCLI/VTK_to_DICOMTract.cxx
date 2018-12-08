@@ -1,4 +1,6 @@
 // std includes
+#include <algorithm>
+#include <iterator>
 #include <memory>
 #include <sstream>
 using std::string;
