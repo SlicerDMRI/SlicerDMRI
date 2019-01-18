@@ -13,9 +13,6 @@
 // MRML includes
 #include <vtkMRMLNRRDStorageNode.h>
 
-// vtkITK includes
-#include <vtkITKNewOtsuThresholdImageFilter.h>
-
 // vtkDMRI includes
 #include <vtkTeemEstimateDiffusionTensor.h>
 #include <vtkTensorMask.h>
