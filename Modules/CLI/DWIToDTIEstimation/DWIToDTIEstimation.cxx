@@ -2,6 +2,8 @@
 #include <vtkMath.h>
 #include <vtkNew.h>
 #include <vtkVersion.h>
+#include <vtkImageCast.h>
+#include <vtkImageData.h>
 
 // vtkTeem includes
 #include <Libs/vtkTeem/vtkTeemNRRDReader.h>
