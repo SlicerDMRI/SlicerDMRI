@@ -157,8 +157,8 @@ void vtkSlicerTractographyInteractiveSeedingLogic::AddMRMLNodesObservers()
       vtkNew<vtkIntArray> markupEvents;
       markupEvents->InsertNextValue ( vtkMRMLTransformableNode::TransformModifiedEvent );
       markupEvents->InsertNextValue ( vtkMRMLMarkupsNode::PointModifiedEvent );
-      markupEvents->InsertNextValue ( vtkMRMLMarkupsNode::MarkupAddedEvent );
-      markupEvents->InsertNextValue ( vtkMRMLMarkupsNode::MarkupRemovedEvent );
+      markupEvents->InsertNextValue ( vtkMRMLMarkupsNode::PointAddedEvent );
+      markupEvents->InsertNextValue ( vtkMRMLMarkupsNode::PointRemovedEvent );
       vtkSetAndObserveMRMLNodeEventsMacro(this->ObservedNodes[this->ObservedNodes.size()-1],
                                           markupsFiducialNode, markupEvents.GetPointer());
       }
@@ -348,7 +348,7 @@ void vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForOneSeed(vtkSee
     for (int i = 0; i < numberOfFiducials; ++i)
       {
       if (!seedSelectedFiducials ||
-          (seedSelectedFiducials && markupsFiducialNode->GetNthMarkupSelected(i)))
+          (seedSelectedFiducials && markupsFiducialNode->GetNthControlPointSelected(i)))
         {
         double xyzf[3];
         markupsFiducialNode->GetNthFiducialPosition(i, xyzf);
@@ -557,8 +557,8 @@ void vtkSlicerTractographyInteractiveSeedingLogic::ProcessMRMLNodesEvents(vtkObj
       event == vtkMRMLHierarchyNode::ChildNodeRemovedEvent ||
       event == vtkMRMLNode::HierarchyModifiedEvent ||
       event == vtkMRMLTransformableNode::TransformModifiedEvent ||
-      event == vtkMRMLMarkupsNode::MarkupAddedEvent ||
-      event == vtkMRMLMarkupsNode::MarkupRemovedEvent)
+      event == vtkMRMLMarkupsNode::PointAddedEvent ||
+      event == vtkMRMLMarkupsNode::PointRemovedEvent)
     {
     this->OnMRMLNodeModified(NULL);
     }
