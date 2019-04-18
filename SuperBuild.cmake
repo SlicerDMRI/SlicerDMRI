@@ -57,9 +57,7 @@ ExternalProject_Add(${proj}
     -DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT}
     -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
     -DSubversion_SVN_EXECUTABLE:PATH=${Subversion_SVN_EXECUTABLE}
-    -DSlicer_DIR:PATH=${Slicer_DIR}
     -DSlicer_USE_vtkTeem:BOOL=${MRML_USE_vtkTeem} # Note: keep in sync
-    -DSlicerDMRI_ENABLE_TRACTIO:BOOL=${SlicerDMRI_ENABLE_TRACTIO}
   DEPENDS
     ${${proj}_DEPENDS}
   )
