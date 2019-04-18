@@ -1,9 +1,13 @@
 import os
+import sys
 import unittest
 import vtk, qt, ctk, slicer
 from slicer.ScriptedLoadableModule import *
 import logging
 import numpy as np
+
+if sys.version_info[0] == 2:
+  range = xrange
 
 #
 # TractographyDownsample
@@ -345,7 +349,7 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
 
     # keep a random sample of outpercent of fibers
     # all possible fiber indices
-    findices = range(0, inpd.GetNumberOfLines())
+    findices = list(range(0, inpd.GetNumberOfLines()))
     # now find the size of the desired subset of these indices
     outpercent = np.divide(outpercent,100.0)
     nkeep = int(np.multiply(inpd.GetNumberOfLines(), outpercent))
@@ -462,7 +466,7 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
     """
 
     nodeCollection = slicer.mrmlScene.GetNodesByClass("vtkMRMLFiberBundleNode")
-    nodes = [nodeCollection.GetItemAsObject(i) for i in xrange(0, nodeCollection.GetNumberOfItems())]
+    nodes = [nodeCollection.GetItemAsObject(i) for i in range(0, nodeCollection.GetNumberOfItems())]
 
     if not nodes:
       slicer.util.errorDisplay('No input fiberBundles in scene. Please load fiber bundles first.')

@@ -9,6 +9,9 @@ import numpy as np
 import vtk
 from vtk.util import numpy_support
 
+if sys.version_info[0] == 2:
+  range = xrange
+
 def runtests(testdata_path):
   # - runs this script again with test arguments and data
   # - validates the results
@@ -186,7 +189,7 @@ def main():
   # reset the attribute dictionary, otherwise it will be transferred over
   attrs = vtk.vtkStringArray()
   node_out.GetAttributeNames(attrs)
-  for i in xrange(0, attrs.GetNumberOfValues()):
+  for i in range(0, attrs.GetNumberOfValues()):
     node_out.SetAttribute(attrs.GetValue(i), None)
 
   # reset the data array to force resizing, otherwise we will just keep the old data too

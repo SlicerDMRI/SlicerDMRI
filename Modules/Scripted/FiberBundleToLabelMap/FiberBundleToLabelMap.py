@@ -1,7 +1,11 @@
 from __future__ import print_function
 import os
+import sys
 import unittest
 import vtk, qt, ctk, slicer, numpy
+
+if sys.version_info[0] == 2:
+  range = xrange
 
 #
 # FiberBundleToLabelMap
@@ -194,7 +198,7 @@ class FiberBundleToLabelMapLogic(object):
     # eating time in the python loop, resample CELLS_TO_PROCESS at once.
     CELLS_TO_PROCESS = 100
 
-    for startCellId in xrange(0, cellCount, CELLS_TO_PROCESS):
+    for startCellId in range(0, cellCount, CELLS_TO_PROCESS):
       # generate list of cell Ids to sample
       cellIdsAr = numpy.arange(startCellId,
                                min(cellCount, startCellId + CELLS_TO_PROCESS),
@@ -217,7 +221,7 @@ class FiberBundleToLabelMapLogic(object):
       pointCount = pdSubset.GetNumberOfPoints()
       points = pdSubset.GetPoints()
 
-      for pointIndex in xrange(pointCount):
+      for pointIndex in range(pointCount):
         point = points.GetPoint(pointIndex)
         ijkFloat = rasToIJK.MultiplyPoint(point+(1,))[:3]
 

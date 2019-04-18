@@ -99,7 +99,7 @@ class DICOMDiffusionVolumePluginClass(DICOMPlugin):
       for tag in self.diffusionTags[vendor]:
         # Check the first three files because some tags may
         # not be present in the b0 image (e.g. for Siemens)
-        for i in xrange(0, 3 if (len(files) > 2) else len(files)):
+        for i in range(0, 3 if (len(files) > 2) else len(files)):
           value = slicer.dicomDatabase.fileValue(files[i], tag)
           hasTag = value != ""
           if hasTag:
