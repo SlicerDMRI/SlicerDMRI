@@ -84,8 +84,8 @@ class DICOMTractographyPluginClass(DICOMPlugin):
     using the dicom to nrrd converter module
     """
 
-    if not hasattr(slicermodules, 'tractiocli')
-        raise Exception("No TractIOCLI module available to perform load operation!")
+    if not hasattr(slicermodules, 'tractiocli'):
+      raise Exception("No TractIOCLI module available to perform load operation!")
 
     # create an output diffusion node as a target
     nodeFactory = slicer.qMRMLNodeFactory()
