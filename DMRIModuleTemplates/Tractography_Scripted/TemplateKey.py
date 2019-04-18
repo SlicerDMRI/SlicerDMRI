@@ -1,6 +1,6 @@
 from __future__ import division
 import unittest, os, logging, warnings
-from itertools import ifilter
+
 
 import vtk, qt, ctk, slicer
 from vtk.numpy_interface import dataset_adapter as dsa
@@ -166,7 +166,7 @@ class TemplateKeyLogic(ScriptedLoadableModuleLogic):
     fb_numpy = dsa.WrapDataObject(pd)
 
     # Get first tensor key
-    ten_key = next(ifilter(lambda x: "Tensor_" in x, fb_numpy.PointData.keys()), None)
+    ten_key = next(x for x in fb_numpy.PointData.keys() if "Tensor_" in x)
     if not ten_key:
       warnings.warn("No tensor data found")
       return
