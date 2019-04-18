@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import unittest
 import vtk, qt, ctk, slicer
@@ -91,7 +92,7 @@ class fiber_visibility_crash2438Widget(object):
     self.helloWorldButton = helloWorldButton
 
   def onHelloWorldButtonClicked(self):
-    print "Hello World !"
+    print("Hello World !")
 
   def onReload(self,moduleName="fiber_visibility_crash2438"):
     """Generic reload method for any scripted module.
