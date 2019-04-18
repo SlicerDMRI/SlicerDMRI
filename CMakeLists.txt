@@ -26,6 +26,7 @@ project(SlicerDMRI)
 find_package(Slicer REQUIRED)
 include(${Slicer_USE_FILE})
 
+# Sanity checks
 if(NOT ${Slicer_USE_vtkTeem})
   message(FATAL_ERROR "SlicerDMRI requires Slicer_USE_vtkTeem")
 endif()
@@ -44,10 +45,10 @@ endif()
 
 #-----------------------------------------------------------------------------
 # Set variables for testing local build, if not defined
-if (NOT DEFINED TEMP)
+if(NOT DEFINED TEMP)
   set(TEMP "${CMAKE_BINARY_DIR}/Testing/Temporary")
 endif()
-if (NOT DEFINED MRML_TEST_DATA)
+if(NOT DEFINED MRML_TEST_DATA)
   set(MRML_TEST_DATA "${Slicer_CMAKE_DIR}/../Libs/MRML/Core/Testing/TestData")
 endif()
 
