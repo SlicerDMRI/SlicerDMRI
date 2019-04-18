@@ -64,3 +64,5 @@ ExternalProject_Add(${proj}
   DEPENDS
     ${${proj}_DEPENDS}
   )
+
+ExternalProject_AlwaysConfigure(${proj})
