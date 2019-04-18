@@ -297,21 +297,19 @@ class FiberBundleToLabelMapTest(unittest.TestCase):
     #
     # first, get some data
     #
-    import urllib
     downloads = (
-        ('http://slicer.kitware.com/midas3/download?items=5767', 'FA.nrrd', slicer.util.loadVolume),
-        ('http://slicer.kitware.com/midas3/download?items=5768', 'tract1.vtk', slicer.util.loadFiberBundle),
+        ('FA', 'FA.nrrd', 'http://slicer.kitware.com/midas3/download?items=5767', 'VolumeFile'),
+        ('tract1', 'tract1.vtk', 'http://slicer.kitware.com/midas3/download?items=5768', 'FiberBundleFile'),
         )
-
-    for url,name,loader in downloads:
-      filePath = slicer.app.temporaryPath + '/' + name
-      if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
-        print('Requesting download %s from %s...\n' % (name, url))
-        urllib.urlretrieve(url, filePath)
-      if loader:
-        print('Loading %s...\n' % (name,))
-        loader(filePath)
-    self.delayDisplay('Finished with download and loading\n')
+    import SampleData
+    for nodeNames, fileNames, uris, loadFileTypes  in downloads:
+      SampleData.downloadFromURL(
+        nodeNames=nodeNames,
+        fileNames=fileNames,
+        uris=uris,
+        loadFileTypes=loadFileTypes
+        )
+      self.delayDisplay('Finished with download and loading of %s' % str(fileNames))
 
     volumeNode = slicer.util.getNode(pattern="FA")
     fiberNode = slicer.util.getNode(pattern="tract1")

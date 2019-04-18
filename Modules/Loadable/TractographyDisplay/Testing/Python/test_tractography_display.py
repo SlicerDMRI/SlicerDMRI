@@ -143,19 +143,12 @@ class test_tractography_displayTest(unittest.TestCase):
     #
     # first, get some data
     #
-    import urllib
-    downloads = (
-        ('http://slicer.kitware.com/midas3/download?items=5768', 'tract1.vtk', slicer.util.loadFiberBundle),
-        )
-
-    for url,name,loader in downloads:
-      filePath = slicer.app.temporaryPath + '/' + name
-      if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
-        print('Requesting download %s from %s...\n' % (name, url))
-        urllib.urlretrieve(url, filePath)
-      if loader:
-        print('Loading %s...\n' % (name,))
-        loader(filePath)
+    import SampleData
+    SampleData.downloadFromURL(
+      nodeNames='tract1',
+      fileNames='tract1.vtk',
+      uris='http://slicer.kitware.com/midas3/download?items=5768',
+      loadFileTypes='FiberBundleFile')
     self.delayDisplay('Finished with download and loading\n')
 
     # use the volumes module to replicate the bug report

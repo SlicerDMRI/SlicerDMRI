@@ -245,21 +245,19 @@ class TractographyExportPLYTest(ScriptedLoadableModuleTest):
   def test_TractographyExportPLY1(self):
     self.delayDisplay("Starting the test")
     try:
-      import urllib
       downloads = (
-          ('https://github.com/SlicerDMRI/DMRITestData/blob/master/Tractography/fiber_ply_export_test.vtk?raw=true', 'fiber_ply_export_test.vtk', slicer.util.loadFiberBundle),
+          ('fiber_ply_export_test', 'fiber_ply_export_test.vtk', 'https://github.com/SlicerDMRI/DMRITestData/blob/master/Tractography/fiber_ply_export_test.vtk?raw=true', 'FiberBundleFile'),
           )
 
-      for url,name,loader in downloads:
-        filePath = slicer.app.temporaryPath + '/' + name
-        if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
-          logging.info('Requesting download %s from %s...\n' % (name, url))
-          urllib.urlretrieve(url, filePath)
-        if loader:
-          logging.info('Loading %s...' % (name,))
-          loader(filePath)
-
-      self.delayDisplay('Finished with download and loading')
+      import SampleData
+      for nodeNames, fileNames, uris, loadFileTypes  in downloads:
+        SampleData.downloadFromURL(
+          nodeNames=nodeNames,
+          fileNames=fileNames,
+          uris=uris,
+          loadFileTypes=loadFileTypes
+          )
+        self.delayDisplay('Finished with download and loading of %s' % str(fileNames))
 
       # logic
       outputPath = os.path.join(slicer.app.temporaryPath, "fiber.ply")
