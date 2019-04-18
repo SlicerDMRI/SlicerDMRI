@@ -7,7 +7,7 @@ import logging
 
 
 # helper class for cleaner multi-operation blocks on a single node.
-class It():
+class It(object):
   def __init__(self, node): self.node = node
   def __enter__(self): return self.node
   def __exit__(self, type, value, traceback): return False

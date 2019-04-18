@@ -11,7 +11,7 @@ if not '__file__' in locals():
 
 
 WORKFLOW_PREFIX = "DICOM2FBTWorkflow"
-class WorkflowConfiguration:
+class WorkflowConfiguration(object):
     step_widget_files = [
         'dicom2nrrd',
         'dwi2dti',

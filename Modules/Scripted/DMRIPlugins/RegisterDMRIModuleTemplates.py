@@ -3,7 +3,7 @@ import vtk, qt, ctk, slicer
 import warnings
 from slicer.ScriptedLoadableModule import *
 
-class RegisterDMRIModuleTemplates:
+class RegisterDMRIModuleTemplates(object):
     def __init__(self, parent):
         parent.title = "DMRI Template auto-Registration Plugin"
         parent.categories = [""]

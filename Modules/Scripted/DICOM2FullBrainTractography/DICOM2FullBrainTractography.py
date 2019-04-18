@@ -4,7 +4,7 @@ import DICOM2FullBrainTractographyLib
 # DICOM2FullBrainTractography
 #
 
-class DICOM2FullBrainTractography:
+class DICOM2FullBrainTractography(object):
   def __init__(self, parent):
     parent.title = "DWI to Full Brain Tractography"
     parent.categories = ["Diffusion.Utilities"]
@@ -21,7 +21,7 @@ class DICOM2FullBrainTractography:
 # qDICOM2FullBrainTractographyWidget
 #
 
-class DICOM2FullBrainTractographyWidget:
+class DICOM2FullBrainTractographyWidget(object):
   def __init__(self, parent = None):
     if not parent:
       self.parent = slicer.qMRMLWidget()

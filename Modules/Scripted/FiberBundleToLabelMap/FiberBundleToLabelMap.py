@@ -6,7 +6,7 @@ import vtk, qt, ctk, slicer, numpy
 # FiberBundleToLabelMap
 #
 
-class FiberBundleToLabelMap:
+class FiberBundleToLabelMap(object):
   def __init__(self, parent):
     import string
     parent.title = "Tractography to Mask Image"
@@ -43,7 +43,7 @@ For these reasons please use care when interpreting the results.
 # qFiberBundleToLabelMapWidget
 #
 
-class FiberBundleToLabelMapWidget:
+class FiberBundleToLabelMapWidget(object):
   def __init__(self, parent = None):
     if not parent:
       self.parent = slicer.qMRMLWidget()
@@ -139,7 +139,7 @@ class FiberBundleToLabelMapWidget:
 # FiberBundleToLabelMapLogic
 #
 
-class FiberBundleToLabelMapLogic:
+class FiberBundleToLabelMapLogic(object):
   """This class should implement all the actual
   computation done by your module.  The interface
   should be such that other python code can import

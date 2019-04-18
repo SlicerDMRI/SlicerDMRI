@@ -9,7 +9,7 @@ from EditorLib.EditUtil import EditUtil
 # NeurosurgicalPlanningTutorialTractographySelfTest
 #
 
-class NeurosurgicalPlanningTutorialTractographySelfTest:
+class NeurosurgicalPlanningTutorialTractographySelfTest(object):
   def __init__(self, parent):
     parent.title = "NeurosurgicalPlanningTutorialTractographySelfTest"
     parent.categories = ["Testing.TestCases"]
@@ -40,7 +40,7 @@ class NeurosurgicalPlanningTutorialTractographySelfTest:
 # qNeurosurgicalPlanningTutorialTractographySelfTestWidget
 #
 
-class NeurosurgicalPlanningTutorialTractographySelfTestWidget:
+class NeurosurgicalPlanningTutorialTractographySelfTestWidget(object):
   def __init__(self, parent = None):
     if not parent:
       self.parent = slicer.qMRMLWidget()
@@ -156,7 +156,7 @@ class NeurosurgicalPlanningTutorialTractographySelfTestWidget:
 # NeurosurgicalPlanningTutorialTractographySelfTestLogic
 #
 
-class NeurosurgicalPlanningTutorialTractographySelfTestLogic:
+class NeurosurgicalPlanningTutorialTractographySelfTestLogic(object):
 
   def __init__(self):
     pass

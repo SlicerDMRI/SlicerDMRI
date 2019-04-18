@@ -6,7 +6,7 @@ import vtk, qt, ctk, slicer
 # TestTractographyDisplay
 #
 
-class test_tractography_display:
+class test_tractography_display(object):
   def __init__(self, parent):
     parent.title = "Test Tractography Display" # TODO make this more human readable by adding spaces
     parent.categories = ["Testing.TestCases"]
@@ -37,7 +37,7 @@ class test_tractography_display:
 # qTestTractographyDisplayWidget
 #
 
-class test_tractography_displayWidget:
+class test_tractography_displayWidget(object):
   def __init__(self, parent = None):
     if not parent:
       self.parent = slicer.qMRMLWidget()
@@ -89,7 +89,7 @@ class test_tractography_displayWidget:
 # TestTractographyDisplayLogic
 #
 
-class TestTractographyDisplayLogic:
+class TestTractographyDisplayLogic(object):
   """This class should implement all the actual
   computation done by your module.  The interface
   should be such that other python code can import

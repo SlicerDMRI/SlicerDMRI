@@ -161,7 +161,7 @@ class DICOMDiffusionVolumePluginClass(DICOMPlugin):
 # DICOMDiffusionVolumePlugin
 #
 
-class DICOMDiffusionVolumePlugin:
+class DICOMDiffusionVolumePlugin(object):
   """
   This class is the 'hook' for slicer to detect and recognize the plugin
   as a loadable scripted module

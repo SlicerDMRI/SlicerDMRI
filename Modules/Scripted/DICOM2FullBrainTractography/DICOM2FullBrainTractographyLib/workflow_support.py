@@ -10,7 +10,7 @@ import slicer
 
 __all__ = ['Workflow', 'GeneralizedStep', 'display_error']
 
-class Workflow:
+class Workflow(object):
 
     def __init__(self, workflow_configuration, parent=None):
         if not parent:

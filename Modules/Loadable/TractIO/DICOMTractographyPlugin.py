@@ -123,7 +123,7 @@ class DICOMTractographyPluginClass(DICOMPlugin):
 # DICOMTractographyPlugin
 #
 
-class DICOMTractographyPlugin:
+class DICOMTractographyPlugin(object):
   """
   This class is the 'hook' for slicer to detect and recognize the plugin
   as a loadable scripted module

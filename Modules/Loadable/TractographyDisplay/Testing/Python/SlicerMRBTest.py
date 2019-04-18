@@ -307,7 +307,7 @@ execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Pyt
 # SlicerMRBTest
 #
 
-class SlicerMRBTest:
+class SlicerMRBTest(object):
   """
   This class is the 'hook' for slicer to detect and recognize the test
   as a loadable scripted module (with a hidden interface)
@@ -348,7 +348,7 @@ class SlicerMRBTest:
 # SlicerMRBTestWidget
 #
 
-class SlicerMRBTestWidget:
+class SlicerMRBTestWidget(object):
   def __init__(self, parent = None):
     self.parent = parent
 

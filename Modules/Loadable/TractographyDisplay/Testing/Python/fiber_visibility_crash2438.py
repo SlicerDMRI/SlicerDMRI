@@ -6,7 +6,7 @@ import vtk, qt, ctk, slicer
 # fiber_visibility_crash2438
 #
 
-class fiber_visibility_crash2438:
+class fiber_visibility_crash2438(object):
   def __init__(self, parent):
     parent.title = "fiber_visibility_crash2438" # TODO make this more human readable by adding spaces
     parent.categories = ["Testing.TestCases"]
@@ -37,7 +37,7 @@ class fiber_visibility_crash2438:
 # qfiber_visibility_crash2438Widget
 #
 
-class fiber_visibility_crash2438Widget:
+class fiber_visibility_crash2438Widget(object):
   def __init__(self, parent = None):
     if not parent:
       self.parent = slicer.qMRMLWidget()
@@ -109,7 +109,7 @@ class fiber_visibility_crash2438Widget:
 # fiber_visibility_crash2438Logic
 #
 
-class fiber_visibility_crash2438Logic:
+class fiber_visibility_crash2438Logic(object):
   """This class should implement all the actual
   computation done by your module.  The interface
   should be such that other python code can import
