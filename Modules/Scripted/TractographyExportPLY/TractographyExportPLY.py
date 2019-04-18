@@ -283,7 +283,7 @@ class TractographyExportPLYTest(ScriptedLoadableModuleTest):
       # If it doesn't throw, it passes...
       self.delayDisplay('Test passed!')
 
-    except Exception, e:
+    except Exception as e:
       import traceback
       traceback.print_exc()
       self.delayDisplay('Test caused exception!\n' + str(e))
