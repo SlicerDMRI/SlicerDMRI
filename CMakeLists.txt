@@ -28,6 +28,9 @@ mark_as_superbuild(Slicer_DIR)
 # Required to include "Slicer/Resources/*Logo.h" files
 get_filename_component(Slicer_ACTUAL_SOURCE_DIR "${Slicer_CMAKE_DIR}/../" ABSOLUTE CACHE)
 
+find_package(Git REQUIRED)
+mark_as_superbuild(GIT_EXECUTABLE)
+
 # Sanity checks
 if(NOT ${Slicer_USE_vtkTeem})
   message(FATAL_ERROR "SlicerDMRI requires Slicer_USE_vtkTeem")
