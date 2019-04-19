@@ -114,7 +114,7 @@ def main():
 
   dwifile = args.inputDWI
   outfile = args.outputDWI
-  target_bvals = map(float, args.bvalues.split(','))
+  target_bvals = [float(bvalue) for bvalue in args.bvalues.split(',')]
   if args.baseline_clamp:
     bval_clamp = float(args.baseline_clamp)
   bval_tolerance = args.tolerance
