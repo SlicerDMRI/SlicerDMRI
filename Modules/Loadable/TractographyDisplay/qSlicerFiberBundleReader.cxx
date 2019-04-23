@@ -94,43 +94,47 @@ bool qSlicerFiberBundleReader::load(const IOProperties& properties)
   Q_ASSERT(properties.contains("fileName"));
   QString fileName = properties["fileName"].toString();
 
-  QStringList fileNames;
-  if (properties.contains("suffix"))
-    {
-    QStringList suffixList = properties["suffix"].toStringList();
-    suffixList.removeDuplicates();
-    // here filename describes a directory
-    Q_ASSERT(QFileInfo(fileName).isDir());
-    QDir dir(fileName);
-    // suffix should be of style: *.png
-    fileNames = dir.entryList(suffixList);
-    }
-  else
-    {
-    fileNames << fileName;
-    }
-
   if (d->FiberBundleLogic.GetPointer() == 0)
     {
     return false;
     }
 
-  QStringList nodes;
-  foreach(QString file, fileNames)
+  QStringList nodeIDs;
+
+  if (properties.contains("suffix"))
     {
-    vtkMRMLFiberBundleNode* node = d->FiberBundleLogic->AddFiberBundle(file.toLatin1());
-    if (node)
+    QStringList suffixList = properties["suffix"].toStringList();
+    suffixList.removeDuplicates();
+
+    // here filename describes a directory
+    Q_ASSERT(QFileInfo(fileName).isDir());
+
+    // suffix should be of style: *.png
+    foreach(const QString& fileName, QDir(fileName).entryList(suffixList))
       {
-      if (properties.contains("name"))
+      vtkMRMLFiberBundleNode* node = d->FiberBundleLogic->AddFiberBundle(fileName.toLatin1());
+      if (node)
         {
-        std::string uname = this->mrmlScene()->GetUniqueNameByString(
-          properties["name"].toString().toLatin1());
-        node->SetName(uname.c_str());
+        nodeIDs << node->GetID();
         }
-      nodes << node->GetID();
       }
     }
-  this->setLoadedNodes(nodes);
+  else
+    {
+    QString name = QFileInfo(fileName).baseName();
+    if (properties.contains("name"))
+      {
+      name = properties["name"].toString();
+      }
 
-  return nodes.size() > 0;
+    vtkMRMLFiberBundleNode* node = d->FiberBundleLogic->AddFiberBundle(fileName.toLatin1(), name.toLatin1());
+    if (node)
+      {
+      nodeIDs << node->GetID();
+      }
+    }
+
+  this->setLoadedNodes(nodeIDs);
+
+  return nodeIDs.size() > 0;
 }

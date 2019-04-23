@@ -16,8 +16,6 @@ set(EXTENSION_BUILD_SUBDIRECTORY inner-build)
 
 set(SUPERBUILD_TOPLEVEL_PROJECT inner)
 
-option(SlicerDMRI_ENABLE_TRACTIO "Enable TractIO module" ON)
-mark_as_advanced(SlicerDMRI_ENABLE_TRACTIO)
 
 #-----------------------------------------------------------------------------
 # Extension dependencies
@@ -25,13 +23,24 @@ find_package(Slicer COMPONENTS ConfigurePrerequisites REQUIRED)
 project(SlicerDMRI)
 find_package(Slicer REQUIRED)
 include(${Slicer_USE_FILE})
+mark_as_superbuild(Slicer_DIR)
 
+# Required to include "Slicer/Resources/*Logo.h" files
+get_filename_component(Slicer_ACTUAL_SOURCE_DIR "${Slicer_CMAKE_DIR}/../" ABSOLUTE CACHE)
+
+find_package(Git REQUIRED)
+mark_as_superbuild(GIT_EXECUTABLE)
+
+# Sanity checks
 if(NOT ${Slicer_USE_vtkTeem})
   message(FATAL_ERROR "SlicerDMRI requires Slicer_USE_vtkTeem")
 endif()
 
-get_filename_component(Slicer_ACTUAL_SOURCE_DIR "${Slicer_CMAKE_DIR}/../"
-                       ABSOLUTE CACHE)
+#-----------------------------------------------------------------------------
+# Options
+option(SlicerDMRI_ENABLE_TRACTIO "Enable TractIO module" ON)
+mark_as_advanced(SlicerDMRI_ENABLE_TRACTIO)
+mark_as_superbuild(SlicerDMRI_ENABLE_TRACTIO)
 
 #-----------------------------------------------------------------------------
 # SuperBuild setup
@@ -44,10 +53,10 @@ endif()
 
 #-----------------------------------------------------------------------------
 # Set variables for testing local build, if not defined
-if (NOT DEFINED TEMP)
+if(NOT DEFINED TEMP)
   set(TEMP "${CMAKE_BINARY_DIR}/Testing/Temporary")
 endif()
-if (NOT DEFINED MRML_TEST_DATA)
+if(NOT DEFINED MRML_TEST_DATA)
   set(MRML_TEST_DATA "${Slicer_CMAKE_DIR}/../Libs/MRML/Core/Testing/TestData")
 endif()
 

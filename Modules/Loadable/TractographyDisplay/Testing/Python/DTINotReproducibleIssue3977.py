@@ -137,20 +137,11 @@ class DTINotReproducibleIssue3977Test(ScriptedLoadableModuleTest):
     #
     # first, get some data
     #
-    import urllib
-    downloads = (
-        ('http://slicer.kitware.com/midas3/download/item/10304', 'dwi.raw.gz', None),
-        ('http://slicer.kitware.com/midas3/download/item/10303', 'dwi.nhdr', slicer.util.loadVolume)
-        )
-
-    for url,name,loader in downloads:
-      filePath = slicer.app.temporaryPath + '/' + name
-      if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
-        logging.info('Requesting download %s from %s...\n' % (name, url))
-        urllib.urlretrieve(url, filePath)
-      if loader:
-        logging.info('Loading %s...' % (name,))
-        loader(filePath)
+    import SampleData
+    SampleData.downloadFromURL(
+      nodeNames=(None, 'dwi'),
+      fileNames=('dwi.raw.gz', 'dwi.nhdr'),
+      uris=('http://slicer.kitware.com/midas3/download/item/10304', 'http://slicer.kitware.com/midas3/download/item/10303'))
     self.delayDisplay('Finished with download and loading')
 
     volumeNode = slicer.util.getNode(pattern="dwi")

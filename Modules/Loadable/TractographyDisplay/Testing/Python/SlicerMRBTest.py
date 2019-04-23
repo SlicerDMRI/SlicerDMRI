@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import division
 
 import os
 import unittest
@@ -67,36 +69,38 @@ execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Pyt
     # first, get the data
     # - amount of data depends on useCase attribue
     #
-    import urllib
     if self.useCase == 'small':
       downloads = (
-          ('http://slicer.kitware.com/midas3/download?items=5767', 'FA.nrrd', slicer.util.loadVolume),
-          ('http://slicer.kitware.com/midas3/download?items=5768', 'tract1.vtk', slicer.util.loadFiberBundle),
+          ('FA', 'FA.nrrd', 'http://slicer.kitware.com/midas3/download?items=5767', 'VolumeFile'),
+          ('tract1', 'tract1.vtk', 'http://slicer.kitware.com/midas3/download?items=5768', 'FiberBundleFile'),
           )
       tracts = ('tract1',)
       tractColors = ( (0.2, 0.9, 0.3), )
     elif self.useCase == 'big':
       downloads = (
-          ('http://slicer.kitware.com/midas3/download?items=5766', 'DTIVolume.raw.gz', None),
-          ('http://slicer.kitware.com/midas3/download?items=5765', 'DTIVolume.nhdr', slicer.util.loadVolume),
-          ('http://slicer.kitware.com/midas3/download?items=5767', 'FA.nrrd', slicer.util.loadVolume),
-          ('http://slicer.kitware.com/midas3/download?items=5768', 'tract1.vtk', slicer.util.loadFiberBundle),
-          ('http://slicer.kitware.com/midas3/download?items=5769', 'tract2.vtk', slicer.util.loadFiberBundle),
-          ('http://slicer.kitware.com/midas3/download?items=5770', 'tract3.vtk', slicer.util.loadFiberBundle),
+          (
+            (None, 'DTIVolume'),
+            ('DTIVolume.raw.gz', 'DTIVolume.nhdr'),
+            ('http://slicer.kitware.com/midas3/download?items=5766', 'http://slicer.kitware.com/midas3/download?items=5765'),
+            'VolumeFile'
+          ),
+          ('FA', 'FA.nrrd', 'http://slicer.kitware.com/midas3/download?items=5767', 'VolumeFile'),
+          ('tract1', 'tract1.vtk', 'http://slicer.kitware.com/midas3/download?items=5768', 'FiberBundleFile'),
+          ('tract2', 'tract2.vtk', 'http://slicer.kitware.com/midas3/download?items=5769', 'FiberBundleFile'),
+          ('tract3', 'tract3.vtk', 'http://slicer.kitware.com/midas3/download?items=5770', 'FiberBundleFile'),
           )
       tracts = ('tract1', 'tract2', 'tract3',)
       tractColors = ( (0.2, 0.9, 0.3), (0.9, 0.3, 0.3), (0.2, 0.4, 0.9) )
 
-    # perform the downloads if needed, then load
-    for url,name,loader in downloads:
-      filePath = slicer.app.temporaryPath + '/' + name
-      if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
-        self.delayDisplay('Requesting download %s from %s...\n' % (name, url))
-        urllib.urlretrieve(url, filePath)
-      if loader:
-        self.delayDisplay('Loading %s...\n' % (name,))
-        loader(filePath)
-    self.delayDisplay('Finished with download and loading\n')
+    import SampleData
+    for nodeNames, fileNames, uris, loadFileTypes  in downloads:
+      SampleData.downloadFromURL(
+        nodeNames=nodeNames,
+        fileNames=fileNames,
+        uris=uris,
+        loadFileTypes=loadFileTypes
+        )
+      self.delayDisplay('Finished with download and loading of %s' % str(fileNames))
 
     # confirm that FA is in the background of the Red slice
     redComposite = slicer.util.getNode('vtkMRMLSliceCompositeNodeRed')
@@ -307,7 +311,7 @@ execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Pyt
 # SlicerMRBTest
 #
 
-class SlicerMRBTest:
+class SlicerMRBTest(object):
   """
   This class is the 'hook' for slicer to detect and recognize the test
   as a loadable scripted module (with a hidden interface)
@@ -348,7 +352,7 @@ class SlicerMRBTest:
 # SlicerMRBTestWidget
 #
 
-class SlicerMRBTestWidget:
+class SlicerMRBTestWidget(object):
   def __init__(self, parent = None):
     self.parent = parent
 

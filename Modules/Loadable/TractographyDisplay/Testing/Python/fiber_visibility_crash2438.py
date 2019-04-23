@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import unittest
 import vtk, qt, ctk, slicer
@@ -6,7 +7,7 @@ import vtk, qt, ctk, slicer
 # fiber_visibility_crash2438
 #
 
-class fiber_visibility_crash2438:
+class fiber_visibility_crash2438(object):
   def __init__(self, parent):
     parent.title = "fiber_visibility_crash2438" # TODO make this more human readable by adding spaces
     parent.categories = ["Testing.TestCases"]
@@ -37,7 +38,7 @@ class fiber_visibility_crash2438:
 # qfiber_visibility_crash2438Widget
 #
 
-class fiber_visibility_crash2438Widget:
+class fiber_visibility_crash2438Widget(object):
   def __init__(self, parent = None):
     if not parent:
       self.parent = slicer.qMRMLWidget()
@@ -91,7 +92,7 @@ class fiber_visibility_crash2438Widget:
     self.helloWorldButton = helloWorldButton
 
   def onHelloWorldButtonClicked(self):
-    print "Hello World !"
+    print("Hello World !")
 
   def onReload(self,moduleName="fiber_visibility_crash2438"):
     """Generic reload method for any scripted module.
@@ -109,7 +110,7 @@ class fiber_visibility_crash2438Widget:
 # fiber_visibility_crash2438Logic
 #
 
-class fiber_visibility_crash2438Logic:
+class fiber_visibility_crash2438Logic(object):
   """This class should implement all the actual
   computation done by your module.  The interface
   should be such that other python code can import
@@ -182,19 +183,12 @@ class fiber_visibility_crash2438Test(unittest.TestCase):
     #
     # first, get some data
     #
-    import urllib
-    downloads = (
-        ('http://slicer.kitware.com/midas3/download?items=5768', 'tract1.vtk', slicer.util.loadFiberBundle),
-        )
-
-    for url,name,loader in downloads:
-      filePath = slicer.app.temporaryPath + '/' + name
-      if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
-        print('Requesting download %s from %s...\n' % (name, url))
-        urllib.urlretrieve(url, filePath)
-      if loader:
-        print('Loading %s...\n' % (name,))
-        loader(filePath)
+    import SampleData
+    SampleData.downloadFromURL(
+      nodeNames='tract1',
+      fileNames='tract1.vtk',
+      uris='http://slicer.kitware.com/midas3/download?items=5768',
+      loadFileTypes='FiberBundleFile')
     self.delayDisplay('Finished with download and loading\n')
 
     # use the volumes module to replicate the bug report

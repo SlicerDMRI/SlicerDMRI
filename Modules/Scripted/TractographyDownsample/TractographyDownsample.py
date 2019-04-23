@@ -1,9 +1,14 @@
+from __future__ import division
 import os
+import sys
 import unittest
 import vtk, qt, ctk, slicer
 from slicer.ScriptedLoadableModule import *
 import logging
 import numpy as np
+
+if sys.version_info[0] == 2:
+  range = xrange
 
 #
 # TractographyDownsample
@@ -320,7 +325,7 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
         point1 = inpoints.GetPoint(ptids.GetId(ptidx + 1))
         step_size += np.sqrt(np.sum(np.power(np.subtract(point0, point1), 2)))
         count += 1
-    step_size = step_size / count
+    step_size = int(step_size / count)
     return step_size
 
   def downsampleFibers(self, inpd, outpd, outstep, outpercent, outminpts, outminlen, outmaxlen):
@@ -345,7 +350,7 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
 
     # keep a random sample of outpercent of fibers
     # all possible fiber indices
-    findices = range(0, inpd.GetNumberOfLines())
+    findices = list(range(0, inpd.GetNumberOfLines()))
     # now find the size of the desired subset of these indices
     outpercent = np.divide(outpercent,100.0)
     nkeep = int(np.multiply(inpd.GetNumberOfLines(), outpercent))
@@ -462,7 +467,7 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
     """
 
     nodeCollection = slicer.mrmlScene.GetNodesByClass("vtkMRMLFiberBundleNode")
-    nodes = [nodeCollection.GetItemAsObject(i) for i in xrange(0, nodeCollection.GetNumberOfItems())]
+    nodes = [nodeCollection.GetItemAsObject(i) for i in range(0, nodeCollection.GetNumberOfItems())]
 
     if not nodes:
       slicer.util.errorDisplay('No input fiberBundles in scene. Please load fiber bundles first.')
@@ -514,19 +519,18 @@ class TractographyDownsampleTest(ScriptedLoadableModuleTest):
     #
     import urllib
     downloads = (
-        ('https://github.com/SlicerDMRI/DMRITestData/blob/master/Tractography/fiber_ply_export_test.vtk?raw=true', 'fiber_ply_export_test.vtk',
-          slicer.util.loadFiberBundle),
+        ('fiber_ply_export_test', 'fiber_ply_export_test.vtk', 'https://github.com/SlicerDMRI/DMRITestData/blob/master/Tractography/fiber_ply_export_test.vtk?raw=true', 'FiberBundleFile'),
         )
 
-    for url,name,loader in downloads:
-      filePath = slicer.app.temporaryPath + '/' + name
-      if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
-        logging.info('Requesting download %s from %s...\n' % (name, url))
-        urllib.urlretrieve(url, filePath)
-      if loader:
-        logging.info('Loading %s...' % (name,))
-        loader(filePath)
-    self.delayDisplay('Finished with download and loading')
+    import SampleData
+    for nodeNames, fileNames, uris, loadFileTypes  in downloads:
+      SampleData.downloadFromURL(
+        nodeNames=nodeNames,
+        fileNames=fileNames,
+        uris=uris,
+        loadFileTypes=loadFileTypes
+        )
+      self.delayDisplay('Finished with download and loading of %s' % str(fileNames))
 
     fiberBundleNode = slicer.util.getNode(pattern="fiber_ply_export_test")
     logic = TractographyDownsampleLogic()

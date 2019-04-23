@@ -10,7 +10,7 @@ import slicer
 
 __all__ = ['Workflow', 'GeneralizedStep', 'display_error']
 
-class Workflow:
+class Workflow(object):
 
     def __init__(self, workflow_configuration, parent=None):
         if not parent:
@@ -93,7 +93,7 @@ class Workflow:
         self.workflowWidget.setWorkflow(self.workflow)
         self.parent.layout().addWidget(self.workflowWidget)
 
-        for i in xrange(len(self.steps) - 1):
+        for i in range(len(self.steps) - 1):
             self.workflow.addTransition(self.steps[i][1], self.steps[i + 1][1])
 
         self.workflow.start()

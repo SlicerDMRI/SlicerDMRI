@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import unittest
 import vtk, qt, ctk, slicer
@@ -6,7 +7,7 @@ import vtk, qt, ctk, slicer
 # TestTractographyDisplay
 #
 
-class test_tractography_display:
+class test_tractography_display(object):
   def __init__(self, parent):
     parent.title = "Test Tractography Display" # TODO make this more human readable by adding spaces
     parent.categories = ["Testing.TestCases"]
@@ -37,7 +38,7 @@ class test_tractography_display:
 # qTestTractographyDisplayWidget
 #
 
-class test_tractography_displayWidget:
+class test_tractography_displayWidget(object):
   def __init__(self, parent = None):
     if not parent:
       self.parent = slicer.qMRMLWidget()
@@ -89,7 +90,7 @@ class test_tractography_displayWidget:
 # TestTractographyDisplayLogic
 #
 
-class TestTractographyDisplayLogic:
+class TestTractographyDisplayLogic(object):
   """This class should implement all the actual
   computation done by your module.  The interface
   should be such that other python code can import
@@ -142,19 +143,12 @@ class test_tractography_displayTest(unittest.TestCase):
     #
     # first, get some data
     #
-    import urllib
-    downloads = (
-        ('http://slicer.kitware.com/midas3/download?items=5768', 'tract1.vtk', slicer.util.loadFiberBundle),
-        )
-
-    for url,name,loader in downloads:
-      filePath = slicer.app.temporaryPath + '/' + name
-      if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
-        print('Requesting download %s from %s...\n' % (name, url))
-        urllib.urlretrieve(url, filePath)
-      if loader:
-        print('Loading %s...\n' % (name,))
-        loader(filePath)
+    import SampleData
+    SampleData.downloadFromURL(
+      nodeNames='tract1',
+      fileNames='tract1.vtk',
+      uris='http://slicer.kitware.com/midas3/download?items=5768',
+      loadFileTypes='FiberBundleFile')
     self.delayDisplay('Finished with download and loading\n')
 
     # use the volumes module to replicate the bug report

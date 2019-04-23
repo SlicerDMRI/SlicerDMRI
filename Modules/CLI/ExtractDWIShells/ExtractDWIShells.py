@@ -1,6 +1,7 @@
 #!/usr/bin/env python-real
 
 from __future__ import print_function
+from __future__ import division
 import sys
 import argparse
 
@@ -8,6 +9,9 @@ import slicer, slicer.util, mrml
 import numpy as np
 import vtk
 from vtk.util import numpy_support
+
+if sys.version_info[0] == 2:
+  range = xrange
 
 def runtests(testdata_path):
   # - runs this script again with test arguments and data
@@ -110,7 +114,7 @@ def main():
 
   dwifile = args.inputDWI
   outfile = args.outputDWI
-  target_bvals = map(float, args.bvalues.split(','))
+  target_bvals = [float(bvalue) for bvalue in args.bvalues.split(',')]
   if args.baseline_clamp:
     bval_clamp = float(args.baseline_clamp)
   bval_tolerance = args.tolerance
@@ -186,7 +190,7 @@ def main():
   # reset the attribute dictionary, otherwise it will be transferred over
   attrs = vtk.vtkStringArray()
   node_out.GetAttributeNames(attrs)
-  for i in xrange(0, attrs.GetNumberOfValues()):
+  for i in range(0, attrs.GetNumberOfValues()):
     node_out.SetAttribute(attrs.GetValue(i), None)
 
   # reset the data array to force resizing, otherwise we will just keep the old data too

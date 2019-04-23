@@ -1,12 +1,17 @@
+from __future__ import print_function
 import os
+import sys
 import unittest
 import vtk, qt, ctk, slicer, numpy
+
+if sys.version_info[0] == 2:
+  range = xrange
 
 #
 # FiberBundleToLabelMap
 #
 
-class FiberBundleToLabelMap:
+class FiberBundleToLabelMap(object):
   def __init__(self, parent):
     import string
     parent.title = "Tractography to Mask Image"
@@ -43,7 +48,7 @@ For these reasons please use care when interpreting the results.
 # qFiberBundleToLabelMapWidget
 #
 
-class FiberBundleToLabelMapWidget:
+class FiberBundleToLabelMapWidget(object):
   def __init__(self, parent = None):
     if not parent:
       self.parent = slicer.qMRMLWidget()
@@ -139,7 +144,7 @@ class FiberBundleToLabelMapWidget:
 # FiberBundleToLabelMapLogic
 #
 
-class FiberBundleToLabelMapLogic:
+class FiberBundleToLabelMapLogic(object):
   """This class should implement all the actual
   computation done by your module.  The interface
   should be such that other python code can import
@@ -193,7 +198,7 @@ class FiberBundleToLabelMapLogic:
     # eating time in the python loop, resample CELLS_TO_PROCESS at once.
     CELLS_TO_PROCESS = 100
 
-    for startCellId in xrange(0, cellCount, CELLS_TO_PROCESS):
+    for startCellId in range(0, cellCount, CELLS_TO_PROCESS):
       # generate list of cell Ids to sample
       cellIdsAr = numpy.arange(startCellId,
                                min(cellCount, startCellId + CELLS_TO_PROCESS),
@@ -216,7 +221,7 @@ class FiberBundleToLabelMapLogic:
       pointCount = pdSubset.GetNumberOfPoints()
       points = pdSubset.GetPoints()
 
-      for pointIndex in xrange(pointCount):
+      for pointIndex in range(pointCount):
         point = points.GetPoint(pointIndex)
         ijkFloat = rasToIJK.MultiplyPoint(point+(1,))[:3]
 
@@ -292,21 +297,19 @@ class FiberBundleToLabelMapTest(unittest.TestCase):
     #
     # first, get some data
     #
-    import urllib
     downloads = (
-        ('http://slicer.kitware.com/midas3/download?items=5767', 'FA.nrrd', slicer.util.loadVolume),
-        ('http://slicer.kitware.com/midas3/download?items=5768', 'tract1.vtk', slicer.util.loadFiberBundle),
+        ('FA', 'FA.nrrd', 'http://slicer.kitware.com/midas3/download?items=5767', 'VolumeFile'),
+        ('tract1', 'tract1.vtk', 'http://slicer.kitware.com/midas3/download?items=5768', 'FiberBundleFile'),
         )
-
-    for url,name,loader in downloads:
-      filePath = slicer.app.temporaryPath + '/' + name
-      if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
-        print('Requesting download %s from %s...\n' % (name, url))
-        urllib.urlretrieve(url, filePath)
-      if loader:
-        print('Loading %s...\n' % (name,))
-        loader(filePath)
-    self.delayDisplay('Finished with download and loading\n')
+    import SampleData
+    for nodeNames, fileNames, uris, loadFileTypes  in downloads:
+      SampleData.downloadFromURL(
+        nodeNames=nodeNames,
+        fileNames=fileNames,
+        uris=uris,
+        loadFileTypes=loadFileTypes
+        )
+      self.delayDisplay('Finished with download and loading of %s' % str(fileNames))
 
     volumeNode = slicer.util.getNode(pattern="FA")
     fiberNode = slicer.util.getNode(pattern="tract1")

@@ -110,7 +110,7 @@ int vtkSlicerFiberBundleLogic::AddFiberBundles (const char* dirname, std::vector
 }
 
 //----------------------------------------------------------------------------
-vtkMRMLFiberBundleNode* vtkSlicerFiberBundleLogic::AddFiberBundle (const char* filename)
+vtkMRMLFiberBundleNode* vtkSlicerFiberBundleLogic::AddFiberBundle (const char* filename, const char* volname)
 {
   vtkDebugMacro("Adding fiber bundle from filename " << filename);
 
@@ -120,13 +120,13 @@ vtkMRMLFiberBundleNode* vtkSlicerFiberBundleLogic::AddFiberBundle (const char* f
     vtkSmartPointer<vtkMRMLFiberBundleStorageNode>::New();
 
   storageNode->SetFileName(filename);
+
   if (storageNode->ReadData(fiberBundleNode) != 0)
     {
-    // set node name based on filename
-    const std::string fname(filename);
-    const std::string name = itksys::SystemTools::GetFilenameWithoutExtension(fname);
-    const std::string uname( this->GetMRMLScene()->GetUniqueNameByString(name.c_str()));
-    fiberBundleNode->SetName(uname.c_str());
+    // Compute volume name
+    std::string volumeName = volname != nullptr ? volname : itksys::SystemTools::GetFilenameWithoutExtension(filename);
+    volumeName = this->GetMRMLScene()->GenerateUniqueName(volumeName);
+    fiberBundleNode->SetName(volumeName.c_str());
 
     fiberBundleNode->SetScene(this->GetMRMLScene());
     fiberBundleNode->SetAndObserveStorageNodeID(storageNode->GetID());

@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import time
 import unittest
@@ -9,7 +10,7 @@ from EditorLib.EditUtil import EditUtil
 # NeurosurgicalPlanningTutorialTractographySelfTest
 #
 
-class NeurosurgicalPlanningTutorialTractographySelfTest:
+class NeurosurgicalPlanningTutorialTractographySelfTest(object):
   def __init__(self, parent):
     parent.title = "NeurosurgicalPlanningTutorialTractographySelfTest"
     parent.categories = ["Testing.TestCases"]
@@ -40,7 +41,7 @@ class NeurosurgicalPlanningTutorialTractographySelfTest:
 # qNeurosurgicalPlanningTutorialTractographySelfTestWidget
 #
 
-class NeurosurgicalPlanningTutorialTractographySelfTestWidget:
+class NeurosurgicalPlanningTutorialTractographySelfTestWidget(object):
   def __init__(self, parent = None):
     if not parent:
       self.parent = slicer.qMRMLWidget()
@@ -145,7 +146,7 @@ class NeurosurgicalPlanningTutorialTractographySelfTestWidget:
       evalString = 'globals()["%s"].%sTest()' % (moduleName, moduleName)
       tester = eval(evalString)
       tester.runTest()
-    except Exception, e:
+    except Exception as e:
       import traceback
       traceback.print_exc()
       slicer.util.warningDisplay('Exception!\n\n' + str(e) + "\n\nSee Python Console for Stack Trace",
@@ -156,7 +157,7 @@ class NeurosurgicalPlanningTutorialTractographySelfTestWidget:
 # NeurosurgicalPlanningTutorialTractographySelfTestLogic
 #
 
-class NeurosurgicalPlanningTutorialTractographySelfTestLogic:
+class NeurosurgicalPlanningTutorialTractographySelfTestLogic(object):
 
   def __init__(self):
     pass

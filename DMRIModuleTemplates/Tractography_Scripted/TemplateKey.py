@@ -1,5 +1,6 @@
+from __future__ import division
 import unittest, os, logging, warnings
-from itertools import ifilter
+
 
 import vtk, qt, ctk, slicer
 from vtk.numpy_interface import dataset_adapter as dsa
@@ -165,7 +166,7 @@ class TemplateKeyLogic(ScriptedLoadableModuleLogic):
     fb_numpy = dsa.WrapDataObject(pd)
 
     # Get first tensor key
-    ten_key = next(ifilter(lambda x: "Tensor_" in x, fb_numpy.PointData.keys()), None)
+    ten_key = next(x for x in fb_numpy.PointData.keys() if "Tensor_" in x)
     if not ten_key:
       warnings.warn("No tensor data found")
       return
@@ -226,19 +227,11 @@ class TemplateKeyTest(ScriptedLoadableModuleTest):
     #
     # first, get some data
     #
-    import urllib
-    downloads = (
-        ('http://slicer.kitware.com/midas3/download?items=5767', 'FA.nrrd', slicer.util.loadVolume),
-        )
-
-    for url,name,loader in downloads:
-      filePath = slicer.app.temporaryPath + '/' + name
-      if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
-        logging.info('Requesting download %s from %s...\n' % (name, url))
-        urllib.urlretrieve(url, filePath)
-      if loader:
-        logging.info('Loading %s...' % (name,))
-        loader(filePath)
+    import SampleData
+    SampleData.downloadFromURL(
+      nodeNames='FA',
+      fileNames='FA.nrrd',
+      uris='http://slicer.kitware.com/midas3/download?items=5767')
     self.delayDisplay('Finished with download and loading')
 
     volumeNode = slicer.util.getNode(pattern="FA")
