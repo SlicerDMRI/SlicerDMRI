@@ -5,7 +5,7 @@ import vtk
 import ctk
 import qt
 
-import saferef
+import weakref
 import slicer
 
 __all__ = ['Workflow', 'GeneralizedStep', 'display_error']
@@ -132,13 +132,13 @@ class GeneralizedStep(ctk.ctkWorkflowWidgetStep, ) :
         self.qt_widget = qt_widget
 
         if onEntryCallback:
-            self.weak_onEntryCallback = saferef.safeRef(onEntryCallback)
+            self.weak_onEntryCallback = weakref.WeakMethod(onEntryCallback)
 
         if validateCallback:
-            self.weak_validateCallback = saferef.safeRef(validateCallback)
+            self.weak_validateCallback = weakref.WeakMethod(validateCallback)
 
         if onExitCallback:
-            self.weak_onExitCallback = saferef.safeRef(onExitCallback)
+            self.weak_onExitCallback = weakref.WeakMethod(onExitCallback)
 
     def createUserInterface(self):
         layout = qt.QVBoxLayout(self)
