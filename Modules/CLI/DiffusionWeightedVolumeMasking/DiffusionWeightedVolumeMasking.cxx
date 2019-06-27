@@ -112,6 +112,8 @@ int main( int argc, char * argv[] )
     otsu->SetInput(median->GetOutput());
     otsu->SetNumberOfThresholds(2);
     otsu->SetNumberOfHistogramBins(128);
+    // To request old ITK4 bin behavior, if needed in future.
+    //otsu->ReturnBinMidpointOn();
     otsu->Update();
 
     typedef itk::ConnectedComponentImageFilter<ImageType, ImageType> ccType;
@@ -127,8 +129,22 @@ int main( int argc, char * argv[] )
 
     typedef itk::BinaryThresholdImageFilter<ImageType, ImageType> threshType;
     threshType::Pointer thresh = threshType::New();
-    thresh->SetLowerThreshold(1);
-    thresh->SetUpperThreshold(1);
+    // ITK5 RelabelComponentImageFilter (above) sets background to 1. This is
+    // unexpected behavior since it should ignore background (0) voxels.
+    // FIX: Check for presence of two output objects.
+    // Object with label 2 is second largest (the brain)
+    if (rl->GetNumberOfObjects() == 2)
+      {
+	thresh->SetLowerThreshold(2);
+	thresh->SetUpperThreshold(2);
+
+      }
+    else
+      {
+	// ITK4 used this code assuming one output relabeled object
+	thresh->SetLowerThreshold(1);
+	thresh->SetUpperThreshold(1);
+      }
     thresh->SetOutsideValue(0);
     thresh->SetInsideValue(1);
     thresh->SetInput(rl->GetOutput());
