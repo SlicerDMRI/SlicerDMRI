@@ -23,18 +23,18 @@ public:
   qSlicerTractographyInteractiveSeedingModule(QObject *_parent = 0);
 
   /// Category of the module
-  virtual QStringList categories() const;
+  virtual QStringList categories() const override;
 
   qSlicerGetTitleMacro(QTMODULE_TITLE);
 
-  virtual QString helpText()const;
-  virtual QString acknowledgementText()const;
-  virtual QStringList contributors()const;
+  virtual QString helpText() const override;
+  virtual QString acknowledgementText() const override;
+  virtual QStringList contributors() const override;
 
 protected:
   /// Create and return a widget representation of the object
-  virtual qSlicerAbstractModuleRepresentation* createWidgetRepresentation();
-  virtual vtkMRMLAbstractLogic* createLogic();
+  virtual qSlicerAbstractModuleRepresentation* createWidgetRepresentation() override;
+  virtual vtkMRMLAbstractLogic* createLogic() override;
 
 private:
   //  Q_DECLARE_PRIVATE(qSlicerTractographyInteractiveSeedingModule);

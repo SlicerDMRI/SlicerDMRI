@@ -46,27 +46,27 @@ public:
   qSlicerTractographyDisplayModule(QObject *_parent = 0);
 
   /// Categories of the module
-  virtual QStringList categories() const;
+  virtual QStringList categories() const override;
 
   qSlicerGetTitleMacro(QTMODULE_TITLE);
 
-  virtual QString helpText()const;
-  virtual QString acknowledgementText()const;
-  virtual QStringList contributors()const;
+  virtual QString helpText() const override;
+  virtual QString acknowledgementText() const override;
+  virtual QStringList contributors() const override;
 
   /// Specify editable node types
-  virtual QStringList associatedNodeTypes()const;
+  virtual QStringList associatedNodeTypes() const override;
 
 
 protected:
   /// Initialize the module. Register the volumes reader/writer
-  virtual void setup();
+  virtual void setup() override;
 
   /// Create and return a widget representation of the object
-  virtual qSlicerAbstractModuleRepresentation* createWidgetRepresentation();
+  virtual qSlicerAbstractModuleRepresentation* createWidgetRepresentation() override;
 
   /// Create and return the logic associated to this module
-  virtual vtkMRMLAbstractLogic* createLogic();
+  virtual vtkMRMLAbstractLogic* createLogic() override;
 };
 #endif
 

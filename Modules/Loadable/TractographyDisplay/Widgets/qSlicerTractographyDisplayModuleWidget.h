@@ -43,7 +43,7 @@ public:
   vtkMRMLFiberBundleNode fiberBundleNode()const;
   double PercentageOfFibersShown()const;
 
-  virtual void exit();
+  virtual void exit() override;
 
   virtual bool setEditedNode(vtkMRMLNode* node, QString role = QString(), QString context = QString()) override;
   virtual double nodeEditable(vtkMRMLNode* node) override;
@@ -60,7 +60,7 @@ signals:
   void currentNodeChanged(vtkMRMLFiberBundleNode*);
 
 protected:
-  virtual void setup();
+  virtual void setup() override;
 
 protected:
   QScopedPointer<qSlicerTractographyDisplayModuleWidgetPrivate> d_ptr;
