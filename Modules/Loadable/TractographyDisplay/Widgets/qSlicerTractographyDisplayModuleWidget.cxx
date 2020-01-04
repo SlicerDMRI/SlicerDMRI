@@ -111,11 +111,34 @@ void qSlicerTractographyDisplayModuleWidget::exit()
   this->Superclass::exit();
 }
 
+//-----------------------------------------------------------
+bool qSlicerTractographyDisplayModuleWidget::setEditedNode(vtkMRMLNode* node,
+                                                        QString role /* = QString()*/,
+                                                        QString context /* = QString() */)
+{
+  Q_UNUSED(role);
+  Q_UNUSED(context);
+  this->setFiberBundleNode(node);
+  return true;
+}
+
+//-----------------------------------------------------------
+double qSlicerTractographyDisplayModuleWidget::nodeEditable(vtkMRMLNode* node)
+{
+  if (node->IsA("vtkMRMLFiberBundleNode"))
+    {
+    return 1.0;
+    }
+  return 0.1;
+}
+
+//-----------------------------------------------------------
 void qSlicerTractographyDisplayModuleWidget::setFiberBundleNode(vtkMRMLNode* inputNode)
 {
   this->setFiberBundleNode(vtkMRMLFiberBundleNode::SafeDownCast(inputNode));
 }
 
+//-----------------------------------------------------------
 void qSlicerTractographyDisplayModuleWidget::setFiberBundleNode(vtkMRMLFiberBundleNode* fiberBundleNode)
 {
   Q_D(qSlicerTractographyDisplayModuleWidget);
@@ -143,6 +166,7 @@ void qSlicerTractographyDisplayModuleWidget::setFiberBundleNode(vtkMRMLFiberBund
   d->LineDisplayWidget->setFiberBundleNode(fiberBundleNode);
   d->TubeDisplayWidget->setFiberBundleNode(fiberBundleNode);
   d->GlyphDisplayWidget->setFiberBundleNode(fiberBundleNode);
+  d->TractographyDisplayTreeView->setCurrentNode(fiberBundleNode);
 
   if (fiberBundleNode)
   {
@@ -157,6 +181,7 @@ void qSlicerTractographyDisplayModuleWidget::setFiberBundleNode(vtkMRMLFiberBund
   emit percentageOfFibersShownChanged(d->PercentageOfFibersShown);
 }
 
+//-----------------------------------------------------------
 void qSlicerTractographyDisplayModuleWidget::setPercentageOfFibersShown(double percentage)
 {
   Q_D(qSlicerTractographyDisplayModuleWidget);
@@ -186,4 +211,3 @@ void qSlicerTractographyDisplayModuleWidget::setSolidTubeColor(bool solid)
       }
     }
 }
-

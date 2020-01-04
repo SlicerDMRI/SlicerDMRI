@@ -45,6 +45,9 @@ public:
 
   virtual void exit();
 
+  virtual bool setEditedNode(vtkMRMLNode* node, QString role = QString(), QString context = QString()) override;
+  virtual double nodeEditable(vtkMRMLNode* node) override;
+
 public slots:
   void setFiberBundleNode(vtkMRMLNode*);
   void setFiberBundleNode(vtkMRMLFiberBundleNode*);
