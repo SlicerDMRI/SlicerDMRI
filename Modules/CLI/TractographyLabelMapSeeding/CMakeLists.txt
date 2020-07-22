@@ -23,5 +23,7 @@ SEMMacroBuildCLI(
 
 #-----------------------------------------------------------------------------
 if(BUILD_TESTING)
-  add_subdirectory(Testing)
+  if(NOT WIN32)
+    add_subdirectory(Testing)
+  endif()
 endif()
