@@ -161,6 +161,8 @@ public:
   /// Create and return default storage node or NULL if does not have one
   virtual vtkMRMLStorageNode* CreateDefaultStorageNode() VTK_OVERRIDE;
 
+  std::string GetDefaultStorageNodeClassName(const char* filename /* =nullptr */) override;
+
   /// Create default display nodes
   virtual void CreateDefaultDisplayNodes() VTK_OVERRIDE;
 

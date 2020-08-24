@@ -25,6 +25,7 @@ vtkMRMLNodeNewMacro(vtkMRMLFiberBundleStorageNode);
 vtkMRMLFiberBundleStorageNode::vtkMRMLFiberBundleStorageNode()
 {
   this->DefaultWriteFileExtension = "vtk";
+  this->CoordinateSystem = vtkMRMLStorageNode::CoordinateSystemRAS;
 }
 
 //----------------------------------------------------------------------------
