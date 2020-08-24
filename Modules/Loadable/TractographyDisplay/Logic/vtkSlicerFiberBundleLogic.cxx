@@ -136,6 +136,7 @@ vtkMRMLFiberBundleNode* vtkSlicerFiberBundleLogic::AddFiberBundle (const char* f
   else
     {
     vtkErrorMacro("Couldn't read file, returning null fiberBundle node: " << filename);
+    fiberBundleNode = nullptr;
     }
 
   return fiberBundleNode;
