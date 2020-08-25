@@ -608,6 +608,15 @@ vtkMRMLStorageNode* vtkMRMLFiberBundleNode::CreateDefaultStorageNode()
 }
 
 //---------------------------------------------------------------------------
+std::string vtkMRMLFiberBundleNode:: GetDefaultStorageNodeClassName(const char* filename /* =nullptr */)
+{
+  vtkDebugMacro("vtkMRMLFiberBundleNode::GetDefaultStorageNodeClassName");
+  return "vtkMRMLFiberBundleStorageNode";
+}
+
+
+
+//---------------------------------------------------------------------------
 vtkMRMLFiberBundleDisplayNode* addDisplayNodeAndDTDPN(vtkMRMLFiberBundleNode* fbNode,
                                                       vtkMRMLFiberBundleDisplayNode* node)
 {
