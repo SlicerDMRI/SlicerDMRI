@@ -91,7 +91,10 @@ QStringList qSlicerFiberBundleReader::extensions()const
 bool qSlicerFiberBundleReader::load(const IOProperties& properties)
 {
   Q_D(qSlicerFiberBundleReader);
-  Q_ASSERT(properties.contains("fileName"));
+  if (!properties.contains("fileName"))
+    {
+    return false;
+    }
   QString fileName = properties["fileName"].toString();
 
   if (d->FiberBundleLogic.GetPointer() == 0)
@@ -107,15 +110,16 @@ bool qSlicerFiberBundleReader::load(const IOProperties& properties)
     suffixList.removeDuplicates();
 
     // here filename describes a directory
-    Q_ASSERT(QFileInfo(fileName).isDir());
-
-    // suffix should be of style: *.png
-    foreach(const QString& fileName, QDir(fileName).entryList(suffixList))
+    if (QFileInfo(fileName).isDir())
       {
-      vtkMRMLFiberBundleNode* node = d->FiberBundleLogic->AddFiberBundle(fileName.toLatin1());
-      if (node)
+      // suffix should be of style: "*.png"
+      foreach(const QString& fileName, QDir(fileName).entryList(suffixList))
         {
-        nodeIDs << node->GetID();
+        vtkMRMLFiberBundleNode* node = d->FiberBundleLogic->AddFiberBundle(fileName.toLatin1());
+        if (node)
+          {
+          nodeIDs << node->GetID();
+          }
         }
       }
     }
