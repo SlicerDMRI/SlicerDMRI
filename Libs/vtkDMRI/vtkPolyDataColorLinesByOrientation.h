@@ -25,7 +25,7 @@ class vtkDMRI_EXPORT vtkPolyDataColorLinesByOrientation : public vtkPolyDataAlgo
 public:
   static vtkPolyDataColorLinesByOrientation *New();
   vtkTypeMacro(vtkPolyDataColorLinesByOrientation,vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///
   /// Turn on/off extraction of scalars for color.
@@ -65,9 +65,9 @@ protected:
   ~vtkPolyDataColorLinesByOrientation();
 
   /// Usual data generation method
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info) VTK_OVERRIDE;
+  virtual int FillInputPortInformation(int port, vtkInformation *info) override;
 
   char* ScalarArrayName;
   int CopyOriginalData;

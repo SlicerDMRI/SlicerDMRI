@@ -44,11 +44,11 @@ public:
   // The Usual vtk class functions
   static vtkSlicerTractographyInteractiveSeedingLogic *New();
   vtkTypeMacro(vtkSlicerTractographyInteractiveSeedingLogic,vtkSlicerModuleLogic);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   virtual void ProcessMRMLNodesEvents(vtkObject* caller,
                                       unsigned long event,
-                                      void * callData) VTK_OVERRIDE;
+                                      void * callData) override;
 
   // Get parameters node
   vtkGetObjectMacro (TractographyInteractiveSeedingNode, vtkMRMLTractographyInteractiveSeedingNode);
@@ -107,10 +107,10 @@ protected:
 
   /// Register node classes into the mrml scene. Called each time a new scene
   /// is set. Do nothing by default. Can be reimplemented in derivated classes.
-  virtual void RegisterNodes() VTK_OVERRIDE;
+  virtual void RegisterNodes() override;
 
   // Initialize listening to MRML events
-  virtual void SetMRMLSceneInternal(vtkMRMLScene * newScene) VTK_OVERRIDE;
+  virtual void SetMRMLSceneInternal(vtkMRMLScene * newScene) override;
 
   // set and observe the 0th parameter node in the scene, looking for it by
   // class vtkMRMLTractographyInteractiveSeedingNode. Called when the scene
@@ -118,11 +118,11 @@ protected:
   void SelectFirstParameterNode();
 
   /// Respond to MRML events
-  virtual void OnMRMLSceneEndImport() VTK_OVERRIDE;
-  virtual void OnMRMLSceneEndRestore() VTK_OVERRIDE;
-  virtual void OnMRMLSceneNodeRemoved(vtkMRMLNode* node) VTK_OVERRIDE;
+  virtual void OnMRMLSceneEndImport() override;
+  virtual void OnMRMLSceneEndRestore() override;
+  virtual void OnMRMLSceneNodeRemoved(vtkMRMLNode* node) override;
 
-  virtual void OnMRMLNodeModified(vtkMRMLNode* node) VTK_OVERRIDE;
+  virtual void OnMRMLNodeModified(vtkMRMLNode* node) override;
 
   void AddMRMLNodesObservers();
 

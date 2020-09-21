@@ -40,7 +40,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRMLDM_EXPORT vtkMRMLTractographyDis
 public:
   static vtkMRMLTractographyDisplayDisplayableManager *New();
   vtkTypeMacro(vtkMRMLTractographyDisplayDisplayableManager, vtkMRMLAbstractThreeDViewDisplayableManager);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkGetMacro(EnableFiberEdit, int);
   vtkSetMacro(EnableFiberEdit, int);
@@ -51,12 +51,12 @@ protected:
   vtkMRMLTractographyDisplayDisplayableManager(const vtkMRMLTractographyDisplayDisplayableManager&);
   void operator=(const vtkMRMLTractographyDisplayDisplayableManager&);
 
-  virtual int ActiveInteractionModes() VTK_OVERRIDE;
+  virtual int ActiveInteractionModes() override;
 
-  virtual void SetMRMLSceneInternal(vtkMRMLScene* newScene) VTK_OVERRIDE;
-  virtual void ProcessMRMLNodesEvents(vtkObject *caller, unsigned long event, void *callData) VTK_OVERRIDE;
+  virtual void SetMRMLSceneInternal(vtkMRMLScene* newScene) override;
+  virtual void ProcessMRMLNodesEvents(vtkObject *caller, unsigned long event, void *callData) override;
 
-  virtual void OnInteractorStyleEvent(int eventId) VTK_OVERRIDE;
+  virtual void OnInteractorStyleEvent(int eventId) override;
 
   vtkMRMLFiberBundleNode* GetPickedFiber(vtkMRMLFiberBundleDisplayNode* displayNode,
                                                          vtkIdType pickedCell, vtkIdType &cellID);

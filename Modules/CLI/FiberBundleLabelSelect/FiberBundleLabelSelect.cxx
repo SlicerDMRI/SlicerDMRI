@@ -159,7 +159,12 @@ int main( int argc, char * argv[] )
   vtkIdType numPts = inPts->GetNumberOfPoints();
   vtkCellArray *inLines = input->GetLines();
   vtkIdType numLines = inLines->GetNumberOfCells();
-  vtkIdType npts=0, sampledNpts=0, *pts=NULL;
+  vtkIdType npts=0, sampledNpts=0;
+#if VTK_MAJOR_VERSION >= 9 || (VTK_MAJOR_VERSION >= 8 && VTK_MINOR_VERSION >= 90)
+  const vtkIdType*pts;
+#else
+  vtkIdType*pts=NULL;
+#endif
 
   if ( !inPts || numPts  < 1 || !inLines || numLines < 1 )
     {

@@ -322,7 +322,12 @@ void vtkMRMLTractographyDisplayDisplayableManager::SelectPickedFibers(vtkMRMLFib
 
   // copy polydata
   vtkIdType npts;
+#if VTK_MAJOR_VERSION >= 9 || (VTK_MAJOR_VERSION >= 8 && VTK_MINOR_VERSION >= 90)
+  const vtkIdType* pts;
+#else
   vtkIdType* pts;
+#endif
+
   vtkPolyData *polyData = vtkPolyData::New();
   polyData->DeepCopy(fiberBundleNode->GetPolyData());
   if (polyData->GetPointData() == NULL || polyData->GetPointData()->GetArray(0) == NULL)

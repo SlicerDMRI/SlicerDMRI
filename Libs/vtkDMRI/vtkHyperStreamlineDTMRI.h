@@ -47,7 +47,7 @@ class vtkDMRI_EXPORT vtkHyperStreamlineDTMRI : public vtkHyperStreamline
 {
 public:
   vtkTypeMacro(vtkHyperStreamlineDTMRI,vtkHyperStreamline);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///
   /// Construct object with initial starting position (0,0,0); integration
@@ -65,8 +65,8 @@ public:
 
   ///
   /// This is in mm, unlike superclass value which is a fraction of a cell.
-  /// Implement here instead of vtkSetMacro to use VTK_OVERRIDE
-  void SetIntegrationStepLength(double length) VTK_OVERRIDE {
+  /// Implement here instead of vtkSetMacro to use override
+  void SetIntegrationStepLength(double length) override {
     if (this->IntegrationStepLength != length) {
       this->IntegrationStepLength = length;
       this->Modified();
@@ -112,7 +112,7 @@ protected:
   ~vtkHyperStreamlineDTMRI();
 
   /// Integrate data
-  virtual int RequestData(vtkInformation *,vtkInformationVector**, vtkInformationVector *) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation *,vtkInformationVector**, vtkInformationVector *) override;
   void BuildLines(vtkDataSet *input, vtkPolyData *output);
   void BuildLinesForSingleTrajectory(vtkDataSet *input, vtkPolyData *output);
   void BuildLinesForTwoTrajectories(vtkDataSet *input, vtkPolyData *output);

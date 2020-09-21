@@ -36,7 +36,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_LOGIC_EXPORT vtkSlicerFiberBundleLog
   // The Usual vtk class functions
   static vtkSlicerFiberBundleLogic *New();
   vtkTypeMacro(vtkSlicerFiberBundleLogic,vtkSlicerModuleLogic);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
   // Create new mrml fiber bundle node and read its polydata from a specified file.
@@ -60,10 +60,10 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_LOGIC_EXPORT vtkSlicerFiberBundleLog
   // Description:
   // Register MRML Node classes to Scene.
   // Gets called automatically when the MRMLScene is attached to this logic class.
-  virtual void RegisterNodes() VTK_OVERRIDE;
+  virtual void RegisterNodes() override;
 
-  virtual void SetMRMLSceneInternal(vtkMRMLScene*) VTK_OVERRIDE;
-  virtual void OnMRMLSceneNodeAdded(vtkMRMLNode*) VTK_OVERRIDE;
+  virtual void SetMRMLSceneInternal(vtkMRMLScene*) override;
+  virtual void OnMRMLSceneNodeAdded(vtkMRMLNode*) override;
 
 protected:
   vtkSlicerFiberBundleLogic();

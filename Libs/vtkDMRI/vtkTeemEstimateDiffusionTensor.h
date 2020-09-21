@@ -171,17 +171,17 @@ class vtkDMRI_EXPORT vtkTeemEstimateDiffusionTensor : public vtkThreadedImageAlg
   ///
   int NumberOfWLSIterations;
 
-  virtual int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *) VTK_OVERRIDE;
+  virtual int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
 
   void ThreadedExecute(vtkImageData *inData, vtkImageData *outData,
-        int extent[6], int id) VTK_OVERRIDE;
+        int extent[6], int id) override;
 
   /// We override this in order to allocate output tensors
   /// before threading happens.  This replaces the superclass
   /// vtkImageAlgorithm's RequestData function.
   virtual int RequestData(vtkInformation* request,
                           vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector) VTK_OVERRIDE;
+                          vtkInformationVector* outputVector) override;
 };
 
 #endif

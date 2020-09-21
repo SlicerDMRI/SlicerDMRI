@@ -40,12 +40,12 @@ class  vtkDMRI_EXPORT vtkBSplineInterpolateImageFunction : public vtkImplicitFun
  public:
   static vtkBSplineInterpolateImageFunction *New();
   vtkTypeMacro(vtkBSplineInterpolateImageFunction, vtkImplicitFunction );
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  virtual void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  virtual double EvaluateFunction (double x[ImageDimension]) VTK_OVERRIDE;
+  virtual double EvaluateFunction (double x[ImageDimension]) override;
 
   virtual void EvaluateGradient (double x[ImageDimension],
-                                 double g[ImageDimension]) VTK_OVERRIDE;
+                                 double g[ImageDimension]) override;
   void SetInput(vtkImageData* dataset);
 
   unsigned int GetSplineOrder() { return this->SplineOrder; }
