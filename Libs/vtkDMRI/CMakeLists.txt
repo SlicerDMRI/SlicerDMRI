@@ -122,13 +122,23 @@ if(VTK_WRAP_PYTHON)
     )
 
   # Set python module logic output
-  set_target_properties(${lib_name}Python ${lib_name}PythonD PROPERTIES
+  set_target_properties(${lib_name}Python PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${Slicer_QTLOADABLEMODULES_BIN_DIR}"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${Slicer_QTLOADABLEMODULES_LIB_DIR}"
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${Slicer_QTLOADABLEMODULES_LIB_DIR}"
     )
+  if(${VTK_VERSION} VERSION_LESS "8.90")
+    set_target_properties(${lib_name}Python PROPERTIES
+      RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${Slicer_QTLOADABLEMODULES_BIN_DIR}"
+      LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${Slicer_QTLOADABLEMODULES_LIB_DIR}"
+      ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${Slicer_QTLOADABLEMODULES_LIB_DIR}"
+      )
+  endif()
   # Export target
-  export(TARGETS ${lib_name}Python ${lib_name}PythonD APPEND FILE ${${lib_name}_EXPORT_FILE})
+  export(TARGETS ${lib_name}Python APPEND FILE ${${lib_name}_EXPORT_FILE})
+  if(${VTK_VERSION} VERSION_LESS "8.90")
+    export(TARGETS ${lib_name}PythonD APPEND FILE ${${lib_name}_EXPORT_FILE})
+  endif()
 endif()
 
 # --------------------------------------------------------------------------

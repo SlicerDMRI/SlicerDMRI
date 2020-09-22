@@ -28,7 +28,7 @@ class vtkDMRI_EXPORT vtkPolyDataTensorToColor : public vtkPolyDataAlgorithm
 public:
   static vtkPolyDataTensorToColor *New();
   vtkTypeMacro(vtkPolyDataTensorToColor,vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkSetClampMacro(ColorMode, int, vtkTensorGlyph::COLOR_BY_SCALARS, vtkTensorGlyph::COLOR_BY_EIGENVALUES);
   vtkGetMacro(ColorMode, int);
@@ -72,9 +72,9 @@ protected:
   ~vtkPolyDataTensorToColor() {};
 
   /// Usual data generation method
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info) VTK_OVERRIDE;
+  virtual int FillInputPortInformation(int port, vtkInformation *info) override;
 
   void ColorGlyphsBy(int measure);
   int ColorMode; /// The coloring mode to use for the glyphs.

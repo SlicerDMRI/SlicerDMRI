@@ -35,21 +35,21 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleLineDi
  public:
   static vtkMRMLFiberBundleLineDisplayNode *New (  );
   vtkTypeMacro ( vtkMRMLFiberBundleLineDisplayNode, vtkMRMLFiberBundleDisplayNode );
-  void PrintSelf ( ostream& os, vtkIndent indent ) VTK_OVERRIDE;
+  void PrintSelf ( ostream& os, vtkIndent indent ) override;
 
   //--------------------------------------------------------------------------
   /// MRMLNode methods
   //--------------------------------------------------------------------------
 
-  virtual vtkMRMLNode* CreateNodeInstance (  ) VTK_OVERRIDE;
+  virtual vtkMRMLNode* CreateNodeInstance (  ) override;
 
   ///
   /// Get node XML tag name (like Volume, UnstructuredGrid)
-  virtual const char* GetNodeTagName ( ) VTK_OVERRIDE {return "FiberBundleLineDisplayNode";};
+  virtual const char* GetNodeTagName ( ) override {return "FiberBundleLineDisplayNode";};
 
   ///
   /// Update the pipeline based on this node attributes
-  virtual void UpdateAssignedAttribute() VTK_OVERRIDE;
+  virtual void UpdateAssignedAttribute() override;
 
 
  protected:
@@ -59,7 +59,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleLineDi
   void operator= ( const vtkMRMLFiberBundleLineDisplayNode& );
 
   /// Reimplemented to return the output of the display pipeline
-  virtual vtkAlgorithmOutput* GetOutputMeshConnection() VTK_OVERRIDE;
+  virtual vtkAlgorithmOutput* GetOutputMeshConnection() override;
 
   /// display pipeline
   vtkPolyDataTensorToColor *TensorToColor;

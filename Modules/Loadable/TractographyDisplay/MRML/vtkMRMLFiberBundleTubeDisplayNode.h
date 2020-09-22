@@ -34,34 +34,34 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleTubeDi
  public:
   static vtkMRMLFiberBundleTubeDisplayNode *New (  );
   vtkTypeMacro ( vtkMRMLFiberBundleTubeDisplayNode, vtkMRMLFiberBundleDisplayNode );
-  void PrintSelf ( ostream& os, vtkIndent indent ) VTK_OVERRIDE;
+  void PrintSelf ( ostream& os, vtkIndent indent ) override;
 
   //--------------------------------------------------------------------------
   /// MRMLNode methods
   //--------------------------------------------------------------------------
 
-  virtual vtkMRMLNode* CreateNodeInstance (  ) VTK_OVERRIDE;
+  virtual vtkMRMLNode* CreateNodeInstance (  ) override;
 
   ///
   /// Read node attributes from XML (MRML) file
-  virtual void ReadXMLAttributes ( const char** atts ) VTK_OVERRIDE;
+  virtual void ReadXMLAttributes ( const char** atts ) override;
 
   ///
   /// Write this node's information to a MRML file in XML format.
-  virtual void WriteXML ( ostream& of, int indent ) VTK_OVERRIDE;
+  virtual void WriteXML ( ostream& of, int indent ) override;
 
 
   ///
   /// Copy the node's attributes to this object
-  virtual void Copy ( vtkMRMLNode *node ) VTK_OVERRIDE;
+  virtual void Copy ( vtkMRMLNode *node ) override;
 
   ///
   /// Get node XML tag name (like Volume, UnstructuredGrid)
-  virtual const char* GetNodeTagName ( ) VTK_OVERRIDE {return "FiberBundleTubeDisplayNode";};
+  virtual const char* GetNodeTagName ( ) override {return "FiberBundleTubeDisplayNode";};
 
   ///
   /// Update the pipeline based on this node attributes
-  virtual void UpdateAssignedAttribute() VTK_OVERRIDE;
+  virtual void UpdateAssignedAttribute() override;
 
   //--------------------------------------------------------------------------
   /// Display Information: Geometry to display (not mutually exclusive)
@@ -86,7 +86,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleTubeDi
 
   ///
   /// Gets resultin glyph PolyData
-  virtual vtkAlgorithmOutput* GetOutputMeshConnection() VTK_OVERRIDE;
+  virtual vtkAlgorithmOutput* GetOutputMeshConnection() override;
 
   /// Enumerated
 

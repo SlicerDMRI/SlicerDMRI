@@ -27,7 +27,7 @@ class vtkDMRI_EXPORT vtkPreciseHyperStreamlinePoints : public vtkPreciseHyperStr
 public:
   static vtkPreciseHyperStreamlinePoints *New();
   vtkTypeMacro(vtkPreciseHyperStreamlinePoints,vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkGetObjectMacro(PreciseHyperStreamline0,vtkPoints);
   vtkGetObjectMacro(PreciseHyperStreamline1,vtkPoints);
@@ -36,7 +36,7 @@ protected:
   vtkPreciseHyperStreamlinePoints();
   ~vtkPreciseHyperStreamlinePoints();
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
 
   /// convenient pointers to PreciseHyperStreamline1 and PreciseHyperStreamline2
   vtkPoints *PreciseHyperStreamlines[2];

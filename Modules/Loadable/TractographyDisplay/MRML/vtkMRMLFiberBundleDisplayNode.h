@@ -34,7 +34,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleDispla
 {
  public:
   vtkTypeMacro(vtkMRMLFiberBundleDisplayNode, vtkMRMLModelDisplayNode);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //--------------------------------------------------------------------------
   /// MRMLNode methods
@@ -42,32 +42,32 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleDispla
 
   ///
   /// Read node attributes from XML (MRML) file
-  virtual void ReadXMLAttributes ( const char** atts ) VTK_OVERRIDE;
+  virtual void ReadXMLAttributes ( const char** atts ) override;
 
   ///
   /// Write this node's information to a MRML file in XML format.
-  virtual void WriteXML ( ostream& of, int indent ) VTK_OVERRIDE;
+  virtual void WriteXML ( ostream& of, int indent ) override;
 
   ///
   /// Copy the node's attributes to this object
-  virtual void Copy ( vtkMRMLNode *node ) VTK_OVERRIDE;
+  virtual void Copy ( vtkMRMLNode *node ) override;
 
   ///
   /// Get node XML tag name (like Volume, FiberBundle)
-  virtual const char* GetNodeTagName() VTK_OVERRIDE = 0;
+  virtual const char* GetNodeTagName() override = 0;
 
   ///
   /// Updates this node if it depends on other nodes
   /// when the node is deleted in the scene
-  virtual void UpdateReferences() VTK_OVERRIDE;
+  virtual void UpdateReferences() override;
 
   ///
   /// Finds the storage node and read the data
-  virtual void UpdateScene(vtkMRMLScene *scene) VTK_OVERRIDE;
+  virtual void UpdateScene(vtkMRMLScene *scene) override;
 
   ///
   /// Update the stored reference to another node in the scene
-  virtual void UpdateReferenceID(const char *oldID, const char *newID) VTK_OVERRIDE;
+  virtual void UpdateReferenceID(const char *oldID, const char *newID) override;
 
   //--------------------------------------------------------------------------
   /// Display Information: Geometry to display (not mutually exclusive)
@@ -183,13 +183,13 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleDispla
   static int GetNthScalarInvariant(int i);
 
   /// Update the pipeline based on this node attributes
-  virtual void UpdateAssignedAttribute() VTK_OVERRIDE;
+  virtual void UpdateAssignedAttribute() override;
 
   virtual void ProcessMRMLEvents ( vtkObject *caller,
                                  unsigned long event,
-                                 void *callData ) VTK_OVERRIDE;
+                                 void *callData ) override;
 
-  virtual void SetInputMeshConnection (vtkAlgorithmOutput*) VTK_OVERRIDE;
+  virtual void SetInputMeshConnection (vtkAlgorithmOutput*) override;
 
  protected:
   vtkMRMLFiberBundleDisplayNode ( );

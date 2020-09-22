@@ -410,7 +410,11 @@ int insert_polydata_scalars(TrcTrackSet* trackset,
     //OFCondition res = TrcMeasurement::create(typeCode, unitCode, measurement);
     OFCondition res = trackset->addMeasurement(typeCode, unitCode, measurement);
 
+#if VTK_MAJOR_VERSION >= 9 || (VTK_MAJOR_VERSION >= 8 && VTK_MINOR_VERSION >= 90)
+    const vtkIdType* ptids;
+#else
     vtkIdType* ptids;
+#endif
     vtkIdType numpts;
     lines->InitTraversal();
     size_t track_idx = 0;

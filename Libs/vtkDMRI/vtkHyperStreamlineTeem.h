@@ -21,7 +21,7 @@ class vtkDMRI_EXPORT vtkHyperStreamlineTeem : public vtkHyperStreamlineDTMRI
 
  public:
   vtkTypeMacro(vtkHyperStreamlineTeem,vtkHyperStreamlineDTMRI);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkHyperStreamlineTeem *New();
 
@@ -29,7 +29,7 @@ class vtkDMRI_EXPORT vtkHyperStreamlineTeem : public vtkHyperStreamlineDTMRI
   vtkHyperStreamlineTeem();
   ~vtkHyperStreamlineTeem();
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
   void StartFiberFrom( const double position[3], tenFiberContext *fibercontext );
   void VisualizeFibers( const Nrrd *fibers );
 
