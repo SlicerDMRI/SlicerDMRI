@@ -1,6 +1,7 @@
 
 #-----------------------------------------------------------------------------
 set(BASELINE ${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline)
+set(DATADIR ${CMAKE_CURRENT_SOURCE_DIR}/../../DWIToDTIEstimation/Data)
 set(CLP ${MODULE_NAME})
 
 #-----------------------------------------------------------------------------
@@ -14,7 +15,7 @@ add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test
   --compare ${BASELINE}/${CLP}Test_EstimatedBaseline.nhdr ${TEMP}/${CLP}Test_EstimatedBaseline.nhdr
   --compare ${BASELINE}/${CLP}Test_OtsuThresholdMask.nhdr ${TEMP}/${CLP}Test_OtsuThresholdMask.nhdr
   ${CLP}Test
-    ${MRML_TEST_DATA}/helix-DWI.nhdr
+    ${DATADIR}/helix-DWI.nhdr
     ${TEMP}/${CLP}Test_EstimatedBaseline.nhdr
     ${TEMP}/${CLP}Test_OtsuThresholdMask.nhdr
   )
