@@ -12,6 +12,7 @@ set_target_properties(${CLP}Test PROPERTIES FOLDER ${${CLP}_TARGETS_FOLDER})
 
 #-----------------------------------------------------------------------------
 get_filename_component(BASELINE ${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline ABSOLUTE)
+get_filename_component(DATADIR ${CMAKE_CURRENT_SOURCE_DIR}/../../DWIToDTIEstimation/Data/Baseline ABSOLUTE)
 
 #-----------------------------------------------------------------------------
 # make sure the data directories exist
@@ -44,7 +45,7 @@ foreach(measure ${MeasuresToTest})
            --compare "${BASELINE}/helix-DTI-${measure}.nhdr" "${TEMP}/helix-DTI-${measure}.nhdr"
            ${CLP}Test
            --enumeration "${measure}"
-           "${MRML_TEST_DATA}/helix-DTI.nhdr"
+           "${DATADIR}/helix-DTI.nhdr"
            "${TEMP}/helix-DTI-${measure}.nhdr"
            )
   set_property(TEST ${testname} PROPERTY LABELS ${CLP})

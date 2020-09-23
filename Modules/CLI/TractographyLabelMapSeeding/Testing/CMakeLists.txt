@@ -1,7 +1,7 @@
 
 #-----------------------------------------------------------------------------
 set(CLP ${MODULE_NAME})
-
+set(DATADIR ${CMAKE_CURRENT_SOURCE_DIR}/../../DWIToDTIEstimation/Data/Baseline)
 #-----------------------------------------------------------------------------
 add_executable(${CLP}Test ${CLP}Test.cxx)
 add_dependencies(${CLP}Test ${CLP})
@@ -22,7 +22,7 @@ add_test(NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test
   --stoppingcurvature 0.8
   --integrationsteplength 0.5
   --label 1
-  ${MRML_TEST_DATA}/helix-DTI.nhdr
+  ${DATADIR}/helix-DTI.nhdr
   ${TEMP}/${CLP}Test_helixTracts.vtp
   )
 set_property(TEST ${testname} PROPERTY LABELS ${CLP})
