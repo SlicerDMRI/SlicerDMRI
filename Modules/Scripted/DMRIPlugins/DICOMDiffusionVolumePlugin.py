@@ -29,12 +29,12 @@ class DICOMDiffusionVolumePluginClass(DICOMPlugin):
             '0019,10bd', # Z component of gradient direction
           ],
         'Siemens' : [
-            '0051,100b', # "Mosiac Matrix Size"
+            # Removed because found in non-DWI volume: '0051,100b', # "Mosiac Matrix Size"
             '0019,100a', # "Number of Images In Mosaic"
             '0019,100c', # "B Value of diffusion weighting"
             '0019,100e', # "Diffusion Gradient Direction"
             '0019,1027', # "Diffusion Matrix"
-            '0029,1010', # "Siemens DWI Info"
+            # Removed because found in non-DWI volume: '0029,1010', # "Siemens DWI Info"
           ],
         'Philips' : [
             '2001,1003', # "B Value of diffusion weighting"
@@ -94,19 +94,18 @@ class DICOMDiffusionVolumePluginClass(DICOMPlugin):
       return loadables
 
     vendorName = ""
+    matchingVendors = []
     for vendor in self.diffusionTags:
-      matchesVendor = True
       for tag in self.diffusionTags[vendor]:
         # Check the first three files because some tags may
         # not be present in the b0 image (e.g. for Siemens)
         for i in range(0, 3 if (len(files) > 2) else len(files)):
           value = slicer.dicomDatabase.fileValue(files[i], tag)
           hasTag = value != ""
-          if hasTag:
-            matchesVendor &= hasTag
-      if matchesVendor:
+          if hasTag and not vendor in matchingVendors:
+            matchingVendors.append(vendor)
+      if len(matchingVendors) > 0:
         validDWI = True
-        vendorName = vendor
 
     if validDWI:
       # default loadable includes all files for series
@@ -114,7 +113,7 @@ class DICOMDiffusionVolumePluginClass(DICOMPlugin):
       loadable.files = files
       loadable.name = name + ' - as DWI Volume'
       loadable.selected = True
-      loadable.tooltip = "Appears to be DWI from vendor %s" % vendorName
+      loadable.tooltip = "Matches DICOM tags for the following vendor(s): %s" % (", ".join(matchingVendors)
       loadable.confidence = 0.6
       loadables = [loadable]
     return loadables
