@@ -113,7 +113,7 @@ class DICOMDiffusionVolumePluginClass(DICOMPlugin):
       loadable.files = files
       loadable.name = name + ' - as DWI Volume'
       loadable.selected = True
-      loadable.tooltip = "Matches DICOM tags for the following vendor(s): %s" % (", ".join(matchingVendors)
+      loadable.tooltip = "Matches DICOM tags for the following vendor(s): %s" % (", ".join(matchingVendors))
       loadable.confidence = 0.6
       loadables = [loadable]
     return loadables
