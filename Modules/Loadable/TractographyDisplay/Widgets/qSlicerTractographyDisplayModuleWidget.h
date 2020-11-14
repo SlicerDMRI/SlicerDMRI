@@ -55,6 +55,7 @@ public slots:
   void setFiberBundleNode(vtkMRMLFiberBundleNode*);
   void setPercentageOfFibersShown(double);
   void setSolidTubeColor(bool);
+  void onAddDirectory();
 
 signals:
   void percentageOfFibersShownChanged(double);

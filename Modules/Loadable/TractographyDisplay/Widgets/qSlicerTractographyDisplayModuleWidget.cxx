@@ -16,6 +16,7 @@
 // Qt includes
 #include <QtConcurrent/QtConcurrent>
 #include <QDir>
+#include <QFileDialog>
 #include <QFuture>
 #include <QFutureSynchronizer>
 #include <QFutureWatcher>
@@ -76,6 +77,8 @@ void qSlicerTractographyDisplayModuleWidgetPrivate::init()
 
   this->percentageOfFibersShown->setTracking(false);
 
+  QObject::connect(this->addDirectory, SIGNAL(clicked()),
+                   q, SLOT(onAddDirectory()));
   QObject::connect(this->percentageOfFibersShown, SIGNAL(valueChanged(double)),
                    q, SLOT(setPercentageOfFibersShown(double)));
   QObject::connect(q, SIGNAL(percentageOfFibersShownChanged(double)),
@@ -225,6 +228,16 @@ void qSlicerTractographyDisplayModuleWidget::setSolidTubeColor(bool solid)
     }
 }
 
+//-----------------------------------------------------------
+void qSlicerTractographyDisplayModuleWidget::onAddDirectory()
+{
+  QString directoryPath = QFileDialog::getExistingDirectory(this, "Directory to add");
+  if (directoryPath != "")
+    {
+    this->loadThreaded(directoryPath);
+    }
+}
+
 
 //-----------------------------------------------------------
 
@@ -263,21 +276,11 @@ public:
 //-----------------------------------------------------------
 bool qSlicerTractographyDisplayModuleWidget::loadThreaded(QString directoryPath)
 {
-  QString path = "/opt/data/SlicerDMRI/ABCD-Harmonization/WMA/tar_sub-NDARINV0UA196B6_ses_newPara/AnatomicalTracts";
-  //path = "/opt/data/SlicerDMRI/ABCD-Harmonization/WMA/tar_harmonized_sub-NDARINV0UA196B6_ses_newPara/TractSubset";
-  /*
-slicer.modules.tractographydisplay.widgetRepresentation().loadThreaded("")
-   */
-  if (directoryPath != "")
-    {
-    path = directoryPath;
-    }
-
   this->mrmlScene()->StartState(vtkMRMLScene::ImportState);
 
   QFutureSynchronizer<void> futureSynchrnonizer;
 
-  QDir dir(path);
+  QDir dir(directoryPath);
   QStringList nameFilter;
   nameFilter << "*.vtp";
   foreach(QString fileName, dir.entryList(nameFilter)) {
@@ -287,7 +290,7 @@ slicer.modules.tractographydisplay.widgetRepresentation().loadThreaded("")
 
     FiberReader reader;
 
-    QFuture<ReaderType> future = reader.read(miniScene, path+"/"+fileName);
+    QFuture<ReaderType> future = reader.read(miniScene, directoryPath+"/"+fileName);
     futureSynchrnonizer.addFuture(future);
 
     QFutureWatcher<ReaderType> *watcher = new QFutureWatcher<ReaderType>();
