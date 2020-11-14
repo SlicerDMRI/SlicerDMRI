@@ -228,30 +228,34 @@ void qSlicerTractographyDisplayModuleWidget::setSolidTubeColor(bool solid)
 
 //-----------------------------------------------------------
 
-typedef vtkPolyData* ReaderType;
+typedef void ReaderType;
 
 class FiberReader : public QObject
 {
 
 public:
 
-  QFuture<ReaderType> read(const QString& filePath)
+  QFuture<ReaderType> read(vtkMRMLScene * miniScene, const QString& filePath)
     {
-    auto fiberReaderWorker = [](const QString& filePath)
+    auto fiberReaderWorker = [](vtkMRMLScene *miniScene, const QString& filePath)
       {
       qDebug() << "inside worker with " << filePath;
-
 
       vtkNew<vtkXMLPolyDataReader> reader;
       reader->SetFileName(filePath.toStdString().c_str());
       reader->Update();
+      vtkPolyData *polyData = reader->GetOutput();
 
-      vtkPolyData *result = reader->GetOutput();
-      result->Register(result);
+      vtkNew<vtkMRMLFiberBundleNode> fiberBundleNode;
+      QString nodeName = QFileInfo(filePath).baseName();
+      fiberBundleNode->SetName(nodeName.toStdString().c_str());
 
-      return result;
+      fiberBundleNode->SetAndObservePolyData(polyData);
+      miniScene->AddNode(fiberBundleNode);
+      fiberBundleNode->CreateDefaultDisplayNodes();
+
       };
-    return QtConcurrent::run(fiberReaderWorker, filePath);
+    return QtConcurrent::run(fiberReaderWorker, miniScene, filePath);
     }
 };
 
@@ -260,7 +264,7 @@ public:
 bool qSlicerTractographyDisplayModuleWidget::loadThreaded(QString directoryPath)
 {
   QString path = "/opt/data/SlicerDMRI/ABCD-Harmonization/WMA/tar_sub-NDARINV0UA196B6_ses_newPara/AnatomicalTracts";
-  path = "/opt/data/SlicerDMRI/ABCD-Harmonization/WMA/tar_harmonized_sub-NDARINV0UA196B6_ses_newPara/TractSubset";
+  //path = "/opt/data/SlicerDMRI/ABCD-Harmonization/WMA/tar_harmonized_sub-NDARINV0UA196B6_ses_newPara/TractSubset";
   /*
 slicer.modules.tractographydisplay.widgetRepresentation().loadThreaded("")
    */
@@ -269,40 +273,69 @@ slicer.modules.tractographydisplay.widgetRepresentation().loadThreaded("")
     path = directoryPath;
     }
 
+  this->mrmlScene()->StartState(vtkMRMLScene::ImportState);
 
   QFutureSynchronizer<void> futureSynchrnonizer;
-  this->mrmlScene()->StartState(vtkMRMLScene::StartBatchProcessEvent);
 
   QDir dir(path);
   QStringList nameFilter;
   nameFilter << "*.vtp";
   foreach(QString fileName, dir.entryList(nameFilter)) {
-    vtkMRMLFiberBundleNode *fiberBundleNode = vtkMRMLFiberBundleNode::New();
-    QString nodeName = QFileInfo(fileName).baseName();
-    fiberBundleNode->SetName(nodeName.toStdString().c_str());
+
+    vtkMRMLScene *miniScene = vtkMRMLScene::New();
+    miniScene->CopyRegisteredNodesToScene(this->mrmlScene());
 
     FiberReader reader;
 
-    QFuture<ReaderType> future = reader.read(path+"/"+fileName);
+    QFuture<ReaderType> future = reader.read(miniScene, path+"/"+fileName);
     futureSynchrnonizer.addFuture(future);
 
     QFutureWatcher<ReaderType> *watcher = new QFutureWatcher<ReaderType>();
 
     connect(watcher, &QFutureWatcher<ReaderType>::finished,
       [=]() {
-        vtkPolyData *polyData = future.result();
-        qDebug() << "Got back " << polyData->GetNumberOfCells();
-        fiberBundleNode->SetAndObservePolyData(polyData);
-        this->mrmlScene()->AddNode(fiberBundleNode);
+        qDebug() << "Got back scene with " << miniScene->GetNumberOfNodes();
 
-        polyData->Delete();
+        vtkMRMLNode *node = miniScene->GetNthNodeByClass(0, "vtkMRMLFiberBundleNode");
+        vtkMRMLFiberBundleNode *fiberBundleNode = vtkMRMLFiberBundleNode::SafeDownCast(node);
+        std::vector<vtkMRMLFiberBundleDisplayNode *> fiberDisplayNodes;
+        int displayNodeCount = fiberBundleNode->GetNumberOfDisplayNodes();
+        for (int displayNodeIndex = 0; displayNodeIndex < displayNodeCount; displayNodeIndex++)
+          {
+          vtkMRMLDisplayNode *displayNode = fiberBundleNode->GetNthDisplayNode(displayNodeIndex);
+          vtkMRMLFiberBundleDisplayNode *fiberDisplayNode = vtkMRMLFiberBundleDisplayNode::SafeDownCast(displayNode);
+          fiberDisplayNodes.push_back(fiberDisplayNode);
+          }
+        fiberBundleNode->RemoveAllDisplayNodeIDs();
+        fiberBundleNode->Register(fiberBundleNode);
+        miniScene->RemoveNode(fiberBundleNode);
+        for(auto fiberDisplayNode : fiberDisplayNodes)
+          {
+          vtkMRMLDiffusionTensorDisplayPropertiesNode *propertiesNode;
+          propertiesNode = fiberDisplayNode->GetDiffusionTensorDisplayPropertiesNode();
+          propertiesNode->Register(fiberBundleNode);
+          miniScene->RemoveNode(propertiesNode);
+          this->mrmlScene()->AddNode(propertiesNode);
+          propertiesNode->Delete();
+          fiberDisplayNode->Register(fiberBundleNode);
+          miniScene->RemoveNode(fiberDisplayNode);
+          this->mrmlScene()->AddNode(fiberDisplayNode);
+          fiberDisplayNode->Delete();
+          fiberDisplayNode->SetAndObserveDiffusionTensorDisplayPropertiesNodeID(propertiesNode->GetID());
+          fiberDisplayNode->SetAndObserveColorNodeID("vtkMRMLColorTableNodeRainbow");
+          fiberBundleNode->AddAndObserveDisplayNodeID(fiberDisplayNode->GetID());
+          }
+        this->mrmlScene()->AddNode(fiberBundleNode);
         fiberBundleNode->Delete();
+        miniScene->Delete();
       }
     );
     watcher->setFuture(future);
   }
 
   futureSynchrnonizer.waitForFinished();
-  this->mrmlScene()->EndState(vtkMRMLScene::EndBatchProcessEvent);
+
+  this->mrmlScene()->EndState(vtkMRMLScene::ImportState);
+
   return true;
 }
