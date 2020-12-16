@@ -81,6 +81,7 @@ add_subdirectory("Modules/Scripted/FiberBundleToLabelMap")
 add_subdirectory("Modules/Scripted/DMRIPlugins")
 add_subdirectory("Modules/Scripted/TractographyExportPLY")
 add_subdirectory("Modules/Scripted/TractographyDownsample")
+add_subdirectory("Modules/Scripted/TRAKOFile")
 
 if (${SlicerDMRI_ENABLE_TRACTIO})
   add_subdirectory("Modules/Loadable/TractIO")
