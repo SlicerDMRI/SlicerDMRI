@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>LNQ TIMC Dataset 1</title>
+    <meta charset="UTF-8">
+    <script src="./js/jquery-1.11.2.min.js"></script>
+		<script src="./js/jquery.svg.js"></script>
+    <link rel="stylesheet" href="./css/dc.css"/>
+    <link rel="stylesheet" href="./css/jquery.svg.css"/>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+
+    <style type="text/css">
+      .dc-chart g.row text {
+          fill: #7B2727;
+      }
+      .dc-chart .pie-slice {
+          fill: #7B2727;
+      }
+      .dc-chart th {
+        text-align: left
+      }
+      .dc-chart th,.dc-chart td {
+          padding-left: 10px;
+      }
+      .dc-chart tr.dc-table-group td {
+          padding-top: 4px;
+          border-bottom: 1px solid black;
+      }
+      .dc-chart select {
+          width: 150px;
+      }
+    </style>
+
+
+</head>
+<body>
+
+<div id='volume-scatter' style="height: 300px; width: 100%"></div>
+<div id="primaryCondition-row-chart"></div>
+<div id="location-row-chart"></div>
+<div id="contrastBolusAgent-pie-chart"></div>
+<div id="timepointHasPET-pie-chart"></div>
+<div id="manufacturerModelName-pie-chart"></div>
+<div id="sliceThickness-histogram-chart"></div>
+
+<div id="measurement-table"></div>
+
+
+<div>
+<p>
+Exploration of variables for TIMC data exported for LNQ.
+</p>
+
+<script type="text/javascript" src="./js/d3.js"></script>
+<script type="text/javascript" src="./js/crossfilter.js"></script>
+<script type="text/javascript" src="./js/dc.js"></script>
+<script type="text/javascript">
+
+let stats = {};
+
+$(document).ready(function() {
+
+  // initialize the dc charts
+  stats.primaryConditionRowChart = dc.rowChart("#primaryCondition-row-chart", "clinical");
+  stats.contrastBolusAgentPieChart = dc.pieChart("#contrastBolusAgent-pie-chart", "clinical");
+  stats.timepointHasPETPieChart = dc.pieChart("#timepointHasPET-pie-chart", "clinical");
+  stats.locationRowChart = dc.rowChart("#location-row-chart", "clinical");
+  stats.manufacturerModelNamePieChart = dc.pieChart("#manufacturerModelName-pie-chart", "clinical");
+  stats.sliceThicknessHistogramChart = dc.barChart("#sliceThickness-histogram-chart", "clinical");
+  stats.measurementTable = dc.dataTable("#measurement-table", "clinical");
+
+  // callback to populate clinical once downloaded
+  stats.makeClinicalPlot = function(clinicalData) {
+
+    stats.cf = crossfilter(measurementData);
+    var allAccess = stats.cf.groupAll();
+
+    var contrastBolusAgentDimension = stats.cf.dimension(function(d) {return d.ContrastBolusAgent;});
+    var contrastBolusAgentGroup = contrastBolusAgentDimension.group();
+
+    primaryConditionDimension = stats.cf.dimension(function(d) {return d.PrimaryCondition;});
+    primaryConditionGroup = primaryConditionDimension.group();
+
+    var sliceThicknessDimension = stats.cf.dimension(function(d) {return d.SliceThickness;});
+    var sliceThicknessHistogram = sliceThicknessDimension.group().reduceCount();
+
+    var timepointHasPETDimension = stats.cf.dimension(function(d) {return d.TimepointHasPET;})
+    timepointHasPETGroup = timepointHasPETDimension.group();
+
+    var locationDimension = stats.cf.dimension(function(d) {return d.Location;})
+    locationGroup = locationDimension.group();
+
+    var manufacturerModelNameDimension = stats.cf.dimension(function(d) {return d.ManufacturerModelName;})
+    manufacturerModelNameGroup = manufacturerModelNameDimension.group();
+
+    patientIDDimension = stats.cf.dimension(function(d) {return d.PatientID;})
+
+    var keyAndPercentValueLabel = function (total_value, d) {
+        return "" + d.key + "  (" + d3.round(d.value/total_value*100.0, 0) + "%)";
+    };
+
+    var pieSize = 200;
+    var pieRadius = 75;
+
+    primaryConditionRowChart
+      .width(300)
+      .height(840)
+      .elasticX(true)
+      .dimension(primaryConditionDimension)
+      .group(primaryConditionGroup)
+      .title( function(p) {return "Primary Condition"} )
+      .label(function(x) { return keyAndPercentValueLabel(allAccess.value(), x) })
+      .legend(dc.legend().x(300).y(10).itemHeight(10).gap(3))
+      .xAxis().ticks(4);
+
+    locationRowChart
+      .width(300)
+      .height(840)
+      .elasticX(100)
+      .dimension(locationDimension)
+      .group(locationGroup)
+      .title( function(p) {return "Location"} )
+      .label(function(x) { return keyAndPercentValueLabel(allAccess.value(), x) })
+      .legend(dc.legend().x(300).y(10).itemHeight(13).gap(5))
+      .xAxis().ticks(4);
+
+    contrastBolusAgentPieChart
+      .width(pieSize)
+      .height(pieSize)
+      .radius(pieRadius)
+      .dimension(contrastBolusAgentDimension)
+      .group(contrastBolusAgentGroup)
+      .title( function(p) {return "Patient Sex"} )
+      .legend(dc.legend().x(300).y(10).itemHeight(13).gap(5));
+
+    timepointHasPETPieChart
+      .width(pieSize)
+      .height(pieSize)
+      .radius(pieRadius)
+      .dimension(timepointHasPETDimension)
+      .group(timepointHasPETGroup)
+      .title( function(p) {return "Has PET"} )
+      .legend(dc.legend().x(300).y(10).itemHeight(13).gap(5));
+
+    manufacturerModelNamePieChart
+      .width(pieSize)
+      .height(pieSize)
+      .radius(pieRadius)
+      .dimension(manufacturerModelNameDimension)
+      .group(manufacturerModelNameGroup)
+      .title( function(p) {return "ManufacturerModelNameModelName"} )
+      .legend(dc.legend().x(300).y(10).itemHeight(13).gap(5));
+
+    sliceThicknessHistogramChart
+      .width(850).height(200)
+      .dimension(sliceThicknessDimension)
+      .group(sliceThicknessHistogram)
+      .x(d3.scale.ordinal())
+      .xUnits(dc.units.ordinal)
+      .xAxisLabel("Slice Thickness")
+      .yAxisLabel("# of Series")
+      .elasticY(true);
+
+
+    measurementTable
+      .width(850).height(400)
+      .dimension(patientIDDimension)
+      .group(function(d) {
+        return ('');
+      })
+      .size(Infinity)
+      .columns([
+        { label : "ID",
+          format : function(d) {
+            return (d.PatientID);
+          }
+        },
+        { label : "Sex",
+          format : function(d) {
+            return (d.ContrastBolusAgent);
+          }
+        },
+      ])
+      .sortBy(function (d) {
+        return (d.PatientID);
+      })
+      .order(d3.ascending)
+      .on('renderlet', function (table) {
+          table.selectAll('.dc-table-group').classed('info', true);
+      });
+
+    dc.renderAll("clinical");
+  };
+
+  /*
+  * code to populate and draw measurement table
+  */
+  function makeMeasurmentPlot(options) {
+
+    var svg = options.svg;
+    var plotMeasurements = options.plotMeasurements || {};
+    var legendText = options.legendText || "No data";
+
+    svg.clear();
+    var root = svg.group('root');
+    svg.rect(root, 0, 0, svg.width(), svg.height(), {
+      'stroke': '#111', 'fill': '#eee', 'stroke-width': 1
+    });
+
+    // the scatter plot
+    var radius = 5;
+    var rectSize = radius-1;
+    var strokeWidth = 1;
+    var topEdge = maxLongestDiameter * 1.05;
+    var rightEdge = maxShortestDiameter * 1.05;
+
+    var pointGroup = svg.group(root, "Points");
+    plotMeasurements.forEach(measurement => {
+      var nx = measurement.LongestDiameter / maxLongestDiameter;
+      var ny = measurement.ShortestDiameter / maxShortestDiameter;
+      var cx = nx * svg.width();
+      var cy = (1 - ny) * svg.height();
+      var locations = locationGroup.all().map(element => element.key);
+      var settings = {
+        fill: "#"+slicerColors[locations.indexOf(measurement.Location)],
+        stroke: '#555',
+
+        class: 'studyPoint',
+        referencedStudyInstanceUID : measurement.StudyInstanceUID,
+        referencedSeriesInstanceUID : measurement.SeriesInstanceUID,
+        referencedSOPInstanceUID : measurement.SOPInstanceUID,
+        location : measurement.Location,
+        primaryCondition : measurement.PrimaryCondition,
+        contrastBolusAgent : measurement.ContrastBolusAgent,
+        weight : measurement.PatientWeight,
+      };
+      console.log(settings.fill);
+      svg.circle(pointGroup, cx, cy, radius, settings);
+    });
+
+    $('.studyPoint').bind('click', studyClick)
+                    .bind('mouseover', studyOver)
+                    .bind('mouseout', studyOut);
+
+    // make a legend
+    var css = {
+      position: 'absolute',
+      display: 'inline',
+      border: '1px solid #fdd',
+      padding: '1px',
+      'background-color': '#fff',
+      opacity: 0.90,
+      font: '10px sans-serif',
+      top: 20,
+      left : 20,
+    };
+    var contents = "X-axis: LongestDiameter<br>";
+    contents += "Y-axis: ShortestDiameter<br>";
+    contents += "Circles: Measurement<br>";
+    contents += "Color: Location<br>";
+    $('<div id="legend">' + contents + '</div>').css( css ).appendTo("body").fadeIn(500);
+  }
+
+  filterAndPlotMeasurements = function() {
+
+    // initialize scatter plot
+    $('#volume-scatter').append(
+      "<div id='trialChartID' class='svgTrialChart' style='width: 100%; height: 300px'></div>"
+    );
+    $('#trialChartID').svg();
+
+    var svg = $('#trialChartID').svg('get');
+    var selectedPatients = patientIDDimension.top(Infinity);
+
+    var options = {
+      svg : svg,
+      plotMeasurements : selectedPatients,
+      legendText : 'Patients by longest diameter',
+    };
+    if (selectedPatients.length == 0) {
+      options.legendText = 'No data available';
+    }
+    makeMeasurmentPlot(options);
+  }
+
+  function showInfoBox(x, y, contents) {
+    var css = {
+      position: 'absolute',
+      display: 'inline',
+      border: '1px solid #fdd',
+      padding: '1px',
+      'background-color': '#fff',
+      opacity: 0.90,
+      font: '12px sans-serif',
+    };
+    css.top = y+5;
+    css.left = x+5;
+    $('<div id="infoBox">' + contents + '</div>').css( css ).appendTo("body").fadeIn(500);
+  }
+
+  function studyClick(event) {
+    var studyPoint = event.target;
+    var segUID = studyPoint.getAttribute('referencedSegmentSOPInstanceUID');
+    window.status = JSON.stringify({'command' : 'loadRequest', 'instanceUID' : segUID});
+  }
+
+  function studyOver(event) {
+    var studyPoint = event.target;
+    $(this).attr('stroke', 'black');
+    $(this).attr('opacity', 1);
+
+    html = `
+        <p>Location: <strong>${studyPoint.getAttribute('location')}</strong></p>
+        <p>PrimaryCondition: <strong>${studyPoint.getAttribute('primaryCondition')}</strong></p>
+        <p>Sex: <strong>${studyPoint.getAttribute('contrastBolusAgent')}</strong></p>
+        <p>Weight: <strong>${studyPoint.getAttribute('weight')}</strong></p>`;
+    showInfoBox(event.pageX, event.pageY, html);
+  }
+
+  function studyOut() {
+    $(this).attr('stroke', '#555');
+    $("#infoBox").fadeOut(500).remove();
+  }
+
+  // Request the clinical and measurement data
+  $.getJSON("./abcd30Subjects_data.json", function success(data) {
+    stats.data = data;
+    $.getJSON("./abcd30Subjects_dictionary.json", function success(dict) {
+      stats.dict = dict;
+
+      measurementTable.on('preRedraw', filterAndPlotMeasurements);
+      makeClinicalPlot();
+      filterAndPlotMeasurements();
+    });
+  });
+
+});
+
+/*
+ // exported with:
+c = getNode("GenericAnatomyColors")
+lut = c.GetLookupTable()
+print("slicerGenericColors = [")
+for i in range(c.GetLookupTable().GetNumberOfAvailableColors()):
+    rgba = lut.GetTableValue(i)
+    hexrgb = '{0:02x}'.format(int(255*rgba[0])) + '{0:02x}'.format(int(255*rgba[1])) + '{0:02x}'.format(int(255*rgba[2]))
+    print('"' + hexrgb + '", ')
+print("]")
+*/
+var slicerColors = [ "80ae80", "f1d691", "b17a65", "6fb8d2", "d8654f", "dd8265", "90ee90",
+  "c06858", "dcf514", "4e3f00", "fffadc", "e6dc46", "c8c8eb", "fafad2", "f4d631", "0097ce",
+  "d8654f", "b79cdc", "b7d6d3", "98bdcf", "6fb8d2", "b2d4f2", "44ac64", "6fc583", "55bcff",
+  "00911e", "d6e682", "4e3f00", "daffff", "aafafa", "8ce0e4", "bc411c", "d8bfd8", "913c42",
+  "966253", "b17a65", "f4d631", "fafae1", "c8c8d7", "448362", "80ae80", "5392a4", "5392a4",
+  "a27369", "a27369", "8d5d89", "8d5d89", "b6a66e", "b6a66e", "bc87a6", "bc87a6", "9a96c9",
+  "9a96c9", "b18cbe", "b18cbe", "1e6f55", "1e6f55", "d29da6", "d29da6", "30817e", "30817e",
+  "629970", "629970", "456e35", "a67189", "7a6526", "7a6526", "fd87c0", "915c6d", "2e6583",
+  "006c70", "006c70", "fafae1", "7f9658", "7f9658", "9f74a3", "9f74a3", "7d669a", "7d669a",
+  "6aae9b", "6aae9b", "9a9253", "9a9253", "7e7e37", "c9a085", "c9a085", "4e988d", "4e988d",
+  "ae8c67", "ae8c67", "8b7eb1", "8b7eb1", "947848", "947848", "ba8787", "ba8787", "636a18",
+  "9cab6c", "9cab6c", "407b93", "407b93", "8a5f4a", "61719e", "7ea1c5", "c2c3a4", "55bcff",
+  "586ad7", "586ad7", "586ad7", "586ad7", "586ad7", "586ad7", "586ad7", "586ad7", "f4d631",
+  "c8c8d7", "fafae1", "52ae80", "399d6e", "3c8f53", "5ca26d", "fff4d1", "fff4d1", "fff4d1",
+  "fff4d1", "c9794d", "46a375", "bc5b5f", "b17a65", "a6545e", "b6696b", "e59376", "e59376",
+  "ae7a5a", "ae7a5a", "c97049", "c97049", "c28e00", "c28e00", "f1d590", "cbb34d", "cbb34d",
+  "e5cc6d", "e5cc6d", "fff398", "fff398", "d1b955", "d1b955", "f8df83", "f8df83", "ffe68a",
+  "c4ac44", "ffffa7", "fffaa0", "ffed91", "f2d97b", "f2d97b", "dec665", "b17a65", "d57c6d",
+  "b8696c", "96d0f3", "3ea272", "3ea272", "3ea272", "f2ce8e", "fad28b", "ffffcf", "b17a65",
+  "b6e4ff", "afd8f4", "c5a591", "c5a591", "ac8a73", "ac8a73", "caa48c", "e0baa2", "e0baa2",
+  "fff5d9", "ce6e54", "d27359", "cb6c51", "e98a70", "c36449", "b55539", "98370d", "9f3f1b",
+  "a64626", "da7b61", "e18268", "e0614c", "fff4d1", "b87a9a", "d3ab8f", "2f9667", "fff4d1",
+  "ad7958", "bc5f4c", "ffefac", "e2ca86", "fde89e", "f4d99a", "cdb36c", "cdb36c", "ba7ca1",
+  "b17a65", "ffffdc", "eaeac2", "cc8eb2", "b47799", "d88469", "fffde5", "cda78e", "cca88f",
+  "ffe0c7", "dd8265", "00911e", "8b9662", "f9b46f", "9d6ca2", "cb8874", "b96653", "b96653",
+  "f7b6a4", "f7b6a4", "de9a84", "7cbadf", "f9ba96", "f9ba96", "f4aa93", "ffb59e", "ffbea5",
+  "e39982", "d58d71", "d58d71", "c17b67", "d8927f", "e69e8c", "f5ac93", "f5ac93", "f1ac97",
+  "f1ac97", "b17c5c", "ab5544", "d9c683", "d4bc66", "b98786", "b98786", "c6af7d", "c2624f",
+  "b17a65", "b17a65", "b17a65", "b17a65", "b17a65", "b17a65", "b17a65", "b17a65", "b17a65",
+  "b17a65", "b17a65", "b17a65", "b17a65", "b17a65", "ffeeaa", "ce6f5d", "b17a65", "b17a65",
+  "b17a65", "b17a65", "b17a65", "b17a65", "b17a65", "b17a65", "b17a65", "b17a65", "b17a65",
+  "b17a65", "d8ba00", "ffe24d", "fff36a", "ffea5c", "f0d223", "e0c200", "d5634f", "d96651",
+  "0093ca", "007aab", "ba4d40", "6fc583", "f0ff1e", "b9e83d", "00e2ff", "fb9fff", "e6a91d",
+  "00c271", "68a0f9", "dd6c9e", "898e00", "e64600", "009300", "0093f8", "e700ce", "814e00",
+  "007400", "0000ff", "9d0000", "646482", "cdcd64"];
+
+var slicerColorScale = d3.scaleOrdinal()
+  .domain(Array(slicerColors.length))
+  .range(slicerColors);
+
+</script>
+</body>
+</html>
+

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>dc.js - Iowa Head and Neck Cancer Demo</title>
+    <meta charset="UTF-8">
+    <script src="../js/jquery-1.11.2.min.js"></script>
+		<script src="../js/jquery.svg.js"></script>
+    <link rel="stylesheet" href="../css/dc.css"/>
+    <link rel="stylesheet" href="../css/jquery.svg.css"/>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+
+    <style type="text/css">
+      .dc-chart g.row text {
+          fill: #7B2727;
+      }
+      .dc-chart .pie-slice {
+          fill: #7B2727;
+      }
+      .dc-chart th {
+        text-align: left
+      }
+      .dc-chart th,.dc-chart td {
+          padding-left: 10px;
+      }
+      .dc-chart tr.dc-table-group td {
+          padding-top: 4px;
+          border-bottom: 1px solid black;
+      }
+      .dc-chart select {
+          width: 150px;
+      }
+    </style>
+
+
+</head>
+<body>
+
+<div id='volume-scatter' style="height: 600px; width: 100%"></div>
+<div id="tumorSite-row-chart"></div>
+<div id="sex-pie-chart"></div>
+<div id="smoking-pie-chart"></div>
+<div id="drinking-pie-chart"></div>
+<div id="chewing-pie-chart"></div>
+<div id="outcome-histogram-chart"></div>
+
+<div id="measurement-table"></div>
+
+<div>
+<p>
+Exploration of clinical variables vs quantitative imaging results for
+patients studied by the University of Iowa as part of the NCI
+Quantitative Imaging Network.
+</p>
+
+<p>
+Chart created using <a href=http://dc-js.github.io/dc.js/>dc</a>
+and <a href=http://keith-wood.name/svg.html>Jquery.svg</a>.
+</p>
+
+<p>
+This demo was created as part of the <a href=http://qiicr.org>QIICR project (U24 CA180918).</a>
+</p>
+
+<p>
+The work is funded by <a href=http://www.nci.nih.gov>NCI</a>.
+</p>
+</div>
+
+<script type="text/javascript" src="../js/d3.js"></script>
+<script type="text/javascript" src="../js/crossfilter.js"></script>
+<script type="text/javascript" src="../js/dc.js"></script>
+<script type="text/javascript">
+
+/*
+Test in Slicer:
+
+v = qt.QWebView()
+v.settings().setAttribute(qt.QWebSettings.DeveloperExtrasEnabled, True)
+v.show()
+v.setUrl(qt.QUrl('http://localhost:12345/dcsr/qiicr-chart/index.html'))
+
+*/
+
+var ndx;
+var patientIDDimension;
+var clinicalData;
+var measurementData;
+var filterAndPlotMeasurements;
+
+$(document).ready(function() {
+
+  // Request the clinical and measurement data
+  $.getJSON("./measurements.json", function(data) {
+    measurementData = data;
+    measurementTable.on('preRedraw', filterAndPlotMeasurements);
+    if (clinicalData) {
+      filterAndPlotMeasurements();
+    }
+  });
+
+  $.getJSON("./clinical.json", function(data) {
+    clinicalData = data;
+    makeClinicalPlot(clinicalData);
+    if (measurementData) {
+      filterAndPlotMeasurements();
+    }
+  });
+
+  // initialize the dc charts
+  tumorSiteRowChart = dc.rowChart("#tumorSite-row-chart", "clinical");
+  sexPieChart = dc.pieChart("#sex-pie-chart", "clinical");
+  smokingPieChart = dc.pieChart("#smoking-pie-chart", "clinical");
+  drinkingPieChart = dc.pieChart("#drinking-pie-chart", "clinical");
+  chewingPieChart = dc.pieChart("#chewing-pie-chart", "clinical");
+  outcomeHistogramChart = dc.barChart("#outcome-histogram-chart", "clinical");
+  measurementTable = dc.dataTable("#measurement-table", "clinical");
+
+  // initialize scatter plot
+  $('#volume-scatter').append(
+    "<div id='trialChartID' class='svgTrialChart' style='width: 100%; height: 600px'></div>"
+  );
+  $('#trialChartID').svg();
+
+  // callback to populate clinical once downloaded
+  makeClinicalPlot = function(clinicalData) {
+
+    ndx = crossfilter(clinicalData),
+        allAccess = ndx.groupAll(),
+        sexDimension = ndx.dimension(function(d) {return d.patient[0].sex;}),
+        sexGroup = sexDimension.group(),
+        tumorSiteDimension = ndx.dimension(function(d) {
+          var tumorStaging = d.document[0].content[0].container[0].container[3];
+          return tumorStaging.code[0].meaning;
+        }),
+        tumorSiteGroup = tumorSiteDimension.group(),
+        outcomeDimension = ndx.dimension(function(d) {
+          var patientCharacteristics = d.document[0].content[0].container[0].container;
+          for (var characteristicIndex = 0; characteristicIndex < patientCharacteristics.length; characteristicIndex++) {
+            if (patientCharacteristics[characteristicIndex].concept[0].meaning[0] === 'Disease Outcome') {
+              codes = patientCharacteristics[characteristicIndex].code;
+              if (codes) {
+                for (var codeIndex = 0; codeIndex < codes.length; codeIndex++) {
+                  if (codes[codeIndex].concept[0].meaning[0] === 'Followup status') {
+                    return codes[codeIndex].meaning[0];
+                  }
+                }
+              }
+            }
+          }
+          return "unknown outcome";
+        }),
+        outcomeHistogram = outcomeDimension.group().reduceCount();
+
+    var smokingDimension = ndx.dimension(function(d) {
+      return (d.document[0].content[0].container[0].container[2].code[0].meaning[0]);
+    }),
+    smokingGroup = smokingDimension.group();
+
+    var drinkingDimension = ndx.dimension(function(d) {
+      return (d.document[0].content[0].container[0].container[2].code[1].meaning[0]);
+    }),
+    drinkingGroup = drinkingDimension.group();
+
+    var chewingDimension = ndx.dimension(function(d) {
+      try { return (d.document[0].content[0].container[0].container[2].code[2].meaning[0]); }
+      catch (err) { return ("Not known");}
+    }),
+    chewingGroup = chewingDimension.group();
+
+    patientIDDimension = ndx.dimension(function(d) {
+      return (d.patient[0].id[0]);
+    });
+
+    var keyAndPercentValueLabel = function (total_value, d) {
+        return "" + d.key + "  (" + d3.round(d.value/total_value*100.0, 0) + "%)";
+    };
+
+    tumorSiteRowChart
+      .width(300)
+      .height(540)
+      .elasticX(true)
+      .dimension(tumorSiteDimension)
+      .group(tumorSiteGroup)
+      .title( function(p) {return "Primary Tumor Site"} )
+      .label(function(x) { return keyAndPercentValueLabel(allAccess.value(), x) })
+      .legend(dc.legend().x(300).y(10).itemHeight(10).gap(3))
+      .xAxis().ticks(4);
+
+    sexPieChart
+      .width(300)
+      .height(300)
+      .radius(100)
+      .cx(170)
+      .dimension(sexDimension)
+      .group(sexGroup)
+      .title( function(p) {return "Patient Sex"} )
+      .legend(dc.legend().x(300).y(10).itemHeight(13).gap(5));
+
+    smokingPieChart
+      .width(300)
+      .height(300)
+      .radius(100)
+      .cx(170)
+      .dimension(smokingDimension)
+      .group(smokingGroup)
+      .title( function(p) {return "Smoking"} )
+      .legend(dc.legend().x(300).y(10).itemHeight(13).gap(5));
+
+    drinkingPieChart
+      .width(300)
+      .height(300)
+      .radius(100)
+      .cx(170)
+      .dimension(drinkingDimension)
+      .group(drinkingGroup)
+      .title( function(p) {return "Drinking"} )
+      .legend(dc.legend().x(300).y(10).itemHeight(13).gap(5));
+
+    chewingPieChart
+      .width(300)
+      .height(300)
+      .radius(100)
+      .cx(170)
+      .dimension(chewingDimension)
+      .group(chewingGroup)
+      .title( function(p) {return "Chewing"} )
+      .legend(dc.legend().x(300).y(10).itemHeight(13).gap(5));
+
+    outcomeHistogramChart
+      .width(850).height(200)
+      .dimension(outcomeDimension)
+      .group(outcomeHistogram)
+      .x(d3.scale.ordinal())
+      .xUnits(dc.units.ordinal)
+      .xAxisLabel("Outcomes")
+      .yAxisLabel("# of Patients")
+      .elasticY(true);
+
+    measurementTable
+      .width(850).height(400)
+      .dimension(patientIDDimension)
+      .group(function(d) {
+        return ('');
+      })
+      .size(Infinity)
+      .columns([
+        { label : "ID",
+          format : function(d) {
+            return (d.patient[0].id[0]);
+          }
+        },
+        { label : "Sex",
+          format : function(d) {
+            return (d.patient[0].sex[0]);
+          }
+        },
+      ])
+      .sortBy(function (d) {
+        return (d.patient[0].id[0]);
+      })
+      .order(d3.ascending)
+      .on('renderlet', function (table) {
+          table.selectAll('.dc-table-group').classed('info', true);
+      });
+
+    dc.renderAll("clinical");
+  };
+
+  /*
+  * code to populate and draw measurement table
+  */
+  function makeMeasurmentPlot(options) {
+
+    var svg = options.svg;
+    var plotMeasurements = options.plotMeasurements || {};
+    var legendText = options.legendText || "No data";
+    var patients = Object.keys(plotMeasurements).sort();
+    var xDivisions = 10;
+    if (patients.length) {
+      xDivisions = 1 + patients.length;
+    }
+
+    svg.clear();
+    var root = svg.group('root');
+    svg.rect(root, 0, 0, svg.width(), svg.height(), {
+      'stroke': '#111', 'fill': '#fff', 'stroke-width': 1
+    });
+    var patientLines = svg.group(root, 'patientLines', {'stroke': '#eee', 'stroke-width': 1});
+
+    // the scatter plot
+    measurementPointsByObserver = {};
+    var xIncrement = svg.width() / (1 + patients.length); // one-patient-width margin on each side
+    x = 0;
+    var maxMeasurmentValue = 0;
+    for (var patientIndex in patients) {
+      var patient = patients[patientIndex];
+      x += xIncrement;
+      svg.line(patientLines, x, 0, x, svg.height());
+      var measurements = plotMeasurements[patient];
+      for (var index = 0; index < measurements.length; index++) {
+        var measurement = measurements[index];
+        var observer = measurement.personObserverName;
+        if (!measurementPointsByObserver[observer]) {
+          measurementPointsByObserver[observer] = [];
+        }
+        var method = 'Manual';
+        if (measurement.seriesDescription.search('SemiAuto') != -1) {
+          method = 'SemiAuto';
+        }
+        measurementPointsByObserver[observer].push({
+          point : [x, measurement.measurementValue],
+          method : method,
+          referencedSegmentSOPInstanceUID : measurement.referencedSegmentSOPInstanceUID,
+          referencedSegmentNumbers : measurement.SegmentNumbers,
+          patient : patient,
+          measurementValue : measurement.measurementValue,
+        });
+        if (measurement.measurementValue > maxMeasurmentValue) {
+          maxMeasurmentValue = measurement.measurementValue;
+        }
+      }
+    }
+
+    var radius = 7;
+    var rectSize = radius-1;
+    var strokeWidth = 1;
+    var topEdge = maxMeasurmentValue * 1.05;
+    for (var observer in measurementPointsByObserver) {
+      var pointGroup = svg.group(root, observer);
+      measurementPoints = measurementPointsByObserver[observer];
+      for (var pointIndex in measurementPoints) {
+        var measurementPoint = measurementPoints[pointIndex];
+        var point = measurementPoint.point;
+        var y = svg.height() * (1. - point[1]/topEdge);
+        var settings = {
+          class: 'studyPoint ' + observer,
+          referencedSegmentSOPInstanceUID : measurementPoint.referencedSegmentSOPInstanceUID,
+          referencedSegmentNumbers : measurementPoint.SegmentNumbers,
+          instanceUID : measurementPoint.instanceUID,
+          observer : observer,
+          method : measurementPoint.method,
+          patient : measurementPoint.patient,
+          measurementValue : measurementPoint.measurementValue,
+        };
+        if (measurementPoint.method == 'Manual') {
+          svg.circle(pointGroup, point[0], y, radius, settings);
+        } else {
+          svg.rect(pointGroup, point[0]-rectSize, y-rectSize, 2*rectSize, 2*rectSize, settings);
+        }
+      }
+    }
+
+    setUserStyles();
+    $('.studyPoint').bind('click', studyClick)
+                    .bind('mouseover', studyOver)
+                    .bind('mouseout', studyOut);
+
+    // make a legend
+    var css = {
+      position: 'absolute',
+      display: 'inline',
+      border: '1px solid #fdd',
+      padding: '1px',
+      'background-color': '#fff',
+      opacity: 0.90,
+      font: '10px sans-serif',
+      top: 20,
+      left : 20,
+    };
+    var contents = "X-axis: patient<br>";
+    contents += "Y-axis: tumor volume<br>";
+    contents += "Circles: manual segmentation<br>";
+    contents += "Squares: semi-auto segmentation<br>";
+    contents += "Color: user<br>";
+    $('<div id="legend">' + contents + '</div>').css( css ).appendTo("body").fadeIn(500);
+  }
+
+  filterAndPlotMeasurements = function() {
+    var svg = $('#trialChartID').svg('get');
+    var observerSet = ["User1", "User2", "User3"];
+    var selectedPatients = patientIDDimension.top(Infinity);
+    var patientIDSet = []
+    for (var patientIndex in selectedPatients) {
+      var patientID = selectedPatients[patientIndex].patient[0].id[0];
+      patientIDSet.push(patientID);
+    }
+    var volumesByPatient = {};
+    for (var measurementIndex in measurementData) {
+      measurement = measurementData[measurementIndex];
+      if (observerSet.indexOf(measurement.personObserverName) == -1) {
+        continue;
+      }
+      if (measurement.finding != "Neoplasm, Primary") {
+        continue;
+      }
+      if (measurement.activitySession != "1") {
+        continue;
+      }
+      var patientID = measurement.patientID;
+      if (patientIDSet.indexOf(patientID) != -1) {
+        if (measurement.measurementConcept == "Volume") {
+          if (!volumesByPatient[patientID]) {
+            volumesByPatient[patientID] = [];
+          }
+          volumesByPatient[patientID].push(measurement);
+        }
+      }
+    }
+    var options = {
+      svg : svg,
+      plotMeasurements : volumesByPatient,
+      legendText : 'Primary lesion volume (ml) per patient',
+    };
+    if (Object.keys(volumesByPatient).length == 0) {
+      options.legendText = 'No data available';
+    }
+    makeMeasurmentPlot(options);
+  }
+
+  function showInfoBox(x, y, contents) {
+    var css = {
+      position: 'absolute',
+      display: 'inline',
+      border: '1px solid #fdd',
+      padding: '1px',
+      'background-color': '#fff',
+      opacity: 0.90,
+      font: '10px sans-serif',
+    };
+    css.top = y+5;
+    css.left = x+5;
+    $('<div id="infoBox">' + contents + '</div>').css( css ).appendTo("body").fadeIn(500);
+  }
+
+  function studyClick(event) {
+    var measurement = event.target;
+    var segUID = measurement.getAttribute('referencedSegmentSOPInstanceUID');
+    window.status = JSON.stringify({'command' : 'loadRequest', 'instanceUID' : segUID});
+  }
+
+  function studyOver(event) {
+    var measurement = event.target;
+    $(this).attr('stroke', 'black');
+    $(this).attr('opacity', 1);
+
+    var observer = measurement.getAttribute('observer');
+    var method = measurement.getAttribute('method');
+    var patient = measurement.getAttribute('patient');
+    var measurementValue = measurement.getAttribute('measurementValue');
+    var html = "<p>Patient:<strong>" + patient + "</strong></p>";
+    html += "<p>Observer:<strong>" + observer + "</strong></p>";
+    html += "<p>Method:<strong>" + method + "</strong></p>";
+    html += "<p>Value:<strong>" + measurementValue + "</strong>(ml)</p>";
+    showInfoBox(event.pageX, event.pageY, html);
+  }
+
+  function studyOut() {
+    setUserStyles();
+    $("#infoBox").fadeOut(500).remove();
+  }
+
+  function setUserStyles() {
+    $('.User1').attr('fill', 'rgba(255, 100, 100, .6)');
+    $('.User2').attr('fill', 'rgba(100, 255, 100, .6)');
+    $('.User3').attr('fill', 'rgba(100, 100, 255, .6)');
+    $('.User1').attr('stroke', '#555');
+    $('.User2').attr('stroke', '#555');
+    $('.User3').attr('stroke', '#555');
+  }
+});
+
+</script>
+</body>
+</html>
+

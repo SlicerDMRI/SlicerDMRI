@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<link rel="stylesheet"" type="text/css" href="https://cdn.jsdelivr.net/npm/parcoord-es@2.2.10/dist/parcoords.css">
+
+<style>
+* {
+  font: 12px sans-serif;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/parcoord-es@2.2.10/dist/parcoords.standalone.js"></script>
+
+<body>
+
+<div id="chart" class="parcoords" style="resize:both;width:100%;height:800px"></div>
+
+<p>Sample from ABCD study</p>
+
+<p><a href="https://github.com/SlicerDMRI/ORG-Atlases/blob/master/Tracts-in-ORG-800FC-100HCP.md">Tract key</a></p>
+
+<script>
+
+const dataToPlot = %%dataToPlot%%;
+
+const colorFunction = function(dataObject) {
+  // TODO: use color table
+  randomColor = () => {return Math.round(100*Math.random());}; // 100 so they are darkish
+  color = `rgba(${randomColor()},${randomColor()},${randomColor()},0.6)`
+  return (color);
+}
+
+const userConfig = {
+  markedLineWidth: 5,
+  markedShadowColor: "#888",
+}
+
+var parcoords = ParCoords(userConfig)("#chart")
+  .data(dataToPlot)
+  .mode("queue")
+  .color(colorFunction)
+  .render()
+  .createAxes()
+;
+
+parcoords
+  .brushMode("1D-axes-multi")
+//  .brushMode("2D-strums")
+//  .brushMode("angular")
+//  .brushedColor("#00a")
+  .alphaOnBrushed(0.4)
+//  .reorderable(true)
+;
+
+parcoords.ctx.marked
+
+parcoords.on("brush", brushedData => {
+  parcoords.clear('marked');
+  const brushedTracts = []
+  const brushExtents = parcoords.brushExtents();
+  Object.keys(brushExtents).forEach(brushExtent => {
+    if (brushExtents[brushExtent].length > 0) {
+      brushedTracts.push(brushExtent);
+    }
+  });
+  if (brushedData.length > 0) {
+    parcoords.mark([brushedData[0]]);
+
+    const mode = "showBrushedTract";
+
+    if (window.slicerPython) {
+      if (mode == "showBrushedTract") {
+        const brushedDataString = JSON.stringify({
+          brushedTracts: brushedTracts,
+          brushedSubjectID: brushedData[0].id
+        });
+        window.slicerPython.evalPython(`
+
+slicer.modules.TractologyWidget.logic.showABCDBrushedTract(${brushedDataString})
+
+        `);
+
+      }
+    }
+  }
+})
+
+parcoords.updateAxes();
+parcoords.render();
+
+// fix headers
+parcoords.on("render", () => {
+  const labelTexts = Array.from(document.getElementsByClassName("label"));
+  labelTexts.forEach(labelText => { 
+    labelText.setAttribute("transform", "translate(-4,60) rotate(-90)");
+  });
+  const axes = Array.from(document.getElementsByClassName("axis"));
+  const lastAxis = axes[axes.length-1];
+  lastAxis.querySelectorAll(".tick").forEach(tick => {
+    tick.setAttribute("opacity", 0)
+  })
+});
+
+// remove most ticks
+const dimensions = parcoords.dimensions()
+Object.keys(dimensions).slice(1).forEach(dimension => {
+  dimensions[dimension].ticks = 0
+});
+parcoords.updateAxes();
+parcoords.render();
+
+</script>
+
+</body>
