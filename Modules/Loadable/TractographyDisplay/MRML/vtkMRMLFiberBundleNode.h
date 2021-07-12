@@ -186,6 +186,10 @@ public:
   vtkGetMacro(EnableShuffleIDs, bool);
   vtkSetMacro(EnableShuffleIDs, bool);
 
+  // Description:
+  // Get the vtk filter that defines fiber boundle selection
+  vtkGetObjectMacro(ExtractFromROI, vtkExtractPolyDataGeometry);
+
 protected:
   vtkMRMLFiberBundleNode();
   ~vtkMRMLFiberBundleNode();
@@ -210,9 +214,11 @@ protected:
 
   virtual void SetAnnotationNodeID(const char* id);
 
-private:
   // Pipeline filter objects
   vtkExtractPolyDataGeometry* ExtractFromROI;
+
+private:
+  // Pipeline filter objects
   vtkExtractSelectedPolyDataIds* ExtractSubsample;
   vtkPlanes *Planes;
   vtkPassThrough* LocalPassThrough;
