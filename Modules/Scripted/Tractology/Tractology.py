@@ -5,6 +5,8 @@ import logging
 import math
 import numpy
 import os
+import pandas
+import pickle
 import random
 import unittest
 import vtk, qt, ctk, slicer
@@ -79,7 +81,7 @@ class TractologyWidget(ScriptedLoadableModuleWidget):
     pass
 
   def abcdTractologyDemo(self):
-    self.logic.abcdTractologyDemo()
+    self.logic.abcdDeviceidTractologyDemo(deviceId=4)
 
   def hcpTractologyDemo(self):
     self.logic.hcpTractologyDemo()
@@ -91,13 +93,13 @@ class TractologyWidget(ScriptedLoadableModuleWidget):
 class TractologyLogic(ScriptedLoadableModuleLogic):
   """
   Use parallel axes to explore tract statistics space
-  
+
   See: http://syntagmatic.github.io/parallel-coordinates/
   https://github.com/BigFatDog/parcoords-es
-  
+
   Note also experimented with vtk version, but it has fewer features
   and performance is not any better in practice.
-  
+
   https://vtk.org/Wiki/VTK/Examples/Python/Infovis/ParallelCoordinatesExtraction
   """
 
@@ -106,30 +108,54 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
 
     self.directoryPathByID = {}
     self.tractFileNameByLabel = {}
+    self.subjects = []
+    self.categoricals = []
 
-  def abcdTractologyDemo(self, addElements=False):
+  def abcdTractologyDemo(self, addElements=True):
+    """To be restored from backup"""
+    pass
 
-    subjects = self.collectABCDSubjectTractStatistics()
+  def abcdDeviceidTractologyDemo(self, deviceId=4, addElements=True):
+
+    directoryPattern = f"/home/ubuntu/data/abcd/Deviceid_{deviceId}/harmonized*"
+    directoryPattern = f"/s3/abcdRelease3_WMA/Deviceid_{deviceId}/Target_harmonization/harmonized*"
+    print(directoryPattern)
+    pickleFile = f"/home/ubuntu/data/abcd/tractology-Deviceid_{deviceId}.pickle"
+    if os.path.exists(pickleFile):
+      [self.subjects, self.tractFileNameByLabel, self.directoryPathByID] = pickle.load(open(pickleFile, "rb"))
+    else:
+      self.subjects,self.tractFileNameByLabel = self.collectABCDSubjectTractStatistics(directoryPattern)
+      pickle.dump([self.subjects,self.tractFileNameByLabel, self.directoryPathByID], open(pickleFile, "wb"))
 
     if addElements:
-      dictionary,dataBySubject = self.collectABCDData()
+      dataPath = "/home/ubuntu/data/abcd/abcdRelease3_merged_DWI_withoutPhilips.csv"
+      elementDataFrame = pandas.read_csv(dataPath)
+      slicer.modules.elementDataFrame = elementDataFrame
       elements = [
-        "interview_age",
+        "nihtbx_totalcomp_fc",
         "scrn_hr_slowfriend",
         "scrn_hr_liecheat",
         "scrn_hr_fear",
         "scrn_hr_dep",
         "scrn_hr_stress",
         "scrn_hr_destroy",
-        "scrn_hr_disobey"]
+        "scrn_hr_disobey",
+        "interview_age",
+        "sex_x",
+      ]
       elementMins = {}
       elementMaxes = {}
       minMaxSubjects = {}
-      for subject in subjects:
+      for subject in self.subjects:
         subjectID = subject['id']
+        if not isinstance(subjectID, int):
+          elementSubjectID = subjectID.replace("_ses", "").replace("NDAR", "NDAR_")
+          row = elementDataFrame[elementDataFrame['src_subject_id'] == elementSubjectID]
         for element in elements:
           if subjectID not in [0, 1]:
-            subject[element] = dataBySubject[subjectID][element]
+            subject[element] = row[element].values[0]
+            if isinstance(subject[element], numpy.int64):
+              subject[element] = int(subject[element])
             elementMins[element] = min(subject[element], elementMins[element]) if element in elementMins else subject[element]
             elementMaxes[element] = max(subject[element], elementMaxes[element]) if element in elementMaxes else subject[element]
           else:
@@ -138,24 +164,51 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
         minMaxSubjects[0][element] = elementMins[element]
         minMaxSubjects[1][element] = elementMaxes[element]
 
-    dataToPlotString = json.dumps(subjects)
+    self.categoricals = {}
+    categories = [
+      "scrn_hr_slowfriend",
+      "scrn_hr_liecheat",
+      "scrn_hr_fear",
+      "scrn_hr_dep",
+      "scrn_hr_stress",
+      "scrn_hr_destroy",
+      "scrn_hr_disobey",
+      "sex_x",
+    ]
+    for category in categories:
+      self.categoricals[category] = []
+      print(elementDataFrame[elementDataFrame["device_id"] == deviceId])
+      valueCounts = elementDataFrame[elementDataFrame["device_id"] == deviceId][category].value_counts()
+      for index in valueCounts.index:
+        value = valueCounts[index]
+        if isinstance(value, numpy.int64):
+          value = int(value)
+        self.categoricals[category].append((index, value))
+
+    dataToPlotString = json.dumps(self.subjects)
+    categoricalsString = json.dumps(self.categoricals)
 
     modulePath = os.path.dirname(slicer.modules.tractology.path)
     resourceFilePath = os.path.join(modulePath, "Resources", "ABCD-ParCoords-template.html")
     html = open(resourceFilePath).read()
     html = html.replace("%%dataToPlot%%", dataToPlotString)
+    html = html.replace("%%categoricals%%", categoricalsString)
 
     self.webWidget = slicer.qSlicerWebWidget()
     self.webWidget.size = qt.QSize(1600,1024)
-    self.webWidget.setHtml(html)
+    # self.webWidget.setHtml(html)
     self.webWidget.show()
 
     # save for debugging
     htmlPath = slicer.app.temporaryPath+'/data.html'
     open(slicer.app.temporaryPath+'/data.html', 'w').write(html)
     print(f"Saved to {htmlPath}")
+    tractImagePath = slicer.app.temporaryPath+"/TractImages"
+    if not os.path.exists(tractImagePath):
+      os.symlink("/home/ubuntu/data/abcd/TractImages", slicer.app.temporaryPath+"/TractImages")
+    self.webWidget.url = "file://"+htmlPath
 
-  def collectABCDData(self):
+  def collectABCDJSONSubjectData(self):
     dictionaryPath = "/opt/data/SlicerDMRI/Test-Dec01-N30/abcd30Subjects_dictionary.json"
     dataPath = "/opt/data/SlicerDMRI/Test-Dec01-N30/abcd30Subjects_data.json"
     dictionary = json.loads(open(dictionaryPath).read())
@@ -166,35 +219,40 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
       dataBySubject[subjectID] = datum
     return dictionary,dataBySubject
 
-  def collectABCDSubjectTractStatistics(self, stat=" FA1.Mean ", statRange=[0,1]):
+  def collectABCDSubjectTractStatistics(self, directoryPattern, stat=" FA1.Mean ", statRange=[0,1]):
     #  TODO: make this configurable instead of hard-coded
 
     statMin, statMax = None, None
     subjects = []
-    directoryPattern = "/opt/data/SlicerDMRI/Test-Dec01-N30/WMA/sub-*-dwi_b3000_orig/AnatomicalTracts"
     for directoryPath in glob.glob(directoryPattern):
-      directoryName = directoryPath.split("/")[6]
+      print(directoryPath)
+      directoryName = directoryPath.split("/")[-1]
       subjectID = directoryName.split("-")[1]
+      directoryPath += "/AnatomicalTracts"
       self.directoryPathByID[subjectID] = directoryPath
       csvFilePath = directoryPath + "/diffusion_measurements_anatomical_tracts.csv"
-      with open(csvFilePath) as csvFile:
-        csvReader = csv.reader(csvFile)
-        subjectStats = {}
-        headers = csvReader.__next__()
-        for row in csvReader:
-          tractFileName = row[0].split('/')[-1]
-          tractName = os.path.splitext(tractFileName)[0]
-          tractNameParts = tractName.split('_')
-          tractLabel = tractNameParts[1]
-          if len(tractNameParts) > 2:
-            tractLabel += "-" + tractNameParts[2][0].upper()
-          self.tractFileNameByLabel[tractLabel] = tractFileName.strip()
-          statValue = row[headers.index(stat)]
-          statMin = min(statValue,statMin) if statMin else statValue
-          statMax = max(statValue,statMax) if statMax else statValue
-          subjectStats[tractLabel] = statValue
-        subjectStats['id'] = subjectID
-        subjects.append(subjectStats)
+      tractFileNameByLabel = {}
+      try:
+        with open(csvFilePath) as csvFile:
+          csvReader = csv.reader(csvFile)
+          subjectStats = {}
+          subjectStats['id'] = subjectID
+          headers = csvReader.__next__()
+          for row in csvReader:
+            tractFileName = row[0].split('/')[-1]
+            tractName = os.path.splitext(tractFileName)[0]
+            tractNameParts = tractName.split('_')
+            tractLabel = tractNameParts[1]
+            if len(tractNameParts) > 2:
+              tractLabel += "-" + tractNameParts[2][0].upper()
+            tractFileNameByLabel[tractLabel] = tractFileName.strip()
+            statValue = row[headers.index(stat)]
+            statMin = min(statValue,statMin) if statMin else statValue
+            statMax = max(statValue,statMax) if statMax else statValue
+            subjectStats[tractLabel] = statValue
+          subjects.append(subjectStats)
+      except FileNotFoundError:
+        print(f"Skipping {csvFilePath}")
     minStats, maxStats = {}, {}
     if statRange is None:
       statRange = [statMin, statMax]
@@ -203,9 +261,10 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
       maxStats[key] = statRange[1]
     subjects.append(minStats)
     subjects.append(maxStats)
-    return subjects
+    return subjects,tractFileNameByLabel
 
   def showABCDBrushedTract(self, brushedData):
+    print(brushedData)
     allNodes = slicer.util.getNodes('*')
     for node in allNodes.values():
       if node.IsA("vtkMRMLModelNode"):
@@ -229,17 +288,25 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
     tractNode.GetLineDisplayNode().SetVisibility(True)
 
     layoutManager = slicer.app.layoutManager()
-    cameraNode = layoutManager.threeDWidget(0).threeDView().interactorStyle().GetCameraNode()
-    print(nodeName)
+    threeDWidget = layoutManager.threeDWidget(0)
+    threeDController = threeDWidget.threeDController()
     if nodeName.endswith("L"):
-      print("left")
-      cameraNode.RotateTo(slicer.vtkMRMLCameraNode.Left)
+      threeDController.lookFromAxis(ctk.ctkAxesWidget.Left)
     elif nodeName.endswith("R"):
-      print("right")
-      cameraNode.RotateTo(slicer.vtkMRMLCameraNode.Right)
+      threeDController.lookFromAxis(ctk.ctkAxesWidget.Right)
     else:
-      print("anterior")
-      cameraNode.RotateTo(slicer.vtkMRMLCameraNode.Anterior)
+      threeDController.lookFromAxis(ctk.ctkAxesWidget.Anterior)
+    threeDWidget.threeDView().resetFocalPoint()
+    renderer = threeDWidget.threeDView().renderWindow().GetRenderers().GetItemAsObject(0)
+    cameraNode = threeDWidget.threeDView().cameraNode()
+    cameraNode.Reset(True, True, True, renderer)
+    return tractNode
+
+  def loadVolumeForVisibleTract(self):
+    for node in allNodes.values():
+      if node.IsA("vtkMRMLModelNode"):
+        if node.GetDisplayVisibility():
+          slicer.util.loadVolume("/s3/abcdRelease3_Harmonization/Deviceid_4/Target_harmonization/sub-NDARINVWM1W0UPC_ses-baselineYear1Arm1_run-01_dwi_b500_mapped_cs.nii.gz")
 
   def hpcTractologyDemo(self):
     """Use parallel axes to explore tract statistics space
@@ -256,13 +323,16 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
 
     self.webWidget = slicer.qSlicerWebWidget()
     self.webWidget.size = qt.QSize(1600,1024)
-    self.webWidget.setHtml(html)
+    # self.webWidget.setHtml(html)
     self.webWidget.show()
 
     # save for debugging
     htmlPath = slicer.app.temporaryPath+'/data.html'
     open(slicer.app.temporaryPath+'/data.html', 'w').write(html)
     print(f"Saved to {htmlPath}")
+
+    self.webWidget.url = "file://"+htmlPath
+    print(f"Serving from {htmlPath}")
 
 #
 # TractologyTest
@@ -301,3 +371,100 @@ class TractologyTest(ScriptedLoadableModuleTest):
     self.delayDisplay("Starting the test")
 
     self.delayDisplay('Test passed')
+
+
+#
+# helper utilities
+#
+
+"""
+paste script below then run this:
+
+import os; generateABCDTractImages("/home/ubuntu/data/abcd/TractImages")
+
+"""
+
+def generateABCDTractImages(targetDirectoryPath):
+  layoutManager = slicer.app.layoutManager()
+  oldLayout = layoutManager.layout
+  threeDWidget = layoutManager.threeDWidget(0)
+  threeDWidget.setParent(None)
+  threeDWidget.show()
+  geometry = threeDWidget.geometry
+  threeDWidget.threeDController().visible = False
+  threeDWidget.setGeometry(geometry.x(), geometry.y(), 512, 512)
+  logic = slicer.modules.TractologyWidget.logic
+  for subject in logic.subjects:
+    subjectID = subject['id']
+    if subjectID in [0,1]:
+      continue; # skip the fake entries created for plotting
+    subjectDirectoryPath = targetDirectoryPath + "/" + subjectID
+    if not os.path.exists(subjectDirectoryPath):
+      os.mkdir(subjectDirectoryPath)
+    for tract in subject.keys():
+      if tract in logic.tractFileNameByLabel:
+        imageFilePath = subjectDirectoryPath + "/" + tract + ".jpg"
+        if os.path.exists(imageFilePath):
+          print(f"skipped {imageFilePath}")
+          continue
+        try:
+          tractNode = logic.showABCDBrushedTract({"brushedTracts": [tract], "brushedSubjectID": subjectID})
+          slicer.util.delayDisplay(f"{subjectID} {tract}", 10)
+          pixmap = threeDWidget.grab()
+          pixmap.save(imageFilePath)
+          print(f"saved {imageFilePath}")
+          slicer.mrmlScene.RemoveNode(tractNode)
+        except Exception as e:
+          print(f"Failed to read a subject tract: {subjectID} {tract}")
+          import traceback
+          traceback.print_exc()
+  # reset the view
+  threeDWidget.threeDController().visible = True
+  layoutManager.setLayout(slicer.vtkMRMLLayoutNode.SlicerLayoutFinalView) ;# force change
+  layoutManager.setLayout(oldLayout)
+
+
+"""
+paste script below then run this:
+
+import os; generateABCD_WMA("/home/ubuntu/data/abcd/abcdRelease3_WMA")
+
+"""
+
+"""
+generateABCD_WMA(filePrefix):
+
+import pandas
+dataPath = "/home/ubuntu/data/abcd/abcdRelease3_merged_DWI_withoutPhilips.csv"
+resultPath = "/home/ubuntu/data/abcd/abcdRelease3_merged_DWI_withoutPhilips+WMA.csv"
+elementDataFrame = pandas.read_csv(dataPath)
+filesNotFound = []
+emptyFiles = []
+for index in range(len(elementDataFrame)):
+  print(index)
+  subjectID = elementDataFrame.iloc[index]['src_subject_id']
+  subjectID = subjectID.replace("NDAR_", "NDAR")
+  deviceID = elementDataFrame.iloc[index]['device_id']
+  csvPath = f"/s3/abcdRelease3_WMA/Deviceid_{deviceID}/Target_harmonization/harmonized_sub-{subjectID}_ses-baselineYear1Arm1_run-01_dwi_b3000_UKF2T/AnatomicalTracts/diffusion_measurements_anatomical_tracts.csv"
+  print(csvPath)
+  subjectDataFrame = None
+  try:
+    subjectDataFrame = pandas.read_csv(csvPath)
+  except FileNotFoundError:
+    print(f"NotFound: {subjectID}")
+    filesNotFound.append(csvPath)
+  except pandas.errors.EmptyDataError:
+    print(f"EmptyFile: {subjectID}")
+    emptyFiles.append(csvPath)
+  if subjectDataFrame is None:
+    continue
+  for tractIndex in range(len(subjectDataFrame)):
+    tractName = subjectDataFrame.iloc[tractIndex]['Name '].split("/")[-1].split('.')[0] 
+    for measureIndex in range(1, len(subjectDataFrame.columns)):
+      column = subjectDataFrame.columns[measureIndex]
+      measureName = tractName + "." + column.strip()
+      if measureName not in elementDataFrame.columns:
+        elementDataFrame[measureName] = None ;# create the empty column
+      elementDataFrame.loc[index, measureName] = subjectDataFrame.iloc[tractIndex][column]
+  break
+"""

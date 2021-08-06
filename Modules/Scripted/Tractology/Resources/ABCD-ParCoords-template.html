@@ -15,6 +15,11 @@
 
 <div id="chart" class="parcoords" style="resize:both;width:100%;height:800px"></div>
 
+<div id="categoricals"></div>
+
+<p id="tractLabel">No image</p>
+<img id="tractImage"></img>
+
 <p>Sample from ABCD study</p>
 
 <p><a href="https://github.com/SlicerDMRI/ORG-Atlases/blob/master/Tracts-in-ORG-800FC-100HCP.md">Tract key</a></p>
@@ -23,10 +28,24 @@
 
 const dataToPlot = %%dataToPlot%%;
 
+const categoricals = %%categoricals%%;
+
+const renderState = {};
+
 const colorFunction = function(dataObject) {
-  // TODO: use color table
-  randomColor = () => {return Math.round(100*Math.random());}; // 100 so they are darkish
-  color = `rgba(${randomColor()},${randomColor()},${randomColor()},0.6)`
+
+  let opacity = 0.6;
+  Object.keys(renderState).forEach(categorical => {
+    if (renderState[categorical][dataObject[categorical]] == false) {
+      opacity = 0.0;
+    }
+  });
+
+  if (dataObject.sex_x == "M") {
+    color = `rgba(0,0,200,${opacity})`
+  } else {
+    color = `rgba(200,100,100,${opacity})`
+  }
   return (color);
 }
 
@@ -37,7 +56,7 @@ const userConfig = {
 
 var parcoords = ParCoords(userConfig)("#chart")
   .data(dataToPlot)
-  .mode("queue")
+  //.mode("queue")
   .color(colorFunction)
   .render()
   .createAxes()
@@ -54,6 +73,28 @@ parcoords
 
 parcoords.ctx.marked
 
+function showTractImage(subject, tract) {
+  const tractImage = document.getElementById("tractImage");
+  tractImage.src = `./TractImages/${subject}/${tract}.jpg`;
+  const tractLabel = document.getElementById("tractLabel");
+  tractLabel.innerText = `${subject} ${tract}`;
+}
+
+function showTractInSlicer(subjectID, tract) {
+  if (window.slicerPython) {
+    const dataString = JSON.stringify({
+      brushedSubjectID: subjectID,
+      brushedTracts: [tract]
+    });
+    window.slicerPython.evalPython(`
+
+slicer.modules.TractologyWidget.logic.showABCDBrushedTract(${dataString})
+
+    `);
+  }
+}
+
+
 parcoords.on("brush", brushedData => {
   parcoords.clear('marked');
   const brushedTracts = []
@@ -68,46 +109,137 @@ parcoords.on("brush", brushedData => {
 
     const mode = "showBrushedTract";
 
-    if (window.slicerPython) {
-      if (mode == "showBrushedTract") {
-        const brushedDataString = JSON.stringify({
-          brushedTracts: brushedTracts,
-          brushedSubjectID: brushedData[0].id
-        });
-        window.slicerPython.evalPython(`
-
-slicer.modules.TractologyWidget.logic.showABCDBrushedTract(${brushedDataString})
-
-        `);
-
-      }
+    if (mode == "showBrushedTract") {
+      showTractImage(brushedData[0].id, brushedTracts[0]);
+      showTractInSlicer(brushedData[0].id, brushedTracts[0]);
     }
   }
 })
 
+
+//
+// select on mouseover
+//
+const chart = document.getElementById("chart");
+let hoveredTract = undefined;
+let closestSubject = undefined;
+let hoveredSubjectID = undefined;
+let pickedSubjectID = undefined;
+let shownSubjectID = undefined;
+
+for (let dimension of document.getElementsByClassName("dimension")) {
+  dimension.addEventListener("mouseover", event => {
+    hoveredTract = dimension.lastChild.getAttribute("dimension");
+  });
+}
+
+chart.addEventListener("mousedown", event => {
+  pickedSubjectID = hoveredSubjectID;
+  event.stopPropagation();
+  event.preventDefault();
+}, {capture: true});
+
+chart.addEventListener("mouseup", event => {
+  pickedSubjectID = undefined;
+}, {capture: true});
+
+document.addEventListener("keydown", event => {
+  if (event.key == "s") {
+    showTractInSlicer(shownSubjectID, hoveredTract);
+  }
+});
+
+chart.addEventListener("mousemove", event => {
+  if (hoveredTract == undefined) {
+    return;
+  }
+  const height = parcoords.height();
+  let hoverFA = (height - event.layerY)/height;
+  let closestFA = 2;
+  for (subjectIndex in dataToPlot) {
+    const subjectFA = dataToPlot[subjectIndex][hoveredTract];
+    const deltaFA = Math.abs(subjectFA - hoverFA);
+    if ( deltaFA < closestFA ) {
+      closestFA = deltaFA;
+      closestSubject = undefined;
+    }
+    if (closestSubject == undefined) {
+      closestSubject = subjectIndex;
+    }
+  }
+  hoveredSubjectID = dataToPlot[closestSubject].id;
+  shownSubjectID = hoveredSubjectID;
+  if (pickedSubjectID == undefined) {
+    parcoords.clear('marked');
+    parcoords.mark([dataToPlot[closestSubject]]);
+  } else {
+    shownSubjectID  = pickedSubjectID;
+  }
+  showTractImage(shownSubjectID, hoveredTract);
+});
+
 parcoords.updateAxes();
 parcoords.render();
 
+//
 // fix headers
-parcoords.on("render", () => {
+//
+function rotateLables() {
   const labelTexts = Array.from(document.getElementsByClassName("label"));
   labelTexts.forEach(labelText => { 
     labelText.setAttribute("transform", "translate(-4,60) rotate(-90)");
   });
-  const axes = Array.from(document.getElementsByClassName("axis"));
-  const lastAxis = axes[axes.length-1];
-  lastAxis.querySelectorAll(".tick").forEach(tick => {
-    tick.setAttribute("opacity", 0)
-  })
+}
+
+setTimeout (rotateLables, 1000);
+
+
+
+// turn off tickmarks
+document.querySelectorAll(".axis .tick").forEach(tick => {
+  tick.setAttribute("style", "opacity: 0")
 });
 
-// remove most ticks
-const dimensions = parcoords.dimensions()
-Object.keys(dimensions).slice(1).forEach(dimension => {
-  dimensions[dimension].ticks = 0
+
+//
+// add categoricals UI
+// - sets renderState used in colorFunction
+//
+
+const categoricalsDiv = document.querySelector("#categoricals");
+const columns = Object.keys(categoricals).length;
+categoricalsDiv.setAttribute("style", `display: grid; grid-template-columns: repeat(${columns}, 1fr)`);
+
+Object.keys(categoricals).forEach(categorical => {
+  renderState[categorical] = {};
+  const categoryDiv = document.createElement("div");
+  categoryDiv.setAttribute("style", "display: grid; grid-template-columns: repeat(1, 1fr)");
+  categoricalsDiv.appendChild(categoryDiv);
+  const categoryLabel = document.createElement("p");
+  categoryLabel.innerText = categorical;
+  categoryDiv.appendChild(categoryLabel);
+  const valuesDiv = document.createElement("div");
+  valuesDiv.setAttribute("style", "display: grid; grid-template-columns: repeat(2, 1fr)");
+  categoryDiv.appendChild(valuesDiv);
+  Object.keys(categoricals[categorical]).forEach(valueKey => {
+     const valueCheck = document.createElement("input");
+     const value = categoricals[categorical][valueKey];
+     valueCheck.id = categorical+value[0];
+     valueCheck.type = "checkbox";
+     valueCheck.checked = true;
+     renderState[categorical][value[0]] = true;
+     valueCheck.addEventListener("change", (event) => {
+       renderState[categorical][value[0]] = event.target.checked;
+       parcoords.render();
+     });
+    const valueLabel = document.createElement("a");
+    valueLabel.innerText = `${value[0]} (${value[1]})`;
+    valuesDiv.appendChild(valueCheck);
+    valuesDiv.appendChild(valueLabel);
+  });
 });
-parcoords.updateAxes();
-parcoords.render();
+
+
 
 </script>
 
