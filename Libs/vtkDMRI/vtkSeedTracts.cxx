@@ -933,6 +933,14 @@ void vtkSeedTracts::TransformStreamlinesToRASAndAppendToPolyData(vtkPolyData *ou
     // -------------------------------------------------
     }
 
+#ifdef VTK_CELL_ARRAY_V2
+  // For vtk9 vtkCellArray::GetData returns a copy of the structure,
+  // so we aren't manipulating the real array as in previous versions.
+  // So we must copy the data into the actual structure used by the vtkPolyData.
+  // https://discourse.vtk.org/t/upcoming-changes-to-vtkcellarray/2066
+  outFibersCellArray->ImportLegacyFormat(cellArray);
+#endif
+
   // Remove the scalars if any, we don't need
   // to save anything but the tensors
   outFibers->GetPointData()->SetScalars(NULL);
