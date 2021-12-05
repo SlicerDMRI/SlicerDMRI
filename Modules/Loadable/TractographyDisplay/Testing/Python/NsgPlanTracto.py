@@ -3,8 +3,6 @@ import os
 import time
 import unittest
 import vtk, qt, ctk, slicer
-import EditorLib
-from EditorLib.EditUtil import EditUtil
 
 #
 # NeurosurgicalPlanningTutorialTractographySelfTest
