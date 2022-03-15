@@ -377,7 +377,8 @@ int vtkPolyDataTensorToColor::RequestData(
       // TO DO: why does superclass have this if no scalar output?
       // in this case it appears copy scalars is on (above in
       // scalar allocation section).
-      outPD->CopyData(pd,0,ptOffset);
+      vtkIdType start = 0;
+      outPD->CopyData(pd,start,ptOffset);
     }
 
     // Keep track of the number of points output so far.
