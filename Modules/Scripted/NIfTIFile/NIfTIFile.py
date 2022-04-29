@@ -4,8 +4,6 @@ import unittest
 import vtk, qt, ctk, slicer
 from slicer.ScriptedLoadableModule import *
 
-import nifti
-
 class NIfTIFile(ScriptedLoadableModule):
   def __init__(self, parent):
     ScriptedLoadableModule.__init__(self, parent)
@@ -24,6 +22,13 @@ class NIfTIFile(ScriptedLoadableModule):
     Supported by NIH Grant 5R01MH119222
     '''
     self.parent = parent
+
+def _NIfTIFileInstallPackage():
+  try:
+    import conversion
+  except ModuleNotFoundError:
+    slicer.util.pip_install("git+https://github.com/pnlbwh/conversion.git@v2.3")
+
 
 class NIfTIFileWidget(ScriptedLoadableModuleWidget):
   def setup(self):
@@ -46,12 +51,19 @@ class NIfTIFileFileReader(object):
     return ['NIfTI (*.nii.gz)']
 
   def canLoadFile(self, filePath):
-    # assume yes if it ends in .tko
+    # assume yes if it ends in .nii.gz
     # TODO: check for .bval and .bvec in same directory
     return True
 
   def load(self, properties):
     try:
+
+      _NIfTIFileInstallPackage()
+      import conversion
+      import nibabel
+      import numpy
+
+
       filePath = properties['fileName']
 
       # Get node base name from filename
@@ -60,12 +72,48 @@ class NIfTIFileFileReader(object):
       else:
         baseName = os.path.splitext(os.path.basename(filePath))[0]
       baseName = slicer.mrmlScene.GenerateUniqueName(baseName)
+      diffusionNode = slicer.mrmlScene.AddNewNodeByClass('vtkMRMLDiffusionWeightedVolumeNode', baseName)
+      measurementFrame = vtk.vtkMatrix4x4()
+      measurementFrame.Identity()
+      measurementFrame.SetElement(0,0,-1)
+      measurementFrame.SetElement(1,1,-1)
+      diffusionNode.SetMeasurementFrameMatrix(measurementFrame)
 
-      polyData = nifti.gltfi2vtk.convert(filePath)
+      niftiImage = nibabel.load(filePath)
 
-      fiberBundleNode = slicer.mrmlScene.AddNewNodeByClass('vtkMRMLFiberBundleNode', baseName)
-      fiberBundleNode.SetAndObservePolyData(polyData)
-      fiberBundleNode.CreateDefaultDisplayNodes()
+      affine = niftiImage.affine
+      ijkToRAS = vtk.vtkMatrix4x4()
+      for row in range(4):
+        for column in range(4):
+          ijkToRAS.SetElement(row, column, affine[row][column])
+      diffusionNode.SetIJKToRASMatrix(ijkToRAS)
+
+      fdata = niftiImage.get_fdata()
+      diffusionArray = numpy.transpose(fdata, axes=[2,1,0,3])
+
+      diffusionImage = vtk.vtkImageData()
+      dshape = diffusionArray.shape
+      diffusionImage.SetDimensions(dshape[2],dshape[1],dshape[0])
+      diffusionImage.AllocateScalars(vtk.VTK_FLOAT, dshape[3])
+      diffusionNode.SetAndObserveImageData(diffusionImage)
+
+      nodeArray = slicer.util.arrayFromVolume(diffusionNode)
+      nodeArray[:] = diffusionArray
+      slicer.util.arrayFromVolumeModified(diffusionNode)
+
+
+      pathBase = filePath[:-len(".nii.gz")]
+      bvalPath = f"{pathBase}.bval"
+      bvecPath = f"{pathBase}.bvec"
+      bval = conversion.bval_bvec_io.read_bvals(bvalPath)
+      bvec = conversion.bval_bvec_io.read_bvecs(bvecPath)
+
+      diffusionNode.SetNumberOfGradients(len(bval))
+      for index in range(len(bval)):
+        diffusionNode.SetBValue(index, bval[index])
+        diffusionNode.SetDiffusionGradient(index, bvec[index])
+
+      diffusionNode.CreateDefaultDisplayNodes()
 
     except Exception as e:
       logging.error('Failed to load file: '+str(e))
@@ -73,7 +121,7 @@ class NIfTIFileFileReader(object):
       traceback.print_exc()
       return False
 
-    self.parent.loadedNodes = [fiberBundleNode.GetID()]
+    self.parent.loadedNodes = [diffusionNode.GetID()]
     return True
 
 
