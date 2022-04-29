@@ -81,7 +81,6 @@ add_subdirectory("Modules/Scripted/FiberBundleToLabelMap")
 add_subdirectory("Modules/Scripted/DMRIPlugins")
 add_subdirectory("Modules/Scripted/TractographyExportPLY")
 add_subdirectory("Modules/Scripted/TractographyDownsample")
-add_subdirectory("Modules/Scripted/TRAKOFile")
 add_subdirectory("Modules/Scripted/Tractology")
 add_subdirectory("Modules/Scripted/BatchTract")
 
