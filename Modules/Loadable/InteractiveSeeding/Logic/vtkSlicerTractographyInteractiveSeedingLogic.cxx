@@ -342,7 +342,7 @@ void vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForOneSeed(vtkSee
         }
       }
     }
-  else if (markupsFiducialNode && markupsFiducialNode->GetNumberOfMarkups())
+  else if (markupsFiducialNode && markupsFiducialNode->GetNumberOfControlPoints())
     {
     int numberOfFiducials = markupsFiducialNode->GetNumberOfMarkups();
     for (int i = 0; i < numberOfFiducials; ++i)
@@ -350,8 +350,8 @@ void vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForOneSeed(vtkSee
       if (!seedSelectedFiducials ||
           (seedSelectedFiducials && markupsFiducialNode->GetNthControlPointSelected(i)))
         {
-        double xyzf[3];
-        markupsFiducialNode->GetNthFiducialPosition(i, xyzf);
+        double *xyzf;
+        xyzf = markupsFiducialNode->GetNthControlPointPosition(i);
         for (double x = -regionSize/2.0; x <= regionSize/2.0; x+=sampleStep)
           {
           for (double y = -regionSize/2.0; y <= regionSize/2.0; y+=sampleStep)
