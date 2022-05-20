@@ -325,7 +325,7 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
         point1 = inpoints.GetPoint(ptids.GetId(ptidx + 1))
         step_size += np.sqrt(np.sum(np.power(np.subtract(point0, point1), 2)))
         count += 1
-    step_size = int(step_size / count)
+    step_size = step_size / count
     return step_size
 
   def downsampleFibers(self, inpd, outpd, outstep, outpercent, outminpts, outminlen, outmaxlen):
