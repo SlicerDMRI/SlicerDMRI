@@ -1,4 +1,5 @@
 from __future__ import division
+import glob
 import os
 import sys
 import unittest
@@ -57,6 +58,8 @@ class TractographyDownsampleWidget(ScriptedLoadableModuleWidget):
     # Layout within the dummy collapsible button
     parametersFormLayout = qt.QFormLayout(parametersCollapsibleButton)
 
+    defaults = TractographyDownsampleLogic().parameterDefaults()
+
     #
     # input fiber bundle selector
     #
@@ -102,7 +105,7 @@ class TractographyDownsampleWidget(ScriptedLoadableModuleWidget):
     # step size output goal value
     self.fiberStepSizeWidget = qt.QDoubleSpinBox()
     self.fiberStepSizeWidget.singleStep = 0.1
-    self.fiberStepSizeWidget.setValue(2.0)
+    self.fiberStepSizeWidget.setValue(defaults['fiberStepSize'])
     self.fiberStepSizeWidget.setToolTip("Set step size value (in mm) for the output tractography. Points will be removed along the fiber such that the output step size is approximately this value (max possible step less than or equal to this value).")
     parametersFormLayout.addRow("Output step size (mm):", self.fiberStepSizeWidget)
 
@@ -111,14 +114,14 @@ class TractographyDownsampleWidget(ScriptedLoadableModuleWidget):
     self.fiberPercentageWidget.singleStep = 0.1
     self.fiberPercentageWidget.maximum = 100.0
     self.fiberPercentageWidget.minimum = 0.01
-    self.fiberPercentageWidget.setValue(50)
+    self.fiberPercentageWidget.setValue(defaults['fiberPercentage'])
     self.fiberPercentageWidget.setToolTip("Set percentage of input fibers to retain in output.")
     parametersFormLayout.addRow("Output fiber percent:", self.fiberPercentageWidget)
 
     # fiber minimum points to keep the fiber output value
     self.fiberMinimumPointsWidget = qt.QSpinBox()
     self.fiberMinimumPointsWidget.singleStep = 0.1
-    self.fiberMinimumPointsWidget.setValue(3)
+    self.fiberMinimumPointsWidget.setValue(defaults['fiberMinimumPoints'])
     self.fiberMinimumPointsWidget.setToolTip("Set minimum length of input fibers (in points) to retain in output. This is best used as a sanity check to remove any very short fibers where the algorithm was not successful in tracing. For example, a minimum length of 3 points means that any spurious fibers with only 1 or 2 points will be removed.")
     parametersFormLayout.addRow("Output min points:", self.fiberMinimumPointsWidget)
 
@@ -127,7 +130,7 @@ class TractographyDownsampleWidget(ScriptedLoadableModuleWidget):
     self.fiberMinimumLengthWidget.singleStep = 1
     self.fiberMinimumLengthWidget.maximum = 250.0
     self.fiberMinimumLengthWidget.minimum = 0.01
-    self.fiberMinimumLengthWidget.setValue(10)
+    self.fiberMinimumLengthWidget.setValue(defaults['fiberMinimumLength'])
     self.fiberMinimumLengthWidget.setToolTip("Set minimum length of input fibers (in mm) to retain in output. For example, a minimum length of 10mm means that any fibers under 10mm in length will be removed.")
     parametersFormLayout.addRow("Output min length (mm):", self.fiberMinimumLengthWidget)
 
@@ -136,7 +139,7 @@ class TractographyDownsampleWidget(ScriptedLoadableModuleWidget):
     self.fiberMaximumLengthWidget.singleStep = 0.1
     self.fiberMaximumLengthWidget.maximum = 250.0
     self.fiberMaximumLengthWidget.minimum = 0.01
-    self.fiberMaximumLengthWidget.setValue(200)
+    self.fiberMaximumLengthWidget.setValue(defaults['fiberMaximumLength'])
     self.fiberMaximumLengthWidget.setToolTip("Set maximum length of input fibers (in mm) to retain in output. For example, a maximum length of 35mm means that any fibers over 35mm in length will be removed. This is useful to clean any long artifactual fibers from a particular bundle.")
     parametersFormLayout.addRow("Output max length (mm):", self.fiberMaximumLengthWidget)
 
@@ -144,7 +147,8 @@ class TractographyDownsampleWidget(ScriptedLoadableModuleWidget):
     # check box to trigger taking screen shots for later use in tutorials
     #
     self.enableScreenshotsFlagCheckBox = qt.QCheckBox()
-    self.enableScreenshotsFlagCheckBox.checked = 0
+    print(defaults)
+    self.enableScreenshotsFlagCheckBox.checked = defaults['enableScreenshots']
     self.enableScreenshotsFlagCheckBox.setToolTip("If checked, take screen shots for tutorials. Use Save Data to write them to disk.")
     parametersFormLayout.addRow("Enable Screenshots", self.enableScreenshotsFlagCheckBox)
 
@@ -156,16 +160,63 @@ class TractographyDownsampleWidget(ScriptedLoadableModuleWidget):
     self.applyButton.enabled = False
     parametersFormLayout.addRow(self.applyButton)
 
+    #
+    # Apply to All Button
+    #
+    self.applyAllButton = qt.QPushButton("Apply to all")
+    self.applyAllButton.toolTip = "Run the algorithm on all tracts loaded."
+    self.applyAllButton.enabled = True
+    parametersFormLayout.addRow(self.applyAllButton)
+
     # connections
     self.applyButton.connect('clicked(bool)', self.onApplyButton)
+    self.applyAllButton.connect('clicked(bool)', self.onApplyAllButton)
     self.inputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.onSelect)
     self.outputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.onSelect)
 
-    # Add vertical spacer
-    self.layout.addStretch(1)
-
     # Refresh Apply button state
     self.onSelect()
+
+    #
+    # Batch Downsample Area
+    #
+    batchCollapsibleButton = ctk.ctkCollapsibleButton()
+    batchCollapsibleButton.text = "Batch"
+    batchCollapsibleButton.collapsed = False
+    self.layout.addWidget(batchCollapsibleButton)
+
+    # Layout within the dummy collapsible button
+    batchFormLayout = qt.QFormLayout(batchCollapsibleButton)
+
+    #
+    # Batch directories
+    #
+    self.batchSourceButton = ctk.ctkDirectoryButton()
+    self.batchSourceButton.toolTip = "Parent of directory tree contraining tract files."
+    self.batchSourceButton.enabled = True
+    batchFormLayout.addRow("Source directory", self.batchSourceButton)
+    self.batchDestinationButton = ctk.ctkDirectoryButton()
+    self.batchDestinationButton.toolTip = "Parent of directory tree to store tract files."
+    self.batchDestinationButton.enabled = True
+    batchFormLayout.addRow("Destination directory", self.batchDestinationButton)
+
+    # for testing
+    self.batchSourceButton.directory = "/mnt/extra/pieper/data/abcd/sourceTracts"
+    self.batchDestinationButton.directory = "/mnt/extra/pieper/data/abcd/batchTracts"
+
+    #
+    # Batch Apply Button
+    #
+    self.batchApplyButton = qt.QPushButton("Apply to directory of fiber bundles")
+    self.batchApplyButton.toolTip = "Downsample fiber bundles in the input directory and save the result to the output directory."
+    self.batchApplyButton.enabled = True
+    batchFormLayout.addRow(self.batchApplyButton)
+
+    # connections
+    self.batchApplyButton.connect('clicked(bool)', self.onBatchApplyButton)
+
+    # Add vertical spacer
+    self.layout.addStretch(1)
 
     #
     # Advanced Area
@@ -196,25 +247,34 @@ class TractographyDownsampleWidget(ScriptedLoadableModuleWidget):
   def onSelect(self):
     self.applyButton.enabled = self.inputSelector.currentNode() and self.outputSelector.currentNode()
 
+  def parameters(self):
+    return {
+        "fiberStepSize" : self.fiberStepSizeWidget.value,
+        "fiberPercentage" : self.fiberPercentageWidget.value,
+        "fiberMinimumPoints" : self.fiberMinimumPointsWidget.value,
+        "fiberMinimumLength" : self.fiberMinimumLengthWidget.value,
+        "fiberMaximumLength" : self.fiberMaximumLengthWidget.value,
+        "enableScreenshots" : self.enableScreenshotsFlagCheckBox.checked
+        }
+
   def onApplyButton(self):
     logic = TractographyDownsampleLogic()
-    enableScreenshotsFlag = self.enableScreenshotsFlagCheckBox.checked
-    fiberStepSize = self.fiberStepSizeWidget.value
-    fiberPercentage = self.fiberPercentageWidget.value
-    fiberMinPoints = self.fiberMinimumPointsWidget.value
-    fiberMinLength = self.fiberMinimumLengthWidget.value
-    fiberMaxLength = self.fiberMaximumLengthWidget.value
-    logic.run(self.inputSelector.currentNode(), self.outputSelector.currentNode(), fiberStepSize, fiberPercentage, fiberMinPoints, fiberMinLength, fiberMaxLength, enableScreenshotsFlag)
+    logic.run(self.inputSelector.currentNode(), self.outputSelector.currentNode(), self.parameters())
+
+  def onApplyAllButton(self):
+    logic = TractographyDownsampleLogic()
+    logic.run(self.inputSelector.currentNode(), self.outputSelector.currentNode(), self.parameters())
+
+  def onBatchApplyButton(self):
+    logic = TractographyDownsampleLogic()
+    sourceDirectory = self.batchSourceButton.directory
+    destinationDirectory = self.batchDestinationButton.directory
+    logic.runBatch(sourceDirectory, destinationDirectory, self.parameters())
 
   def onAdvancedApplyButton(self):
     logic = TractographyDownsampleLogic()
-    enableScreenshotsFlag = self.enableScreenshotsFlagCheckBox.checked
-    fiberStepSize = self.fiberStepSizeWidget.value
-    fiberPercentage = self.fiberPercentageWidget.value
-    fiberMinPoints = self.fiberMinimumPointsWidget.value
-    fiberMinLength = self.fiberMinimumLengthWidget.value
-    fiberMaxLength = self.fiberMaximumLengthWidget.value
-    logic.runAdvanced(fiberStepSize, fiberPercentage, fiberMinPoints, fiberMinLength, fiberMaxLength, enableScreenshotsFlag)
+    logic.runAdvanced(self.parameters())
+
 
 #
 # TractographyDownsampleLogic
@@ -229,6 +289,16 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
   Uses ScriptedLoadableModuleLogic base class, available at:
   https://github.com/Slicer/Slicer/blob/master/Base/Python/slicer/ScriptedLoadableModule.py
   """
+
+  def parameterDefaults(self):
+    return {
+        "fiberStepSize" : 2.0,
+        "fiberPercentage" : 50,
+        "fiberMinimumPoints" : 3,
+        "fiberMinimumLength" : 10,
+        "fiberMaximumLength" : 200,
+        "enableScreenshots": 0
+        }
 
   def hasFiberBundleData(self,fiberBundleNode):
     """This is an example logic method that
@@ -407,7 +477,7 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
     outpd.SetLines(outlines)
     outpd.SetPoints(outpoints)
 
-  def run(self, inputFiberBundle, outputFiberBundle, fiberStepSize, fiberPercentage, fiberMinPoints, fiberMinLength, fiberMaxLength, enableScreenshots=0, advanced=0):
+  def run(self, inputFiberBundle, outputFiberBundle, parameters, advanced=0):
     """
     Run the actual algorithm
     """
@@ -437,7 +507,7 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
     logging.info(pd.GetNumberOfPoints())
 
     # call the main function that does the processing
-    self.downsampleFibers(pd, outpd, fiberStepSize, fiberPercentage, fiberMinPoints, fiberMinLength, fiberMaxLength)
+    self.downsampleFibers(pd, outpd, parameters['fiberStepSize'], parameters['fiberPercentage'], parameters['fiberMinimumPoints'], parameters['fiberMinimumLength'], parameters['fiberMaximumLength'])
 
     # log information about output
     logging.info('Output Fiber Bundle Stats:')
@@ -454,14 +524,62 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
     outputFiberBundle.SetAndObservePolyData(outpd)
 
     # Capture screenshot
-    if enableScreenshots:
+    if parameters['enableScreenshots']:
       self.takeScreenshot('TractographyDownsampleTest-Start','MyScreenshot',-1)
 
     logging.info('Processing completed')
 
     return True
 
-  def runAdvanced(self, fiberStepSize, fiberPercentage, fiberMinPoints, fiberMinLength, fiberMaxLength, enableScreenshots=0):
+  def runBatch(self, sourceDirectory, destinationDirectory, parameters):
+    """
+    Run the batch operation
+    """
+
+    logging.info(f'BATCH Processing started. Downsampling all fiber bundles in {sourceDirectory} saving to {destinationDirectory}.')
+
+    fiberPaths = glob.glob(f"{sourceDirectory}/**/*.vtk", recursive=True)
+    fiberPaths.extend(glob.glob(f"{sourceDirectory}/**/*.vtp", recursive=True))
+
+    self.runBatchOnPaths(fiberPaths, sourceDirectory, destinationDirectory, parameters)
+
+  def runBatchOnPaths(self, sourceFiberPaths, sourceDirectory, destinationDirectory, parameters):
+    """
+    like runBatch, but pass in an iterable sourceFiberPaths that may come from a custom glob within the source directory
+    e.g.
+
+import glob
+import TractographyDownsample
+logic = TractographyDownsample.TractographyDownsampleLogic()
+parameters = logic.parameterDefaults()
+sourceDirectory = "/s3/abcdRelease3_WMA"
+sourceFiberPaths = glob.glob(f"{sourceDirectory}/Deviceid_4/Target_harmonization/harmonized_sub-*_ses-baselineYear1Arm1_run-01_dwi_b3000_UKF2T/AnatomicalTracts/*.vtp")
+#destinationDirectory = "/mnt/extra/pieper/data/abcd/batchTracts"
+destinationDirectory = "/s3/abcdRelease3_VisAssets"
+logic.runBatchOnPaths(sourceFiberPaths, sourceDirectory, destinationDirectory, parameters)
+
+    """
+
+    for fiberPath in sourceFiberPaths:
+      logging.info(f'Processing {fiberPath}.')
+      fiberNode = slicer.util.loadFiberBundle(fiberPath)
+      try:
+        self.run(fiberNode, fiberNode, parameters, advanced=1)
+      except:
+        logging.warn(f"error processing {fiberPath} - skipping")
+      savePath = f"{destinationDirectory}/{fiberPath[1+len(sourceDirectory):]}"
+      logging.info(f"Saving to {savePath}")
+      saveDir = os.path.dirname(savePath)
+      os.makedirs(saveDir, exist_ok=True)
+      logging.info(f"dir is {saveDir}")
+      slicer.util.saveNode(fiberNode, savePath)
+      slicer.mrmlScene.RemoveNode(fiberNode)
+
+    logging.info('BATCH Processing completed')
+
+    return True
+
+  def runAdvanced(self, parameters):
     """
     Run the actual algorithm
     """
@@ -476,7 +594,7 @@ class TractographyDownsampleLogic(ScriptedLoadableModuleLogic):
     logging.info('ADVANCED Processing started. Downsampling all fiber bundles in Slicer scene.')
     logging.info(nodes)
     for node in nodes:
-      self.run(node, node, fiberStepSize, fiberPercentage, fiberMinPoints, fiberMinLength, fiberMaxLength, enableScreenshots=0, advanced=1)
+      self.run(node, node, parameters, advanced=1)
     logging.info('ADVANCED Processing completed')
 
     return True
