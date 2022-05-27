@@ -237,30 +237,45 @@ class BatchTractLogic(ScriptedLoadableModuleLogic):
     fp.write("0 1 0 0.095\n") # TODO compute from json
     fp.close()
 
+    print("copying run-eddy.sh")
     shutil.copy(f"{os.path.dirname(slicer.modules.batchtract.path)}/Resources/run-eddy.sh", niiPath)
 
     outFP = open(os.path.join(outputPath, "eddy.stdout.txt"), 'w')
     errFP = open(os.path.join(outputPath, "eddy.stderr.txt"), 'w')
 
-    cmd = "gcloud --project project-7519307760985532298 compute ssh freesurfer-synth --command 'rm /usr/local/data/eddy-subject/*'"
-    slicer.util.launchConsoleProcess(cmd.split())
+    print("deleting")
+    cmd = "gcloud --project project-7519307760985532298 compute ssh freesurfer-synth --command".split()
+    cmd.append('rm -rf /usr/local/data/eddy-subject/dcm2niix-nii')
+    process = slicer.util.launchConsoleProcess(cmd)
+    process.wait()
+    outFP.write(str(process.communicate()))
 
+    print("copying data")
     cmd = "gcloud --project project-7519307760985532298 compute scp --recurse "
-    cmd += f"'{niiPath}/' freesurfer-synth:/usr/local/data/eddy-subject"
-    slicer.util.launchConsoleProcess(cmd.split())
+    cmd += f"{niiPath} freesurfer-synth:/usr/local/data/eddy-subject"
+    process = slicer.util.launchConsoleProcess(cmd.split())
+    process.wait()
+    outFP.write(str(process.communicate()))
 
+    print("changing permissions")
     cmd = "gcloud --project project-7519307760985532298 compute ssh freesurfer-synth --command".split()
     cmd.append("sudo chmod -R a+rw /usr/local/data/eddy-subject")
-    slicer.util.launchConsoleProcess(cmd)
+    process = slicer.util.launchConsoleProcess(cmd)
+    process.wait()
+    outFP.write(str(process.communicate()))
 
+    print("running run-eddy.sh")
     cmd = "gcloud --project project-7519307760985532298 compute ssh freesurfer-synth --command".split()
     cmd.append("sudo su - pieper -c '/bin/bash /usr/local/data/eddy-subject/dcm2niix-nii/run-eddy.sh'")
     process = slicer.util.launchConsoleProcess(cmd)
     process.wait()
-    outFP.write(process.communicate())
+    outFP.write(str(process.communicate()))
 
+    print("copying results")
     cmd = f"gcloud --project project-7519307760985532298 compute scp --recurse freesurfer-synth:/usr/local/data/eddy-subject/dcm2niix-nii/ {outputPath}"
-    slicer.util.launchConsoleProcess(cmd.split())
+    process = slicer.util.launchConsoleProcess(cmd.split())
+    process.wait()
+    outFP.write(str(process.communicate()))
 
     print(f"Eddy corrected data in {outputPath}")
 
@@ -277,9 +292,9 @@ class BatchTractLogic(ScriptedLoadableModuleLogic):
         for series in db.seriesForStudy(study):
           print(f"Series {series}")
           temporaryDir = qt.QTemporaryDir()
-          if series != "1.3.12.2.1107.5.2.32.35288.2013022319050913362263496.0.0.0":
-            print(f"skipping {series}")
-            continue
+          # if series != "1.3.12.2.1107.5.2.32.35288.2013022319050913362263496.0.0.0":
+            # print(f"skipping {series}")
+            # continue
           for instanceUID in db.instancesForSeries(series):
             qt.QFile.copy(db.fileForInstance(instanceUID), temporaryDir.path()+f"/{instanceUID}.dcm")
           patientID = slicer.dicomDatabase.instanceValue(instanceUID, '0010,0020')
@@ -349,7 +364,7 @@ class BatchTractLogic(ScriptedLoadableModuleLogic):
           else:
             print(f"No bval for {outputPath}")
 
-      break
+      # break
     print("done")
 
   def tractResults(self, path):
