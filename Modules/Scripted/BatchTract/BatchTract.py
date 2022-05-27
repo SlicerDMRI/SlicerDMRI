@@ -150,7 +150,7 @@ class BatchTractLogic(ScriptedLoadableModuleLogic):
     errFP.close()
 
   def tractsFromNRRD(self, nrrdPath, tractsPath):
-    return
+    return #TODO
     if not os.path.exists(tractsPath):
       os.makedirs(tractsPath)
     baselinePath = os.path.join(tractsPath, "baseline.nrrd")
@@ -220,8 +220,6 @@ class BatchTractLogic(ScriptedLoadableModuleLogic):
 
   def eddyCorrect(self, niiPath, outputPath):
     print(f"eddy correcting {niiPath} to {outputPath}")
-    if not os.path.exists(outputPath):
-      os.makedirs(outputPath)
 
     bvecPath = glob.glob(f"{niiPath}/*.bvec")[0]
     gradients = open(bvecPath).read()
@@ -303,15 +301,16 @@ class BatchTractLogic(ScriptedLoadableModuleLogic):
           if not os.path.exists(outputPath):
             os.makedirs(outputPath)
           nrrdPath = os.path.join(outputPath, series+".nrrd")
-          outFP = open(os.path.join(outputPath, series+".stdout.txt"), 'w')
-          errFP = open(os.path.join(outputPath, series+".stderr.txt"), 'w')
-          dwiConvertProcess = subprocess.Popen([slicer.modules.dwiconvert.path,
-                                                '-i', temporaryDir.path(),
-                                                '-o', nrrdPath],
-                                                stdout=outFP, stderr=errFP)
-          dwiConvertProcess.wait()
-          outFP.close()
-          errFP.close()
+          if not os.path.exists(nrrdPath):
+            outFP = open(os.path.join(outputPath, series+".stdout.txt"), 'w')
+            errFP = open(os.path.join(outputPath, series+".stderr.txt"), 'w')
+            dwiConvertProcess = subprocess.Popen([slicer.modules.dwiconvert.path,
+                                                  '-i', temporaryDir.path(),
+                                                  '-o', nrrdPath],
+                                                  stdout=outFP, stderr=errFP)
+            dwiConvertProcess.wait()
+            outFP.close()
+            errFP.close()
           print('converted to ' + outputPath)
           if qt.QFileInfo(nrrdPath).exists():
             tractsPath = os.path.join(outputPath, "tracts")
@@ -321,46 +320,51 @@ class BatchTractLogic(ScriptedLoadableModuleLogic):
           outputPath = os.path.join(convertedPath, patientID, study, series, "dcm2niix")
           if not os.path.exists(outputPath):
             os.makedirs(outputPath)
-          outFP = open(os.path.join(outputPath, series+".stdout.txt"), 'w')
-          errFP = open(os.path.join(outputPath, series+".stderr.txt"), 'w')
-          dcm2niixPath = os.path.join(qt.QFileInfo(slicer.modules.dcm2niixgui.path).path(), "Resources/bin/dcm2niix")
-          dcm2niixProcess = subprocess.Popen([dcm2niixPath,
-                                                '-o', outputPath,
-                                                '-f', series,
-                                                '-e', 'y', # for nrrd
-                                                '-z', 'o',
-                                                temporaryDir.path()],
-                                                stdout=outFP, stderr=errFP)
-          dcm2niixProcess.wait()
-          outFP.close()
-          errFP.close()
-          print('converted to ' + outputPath)
-          for nrrdFile in qt.QDir(outputPath).entryList(["*.nhdr"]):
-            tractsPath = os.path.join(outputPath, "tracts")
-            self.tractsFromNRRD(nrrdPath, tractsPath)
+          if len(glob.glob(f"{outputPath}/*")) == 0:
+            outFP = open(os.path.join(outputPath, series+".stdout.txt"), 'w')
+            errFP = open(os.path.join(outputPath, series+".stderr.txt"), 'w')
+            dcm2niixPath = os.path.join(qt.QFileInfo(slicer.modules.dcm2niixgui.path).path(), "Resources/bin/dcm2niix")
+            dcm2niixProcess = subprocess.Popen([dcm2niixPath,
+                                                  '-o', outputPath,
+                                                  '-f', series,
+                                                  '-e', 'y', # for nrrd
+                                                  '-z', 'o',
+                                                  temporaryDir.path()],
+                                                  stdout=outFP, stderr=errFP)
+            dcm2niixProcess.wait()
+            outFP.close()
+            errFP.close()
+            print('converted to ' + outputPath)
+            for nrrdFile in qt.QDir(outputPath).entryList(["*.nhdr"]):
+              tractsPath = os.path.join(outputPath, "tracts")
+              self.tractsFromNRRD(nrrdFile, tractsPath)
 
           # dcm2niix nifti
           outputPath = os.path.join(convertedPath, patientID, study, series, "dcm2niix-nii")
           if not os.path.exists(outputPath):
             os.makedirs(outputPath)
-          outFP = open(os.path.join(outputPath, series+".stdout.txt"), 'w')
-          errFP = open(os.path.join(outputPath, series+".stderr.txt"), 'w')
-          dcm2niixPath = os.path.join(qt.QFileInfo(slicer.modules.dcm2niixgui.path).path(), "Resources/bin/dcm2niix")
-          dcm2niixProcess = subprocess.Popen([dcm2niixPath,
-                                                '-o', outputPath,
-                                                '-f', series,
-                                                '-z', 'o',
-                                                temporaryDir.path()],
-                                                stdout=outFP, stderr=errFP)
-          dcm2niixProcess.wait()
-          outFP.close()
-          errFP.close()
-          print('converted to ' + outputPath)
+          if len(glob.glob(f"{outputPath}/*")) == 0:
+            outFP = open(os.path.join(outputPath, series+".stdout.txt"), 'w')
+            errFP = open(os.path.join(outputPath, series+".stderr.txt"), 'w')
+            dcm2niixPath = os.path.join(qt.QFileInfo(slicer.modules.dcm2niixgui.path).path(), "Resources/bin/dcm2niix")
+            dcm2niixProcess = subprocess.Popen([dcm2niixPath,
+                                                  '-o', outputPath,
+                                                  '-f', series,
+                                                  '-z', 'o',
+                                                  temporaryDir.path()],
+                                                  stdout=outFP, stderr=errFP)
+            dcm2niixProcess.wait()
+            outFP.close()
+            errFP.close()
+            print('converted to ' + outputPath)
 
           if len(glob.glob(f"{outputPath}/*.bvec")) > 0:
             eddyPath = os.path.join(convertedPath, patientID, study, series, "eddy")
-            print('Running eddy current correction to ' + eddyPath)
-            self.eddyCorrect(outputPath, eddyPath)
+            if not os.path.exists(eddyPath):
+              os.makedirs(eddyPath)
+            if len(glob.glob(f"{eddyPath}/*")) == 0:
+              print('Running eddy current correction to ' + eddyPath)
+              self.eddyCorrect(outputPath, eddyPath)
           else:
             print(f"No bval for {outputPath}")
 
