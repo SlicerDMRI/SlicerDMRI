@@ -56,6 +56,13 @@ class NIfTIFileFileReader(object):
     return True
 
   def load(self, properties):
+    """
+    uses properties:
+        fileName - path to the .nii.gz file
+        name (optional) - name for the loaded node
+        bval (optional) - path to the bval file, defaults to match fileName
+        bvec  (optional)- path to the bvec file, defaults to match fileName
+    """
     try:
 
       _NIfTIFileInstallPackage()
@@ -147,27 +154,7 @@ class NIfTIFileFileWriter(object):
     return bool(obj.IsA("vtkMRMLDiffusionWeightedVolumeNode"))
 
   def write(self, properties):
-    # TODO: expose more compression options
-    try:
-
-      # Get node
-      fiberBundleNode = slicer.mrmlScene.GetNodeByID(properties["nodeID"])
-      polyData = fiberBundleNode.GetPolyData()
-
-      # Write node content to file
-      filePath = properties['fileName']
-      fibercluster = nifti.vtk2gltfi.convert(polyData)
-      tko = nifti.vtk2gltfi.fibercluster2gltf(fibercluster, draco=True)
-      tko.save(filePath)
-
-    except Exception as e:
-      logging.error('Failed to write file: '+str(e))
-      import traceback
-      traceback.print_exc()
-      return False
-
-    self.parent.writtenNodes = [fiberBundleNode.GetID()]
-    return True
+    return Fale
 
 
 class NIfTIFileTest(ScriptedLoadableModuleTest):
@@ -182,10 +169,6 @@ class NIfTIFileTest(ScriptedLoadableModuleTest):
 
   def setUp(self):
     self.tempDir = slicer.util.tempDirectory()
-    logging.info("tempDir: " + self.tempDir)
-    self.textInNode = "This is\nsome example test"
-    self.validFilename = self.tempDir + "/tempNIfTIFileValid.tko"
-    self.invalidFilename = self.tempDir + "/tempNIfTIFileInvalid.tko"
     slicer.mrmlScene.Clear()
 
   def tearDown(self):
@@ -198,15 +181,3 @@ class NIfTIFileTest(ScriptedLoadableModuleTest):
 
     # TODO: rewrite this for NIfTI
 
-    self.delayDisplay('Testing node writer')
-    slicer.mrmlScene.Clear()
-    textNode = slicer.mrmlScene.AddNewNodeByClass('vtkMRMLTextNode')
-    textNode.SetText(self.textInNode)
-    self.assertTrue(slicer.util.saveNode(textNode, self.validFilename, {'fileType': 'MyFileType'}))
-
-    self.delayDisplay('Testing node reader')
-    slicer.mrmlScene.Clear()
-    loadedNode = slicer.util.loadNodeFromFile(self.validFilename, 'MyFileType')
-    self.assertIsNotNone(loadedNode)
-    self.assertTrue(loadedNode.IsA('vtkMRMLTextNode'))
-    self.assertEqual(loadedNode.GetText(), self.textInNode)
