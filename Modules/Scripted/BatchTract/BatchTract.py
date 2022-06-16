@@ -60,7 +60,7 @@ class BatchTractWidget(ScriptedLoadableModuleWidget):
 
     self.batchPath = ctk.ctkPathLineEdit()
     self.parametersFormLayout.addRow("Target path", self.batchPath)
-    self.batchPath.currentPath = "/Volumes/SSD2T/data/pedistroke/converted"
+    self.batchPath.currentPath = "/Volumes/SSD2T/data/pedistroke/converted-eddy-test"
 
     self.batchTractButton = qt.QPushButton("Run Batch Tract")
     self.parametersFormLayout.addWidget(self.batchTractButton)
@@ -73,6 +73,10 @@ class BatchTractWidget(ScriptedLoadableModuleWidget):
     self.screenshotsButton = qt.QPushButton("Make screenshots")
     self.parametersFormLayout.addWidget(self.screenshotsButton)
     self.screenshotsButton.connect('clicked()', self.screenshots)
+
+    self.pediTractButton = qt.QPushButton("Pedi tract")
+    self.parametersFormLayout.addWidget(self.pediTractButton)
+    self.pediTractButton.connect('clicked()', self.pediTract)
 
     #
     # Results Area
@@ -130,6 +134,9 @@ class BatchTractWidget(ScriptedLoadableModuleWidget):
   def screenshots(self):
     self.logic.screenshots(self.results)
 
+  def pediTract(self):
+    self.logic.pediTract(self.batchPath.currentPath)
+
 #
 # BatchTractLogic
 #
@@ -145,9 +152,14 @@ class BatchTractLogic(ScriptedLoadableModuleLogic):
   def runCommand(self, command, outputBasePath):
     outFP = open(outputBasePath + "stdout.txt", 'w')
     errFP = open(outputBasePath + "stderr.txt", 'w')
-    subprocess.Popen(command, stdout=outFP, stderr=errFP).wait()
+    exitCode = subprocess.Popen(command, stdout=outFP, stderr=errFP).wait()
     outFP.close()
     errFP.close()
+    if exitCode != 0:
+        print(f"command exited with {exitCode}")
+        print(command)
+        print(f"outputs in {outputBasePath}")
+    return(exitCode)
 
   def tractsFromNRRD(self, nrrdPath, tractsPath):
     return #TODO
@@ -401,6 +413,118 @@ class BatchTractLogic(ScriptedLoadableModuleLogic):
         slicer.util.mainWindow().centralWidget().grab().toImage().save(savePath)
         print(savePath)
 
+  def _NIfTIFileInstallPackage():
+    try:
+      import conversion
+    except ModuleNotFoundError:
+      slicer.util.pip_install("git+https://github.com/pnlbwh/conversion.git@v2.3")
+
+  def find_files(self, directory, pattern):
+    """ https://stackoverflow.com/questions/2186525/how-to-use-glob-to-find-files-recursively
+    faster for testing than: rotatedBvecs = glob.glob(f"{dataPath}/**/*rotated*", recursive=True)
+    """
+    import os, fnmatch
+    for root, dirs, files in os.walk(directory):
+      for basename in files:
+        if fnmatch.fnmatch(basename, pattern):
+          filename = os.path.join(root, basename)
+          yield filename
+
+  def pediTract(self, dataPath):
+    self._NIfTIFileInstallPackage
+    import conversion
+    import os
+    count = 0
+    for rotatedBvecPath in self.find_files(dataPath, '*rotated*'):
+        slicer.mrmlScene.Clear()
+
+        # make nhdr file
+        correctedNIIPath = rotatedBvecPath[:-1 * len(".eddy_rotated_bvecs")]
+        bvalPath = correctedNIIPath[:-1 * len("-noeddy.nii.gz")] + ".bval"
+        nhdrPath = correctedNIIPath + ".nhdr"
+        conversion.nhdr_write(correctedNIIPath, bvalPath, rotatedBvecPath, nhdrPath)
+        niiDirPath = os.path.dirname(correctedNIIPath)
+
+        # perform tractography
+        print("tractography...")
+        tractsPath = os.path.join(niiDirPath, "tracts")
+        if not os.path.exists(tractsPath):
+            os.makedirs(tractsPath)
+        maskNode = slicer.util.loadVolume(f'{niiDirPath}/bet-mask.nii.gz')
+        castFilter = vtk.vtkImageCast()
+        castFilter.SetInputData(maskNode.GetImageData())
+        castFilter.SetOutputScalarTypeToShort()
+        castFilter.Update()
+        maskNode.SetAndObserveImageData(castFilter.GetOutputDataObject(0))
+        slicer.util.saveNode(maskNode, f'{niiDirPath}/bet-mask.nrrd')
+        command = [slicer.modules.ukftractography.path,
+                     '--stoppingThreshold', '0.06',
+                     '--stoppingFA', '0.08',
+                     '--seedingThreshold', '0.10',
+                     '--seedsPerVoxel', '1',
+                     '--dwiFile', nhdrPath,
+                     '--maskFile', f'{niiDirPath}/bet-mask.nrrd',
+                     '--labels', '1',
+                     '--numTensor', '1',
+                     '--freeWater',
+                     '--tracts',
+                     f'{tractsPath}/tracts.vtk',
+                  ]
+        self.runCommand(command, tractsPath)
+
+        # scale to adult size
+        print("scale...")
+        tfmPath = os.path.join(os.path.dirname(slicer.modules.batchtract.path),
+                    "Resources/dHCP_enlarge1.5.tfm")
+        tractsScaledPath = f'{tractsPath}/tracts-scaled'
+        if not os.path.exists(tractsScaledPath):
+            os.makedirs(tractsScaledPath)
+        command = ['wm_harden_transform.py',
+                '-t', tfmPath,
+                f'{tractsPath}',
+                f'{tractsScaledPath}',
+                f'{slicer.app.slicerHome}/Slicer',
+                ]
+        print(command)
+        self.runCommand(command, tractsScaledPath)
+
+        # apply white matter analysis
+        print("WMA...")
+        command = ['wm_apply_ORG_atlas_to_subject.sh',
+                '-n', '20',
+                '-i', f'{tractsScaledPath}/tracts.vtk',
+                '-o', f'{tractsScaledPath}',
+                '-a', f'/Volumes/SSD2T/data/pedistroke/scratch/ORG-Atlases-1.1.1',
+                '-s', f'{slicer.app.slicerHome}/Slicer',
+                '-d',
+                '-m', '/Users/pieper/slicer/latest/SlicerDMRI-build/inner-build/lib/Slicer-5.1/cli-modules/FiberTractMeasurements',
+                ]
+        print(command)
+        self.runCommand(command, tractsScaledPath+"_WMA")
+
+        # scale back to baby space
+        print("backscale...")
+        tractsBackscaledPath = f'{tractsPath}/tracts-backscaled'
+        if not os.path.exists(tractsBackscaledPath):
+            os.makedirs(tractsBackscaledPath)
+        command = ['wm_harden_transform.py',
+                '-i',
+                '-t', tfmPath,
+                f'{tractsScaledPath}/tracts/AnatomicalTracts',
+                f'{tractsBackscaledPath}',
+                f'{slicer.app.slicerHome}/Slicer',
+                ]
+        print(command)
+        self.runCommand(command, tractsBackscaledPath)
+
+        count += 1
+        print(f"Finished {count}")
+        print(f"ooO*Ooo")
+        # break
+
+
+        #diffusionNode - slicer.util.loadVolume(nhdrPath)
+    print("done")
 
 
 #
