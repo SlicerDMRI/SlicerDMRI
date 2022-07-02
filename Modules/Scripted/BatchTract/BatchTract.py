@@ -60,7 +60,7 @@ class BatchTractWidget(ScriptedLoadableModuleWidget):
 
     self.batchPath = ctk.ctkPathLineEdit()
     self.parametersFormLayout.addRow("Target path", self.batchPath)
-    self.batchPath.currentPath = "/Volumes/SSD2T/data/pedistroke/converted-eddy-test"
+    self.batchPath.currentPath = "/Volumes/SSD2T/data/pedistroke/converted-eddy"
 
     self.batchTractButton = qt.QPushButton("Run Batch Tract")
     self.parametersFormLayout.addWidget(self.batchTractButton)
@@ -383,7 +383,9 @@ class BatchTractLogic(ScriptedLoadableModuleLogic):
       # break
     print("done")
 
-  def tractResults(self, path):
+  def tractResultsCompareConverters(self, path):
+    """ load tract results to compare dcm2niix vs DWIConvert
+    """
     dirIt = qt.QDirIterator(path, ["*.vtk",], qt.QDir.Files, qt.QDirIterator.Subdirectories)
     tractResults = []
     while dirIt.hasNext():
@@ -399,11 +401,38 @@ class BatchTractLogic(ScriptedLoadableModuleLogic):
       tractResults.append(result)
     return tractResults
 
-  def loadResult(self,result):
+  def tractResults(self, path):
+    """ load results from eddy corrected files
+    """
+    dirIt = qt.QDirIterator(path, ["*backscaled*",], qt.QDir.Dirs, qt.QDirIterator.Subdirectories)
+    tractResults = []
+    while dirIt.hasNext():
+      backscalePath = dirIt.next()
+      parts = backscalePath.split('/')
+      result = {
+        "tractPath": backscalePath,
+        "method": parts[-3],
+        "seriesUID": parts[-5],
+        "studyUID": parts[-6],
+        "patientID": parts[-7],
+      }
+      tractResults.append(result)
+    return tractResults
+
+  def loadResultCompareConverters(self,result):
     slicer.mrmlScene.Clear()
     slicer.util.loadFiberBundle(result['tractPath'])
     dtiPath = f"{os.path.dirname(result['tractPath'])}/dti.nrrd"
     slicer.util.loadVolume(dtiPath)
+
+  def loadResult(self,result):
+    path = result['tractPath']
+    slicer.mrmlScene.Clear()
+    fiberIt = qt.QDirIterator(path, ["*.vtp",], qt.QDir.Files, qt.QDirIterator.Subdirectories)
+    while fiberIt.hasNext():
+        slicer.util.loadFiberBundle(fiberIt.next())
+    noeddyPath = glob.glob(f"{path}/../../*-noeddy.nii.gz.nhdr")[0]
+    slicer.util.loadVolume(noeddyPath)
 
   def screenshots(self,results):
     for result in results:
