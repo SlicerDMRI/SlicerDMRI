@@ -49,33 +49,86 @@ class TractologyWidget(ScriptedLoadableModuleWidget):
   def setup(self):
     ScriptedLoadableModuleWidget.setup(self)
 
+    self.logic = TractologyLogic()
+
     # Instantiate and connect widgets ...
 
     #
-    # Demos Area
+    # Explorers Area
     #
-    demosCollapsibleButton = ctk.ctkCollapsibleButton()
-    demosCollapsibleButton.text = "Parameters"
-    self.layout.addWidget(demosCollapsibleButton)
+    explorersCollapsibleButton = ctk.ctkCollapsibleButton()
+    explorersCollapsibleButton.text = "Explorers"
+    self.layout.addWidget(explorersCollapsibleButton)
 
     # Layout within the dummy collapsible button
-    self.demosFormLayout = qt.QFormLayout(demosCollapsibleButton)
+    self.explorersFormLayout = qt.QFormLayout(explorersCollapsibleButton)
 
     self.abcdTractologyDemoButton = qt.QPushButton("Run ABCD Tract Explorer")
-    self.demosFormLayout.addWidget(self.abcdTractologyDemoButton)
+    self.explorersFormLayout.addWidget(self.abcdTractologyDemoButton)
     self.abcdTractologyDemoButton.connect('clicked()', self.abcdTractologyDemo)
 
     self.hcpTractologyDemoButton = qt.QPushButton("Run HCP Tract Explorer")
-    self.demosFormLayout.addWidget(self.hcpTractologyDemoButton)
+    self.explorersFormLayout.addWidget(self.hcpTractologyDemoButton)
     self.hcpTractologyDemoButton.connect('clicked()', self.hcpTractologyDemo)
 
-    # no UI right now
+    #
+    # Networks Area
+    #
+    networksCollapsibleButton = ctk.ctkCollapsibleButton()
+    networksCollapsibleButton.text = "Networks"
+    self.layout.addWidget(networksCollapsibleButton)
+
+    # Layout within the dummy collapsible button
+    self.networksFormLayout = qt.QFormLayout(networksCollapsibleButton)
+
+    self.useFullFibersCheckBox = qt.QCheckBox()
+    self.useFullFibersCheckBox.checked = False
+    self.useFullFibersCheckBox.toolTip = "When checked, visualize the full resolution fiber bundle files with scalar overlay options (slower)"
+    self.networksFormLayout.addRow("Use full fibers", self.useFullFibersCheckBox)
+
+
+    subjectID = "NDARINVTPCLKWJ5"
+    self.subjectIDEdit = qt.QLineEdit()
+    self.subjectIDEdit.text = subjectID
+    self.networksFormLayout.addRow("Subject ID", self.subjectIDEdit)
+
+    modulePath = os.path.dirname(slicer.modules.tractology.path)
+    networksFilePath = os.path.join(modulePath, "Resources", "PUTATIVE_NETWORKS_TRACTS - Steve_format_revised-2022-03-10.csv")
+
+    self.tractNames,self.tractColors,self.networks = self.logic.loadNetworks(networksFilePath)
+
+    print(self.tractNames,self.networks)
+    for networkName in self.networks.keys():
+      button = qt.QPushButton(f"{networkName} - {len(self.networks[networkName])} tracts")
+      toolTip = ""
+      for tract in self.networks[networkName]:
+        toolTip += self.tractNames[tract] + ", "
+      button.toolTip = toolTip[:-2]
+      self.networksFormLayout.addWidget(button)
+      button.connect("clicked()", lambda networkName=networkName: self.onNetworkClicked(networkName))
+
 
     # Add vertical spacer
     self.layout.addStretch(1)
 
-    self.logic = TractologyLogic()
+    self.logic.setCustomOrientationMarker()
+    slicer.app.layoutManager().threeDWidget(0).viewLogic().GetViewNode().SetBackgroundColor((0,0,0))
+    slicer.app.layoutManager().threeDWidget(0).viewLogic().GetViewNode().SetBackgroundColor2((0,0,0))
+    slicer.app.layoutManager().threeDWidget(0).viewLogic().GetViewNode().SetBoxVisible(False)
+    slicer.app.layoutManager().threeDWidget(0).viewLogic().GetViewNode().SetAxisLabelsVisible(False)
+    slicer.app.layoutManager().setLayout(slicer.vtkMRMLLayoutNode.SlicerLayoutOneUp3DView)
 
+    try:
+        import Lights
+        lightsLogic = Lights.LightsLogic()
+        viewNodes = slicer.mrmlScene.GetNodesByClass('vtkMRMLViewNode')
+        for viewNodeIndex in range(viewNodes.GetNumberOfItems()):
+            viewNode = viewNodes.GetItemAsObject(viewNodeIndex)
+            lightsLogic.addManagedView(viewNode)
+            lightsLogic.setUseSSAO(True)
+            lightsLogic.setSSAOSizeScaleLog(0.7)
+    except ModuleNotFoundError:
+        print("Lights not available - install Sandbox extension")
 
   def cleanup(self):
     pass
@@ -86,7 +139,12 @@ class TractologyWidget(ScriptedLoadableModuleWidget):
   def hcpTractologyDemo(self):
     self.logic.hcpTractologyDemo()
 
-#
+  def onNetworkClicked(self, networkName):
+    print(f"Showing {networkName}, with {self.networks[networkName]}")
+    self.logic.showNetwork(self.subjectIDEdit.text, self.networks[networkName], self.tractNames, self.tractColors, self.useFullFibersCheckBox.checked)
+    print(f"done showing {networkName}")
+
+
 # TractologyLogic
 #
 
@@ -263,12 +321,16 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
     subjects.append(maxStats)
     return subjects,tractFileNameByLabel
 
-  def showABCDBrushedTract(self, brushedData):
-    print(brushedData)
+  def showTractsOnly(self, tracts):
     allNodes = slicer.util.getNodes('*')
     for node in allNodes.values():
       if node.IsA("vtkMRMLModelNode"):
         node.SetDisplayVisibility(False)
+      if node.IsA("vtkMRMLFiberBundleNode") and node.GetTubeDisplayNode():
+        node.GetTubeDisplayNode().SetVisibility(node in tracts)
+
+  def showABCDBrushedTract(self, brushedData):
+    print(brushedData)
     if len(brushedData['brushedTracts']) == 0:
       return
     tractLabel = brushedData['brushedTracts'][0]
@@ -280,12 +342,14 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
     try:
       tractNode = slicer.util.getNode(nodeName)
     except slicer.util.MRMLNodeNotFoundException:
+      print(f"Loading {filePath}")
       tractNode = slicer.util.loadNodeFromFile(filePath, "FiberBundleFile")
       if tractNode is None:
         print("Oops, no tract file available!")
         return
       tractNode.SetName(nodeName)
     tractNode.GetLineDisplayNode().SetVisibility(True)
+    self.showTractsOnly([tractNode])
 
     layoutManager = slicer.app.layoutManager()
     threeDWidget = layoutManager.threeDWidget(0)
@@ -333,6 +397,84 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
 
     self.webWidget.url = "file://"+htmlPath
     print(f"Serving from {htmlPath}")
+
+  def loadNetworks(self,csvFilePath):
+    tractNames = {}
+    tractColors = {}
+    networks = {}
+    with open(csvFilePath) as csvFile:
+      csvReader = csv.reader(csvFile)
+      headers = csvReader.__next__()
+      for header in headers[3:]:
+        networkName = header.split("_")[0]
+        networks[networkName] = []
+      networkKeys = list(networks.keys())
+      for row in csvReader:
+        tractNames[row[0]] = row[1]
+        tractColors[row[0]] = row[2]
+        for networkIndex in range(3, len(row)):
+          if row[networkIndex] != "":
+           networks[networkKeys[networkIndex-3]].append(row[0])
+    return tractNames,tractColors,networks
+
+  def showNetwork(self, subjectID, tracts, tractNames, tractColors, useFullFibers):
+    if useFullFibers:
+      pathPrefix = "/s3/abcdRelease3_WMA/Deviceid_4/Target_harmonization/harmonized_sub-"
+    else:
+      pathPrefix = "/mnt/extra/pieper/data/abcd/batchTracts/Deviceid_4/Target_harmonization/harmonized_sub-"
+    pathPostfix = "_ses-baselineYear1Arm1_run-01_dwi_b3000_UKF2T/AnatomicalTracts/"
+    tractNodes = []
+    for tract in tracts:
+      colorString = tractColors[tract].lstrip("#")
+      tractColor = tuple((int(colorString[i:i+2], 16)/255 for i in (0, 2, 4)))
+      tractName = f"{subjectID}-{tractNames[tract]}"
+      print(tractName, tractColor)
+      try:
+        tractNode = slicer.util.getNode(tractName)
+      except slicer.util.MRMLNodeNotFoundException:
+        filePath = f"{pathPrefix}{subjectID}{pathPostfix}{tract}"
+        logging.info(f"Loading {filePath}")
+        #filePath = f"/mnt/extra/pieper/data/abcd/batchTracts/{tract}"
+        tractNode = slicer.util.loadFiberBundle(filePath)
+      tractNode.SetName(tractName)
+      tractNode.GetTubeDisplayNode().SetColor(*tractColor)
+      tractNode.GetLineDisplayNode().SetColor(*tractColor)
+      tractNode.GetGlyphDisplayNode().SetColor(*tractColor)
+      tractNode.GetTubeDisplayNode().SetVisibility(True)
+      tractNode.GetLineDisplayNode().SetVisibility(False)
+      tractNode.GetGlyphDisplayNode().SetVisibility(False)
+      tractNode.GetLineDisplayNode().SetOpacity(1)
+      tractNode.GetTubeDisplayNode().SetOpacity(1)
+      tractNode.GetLineDisplayNode().SetColorModeToSolid()
+      tractNode.GetTubeDisplayNode().SetColorModeToSolid()
+      tractNode.GetTubeDisplayNode().SetTubeRadius(0.2)
+      tractNode.SetSubsamplingRatio(.5)
+      tractNode.GetTubeDisplayNode().SetAmbient(0.15)
+      tractNode.GetTubeDisplayNode().SetDiffuse(0.95)
+      tractNode.GetTubeDisplayNode().SetSpecular(0.0)
+      tractNode.GetTubeDisplayNode().SetPower(0.15)
+      tractNode.GetTubeDisplayNode().SetPower(0.05)
+      tractNode.GetTubeDisplayNode().SetMetallic(0.75)
+      tractNode.GetTubeDisplayNode().SetRoughness(0.1)
+      tractNodes.append(tractNode)
+    self.showTractsOnly(tractNodes)
+    return(tractNodes)
+
+  def setCustomOrientationMarker(self):
+    modulePath = os.path.dirname(slicer.modules.tractology.path)
+    markerFilePath = os.path.join(modulePath, "Resources", "mrHeadSeg.vtk")
+    mrHeadName = "MRHeadOrientationMarker"
+    try:
+      headModel = slicer.util.getNode(mrHeadName)
+    except slicer.util.MRMLNodeNotFoundException:
+      headModel = slicer.util.loadModel(markerFilePath)
+      headModel.SetName(mrHeadName)
+    headModel.GetDisplayNode().SetVisibility(False)
+    viewNodes = slicer.util.getNodesByClass("vtkMRMLAbstractViewNode")
+    for viewNode in viewNodes:
+      viewNode.SetOrientationMarkerType(slicer.vtkMRMLAbstractViewNode.OrientationMarkerTypeHuman)
+      viewNode.SetOrientationMarkerHumanModelNodeID(headModel.GetID())
+
 
 #
 # TractologyTest
@@ -459,12 +601,49 @@ for index in range(len(elementDataFrame)):
   if subjectDataFrame is None:
     continue
   for tractIndex in range(len(subjectDataFrame)):
-    tractName = subjectDataFrame.iloc[tractIndex]['Name '].split("/")[-1].split('.')[0] 
+    tractName = subjectDataFrame.iloc[tractIndex]['Name '].split("/")[-1].split('.')[0]
     for measureIndex in range(1, len(subjectDataFrame.columns)):
       column = subjectDataFrame.columns[measureIndex]
       measureName = tractName + "." + column.strip()
       if measureName not in elementDataFrame.columns:
         elementDataFrame[measureName] = None ;# create the empty column
       elementDataFrame.loc[index, measureName] = subjectDataFrame.iloc[tractIndex][column]
-  break
+elementDataFrame.to_csv(resultPath)
+"""
+
+
+"""
+
+import glob
+import os
+
+def refreshMount():
+    print(slicer.util.launchConsoleProcess("umount /s3".split()).communicate())
+    print(slicer.util.launchConsoleProcess("python3 /home/ubuntu/nda_aws_token_generator/python/get_token.py".split()).communicate())
+    print(slicer.util.launchConsoleProcess("s3fs nda-enclave-c3371:/ /s3 -o profile=NDA".split()).communicate())
+
+
+filePath = f"{os.path.dirname(slicer.modules.tractology.path)}/Resources/abcd-subjects.txt"
+subjectPaths = open(filePath).read().strip().split("\n")
+
+import TractographyDownsample
+downsampleLogic = TractographyDownsample.TractographyDownsampleLogic()
+for subjectPath in subjectPaths:
+    subjectPath += "/ses-baselineYear1Arm1/tractography"
+    print(subjectPath)
+    refreshMount()
+    #subjectPath = "/mnt/extra/pieper/data/tract-test/tractography/"
+    sourceDirectory = f"{subjectPath}/AnatomicalTracts"
+    destinationDirectory = f"{subjectPath}/AnatomicalTracts_downsampled"
+    if len(glob.glob(f"{sourceDirectory}/*.vtp")) == len(glob.glob(f"{destinationDirectory}/*.vtp")):
+        print("subject already processed, skipping")
+        continue
+    parameters = downsampleLogic.parameterDefaults()
+    try:
+        downsampleLogic.runBatch(sourceDirectory, destinationDirectory, parameters)
+    except RuntimeError:
+        print(f"FAILED for {subjectPath}")
+
+
+
 """
