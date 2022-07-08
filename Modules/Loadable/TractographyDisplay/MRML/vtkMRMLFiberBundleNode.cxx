@@ -554,7 +554,11 @@ void vtkMRMLFiberBundleNode::UpdateSubsampling()
       idVector.push_back(i);
 
     if (this->EnableShuffleIDs)
-      std::random_shuffle(idVector.begin(), idVector.end());
+      {
+      std::random_device randomDevice;
+      std::mt19937 randomGenerator(randomDevice());
+      std::shuffle(idVector.begin(), idVector.end(), randomGenerator);
+      }
 
     this->ShuffledIds->Initialize();
 
