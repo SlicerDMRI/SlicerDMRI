@@ -87,17 +87,20 @@ class TractologyWidget(ScriptedLoadableModuleWidget):
     self.networksFormLayout.addRow("Use full fibers", self.useFullFibersCheckBox)
 
 
-    subjectID = "NDARINVTPCLKWJ5"
+    subjectID = "sub-NDARINVTPCLKWJ5"
     self.subjectIDEdit = qt.QLineEdit()
     self.subjectIDEdit.text = subjectID
     self.networksFormLayout.addRow("Subject ID", self.subjectIDEdit)
 
+    self.randomSubjectButton = qt.QPushButton("Random subject")
+    self.networksFormLayout.addWidget(self.randomSubjectButton)
+    self.randomSubjectButton.connect("clicked()", self.onRandomSubjectClicked)
+
     modulePath = os.path.dirname(slicer.modules.tractology.path)
     networksFilePath = os.path.join(modulePath, "Resources", "PUTATIVE_NETWORKS_TRACTS - Steve_format_revised-2022-03-10.csv")
 
-    self.tractNames,self.tractColors,self.networks = self.logic.loadNetworks(networksFilePath)
+    self.tractNames, self.tractColors,self.networks = self.logic.loadNetworks(networksFilePath)
 
-    print(self.tractNames,self.networks)
     for networkName in self.networks.keys():
       button = qt.QPushButton(f"{networkName} - {len(self.networks[networkName])} tracts")
       toolTip = ""
@@ -107,6 +110,9 @@ class TractologyWidget(ScriptedLoadableModuleWidget):
       self.networksFormLayout.addWidget(button)
       button.connect("clicked()", lambda networkName=networkName: self.onNetworkClicked(networkName))
 
+    button = qt.QPushButton(f"Load all")
+    self.networksFormLayout.addWidget(button)
+    button.connect("clicked()", self.onLoadAll)
 
     # Add vertical spacer
     self.layout.addStretch(1)
@@ -139,12 +145,20 @@ class TractologyWidget(ScriptedLoadableModuleWidget):
   def hcpTractologyDemo(self):
     self.logic.hcpTractologyDemo()
 
+  def onRandomSubjectClicked(self):
+    self.subjectIDEdit.text = self.logic.randomABCDSubject()
+
   def onNetworkClicked(self, networkName):
     print(f"Showing {networkName}, with {self.networks[networkName]}")
     self.logic.showNetwork(self.subjectIDEdit.text, self.networks[networkName], self.tractNames, self.tractColors, self.useFullFibersCheckBox.checked)
     print(f"done showing {networkName}")
 
+  def onLoadAll(self):
+    self.logic.showNetwork(self.subjectIDEdit.text, self.tractNames.keys(), self.tractNames, self.tractColors, self.useFullFibersCheckBox.checked)
+    print(f"All tracts loaded")
 
+
+#
 # TractologyLogic
 #
 
@@ -168,6 +182,7 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
     self.tractFileNameByLabel = {}
     self.subjects = []
     self.categoricals = []
+    self.abcdSubjects = None
 
   def abcdTractologyDemo(self, addElements=True):
     """To be restored from backup"""
@@ -398,6 +413,13 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
     self.webWidget.url = "file://"+htmlPath
     print(f"Serving from {htmlPath}")
 
+  def randomABCDSubject(self):
+    if self.abcdSubjects is None:
+      modulePath = os.path.dirname(slicer.modules.tractology.path)
+      resourceFilePath = os.path.join(modulePath, "Resources", "abcd-subjects.txt")
+      self.abcdSubjects = open(resourceFilePath).read().strip().split("\n")
+    return random.choice(self.abcdSubjects)
+
   def loadNetworks(self,csvFilePath):
     tractNames = {}
     tractColors = {}
@@ -418,11 +440,11 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
     return tractNames,tractColors,networks
 
   def showNetwork(self, subjectID, tracts, tractNames, tractColors, useFullFibers):
+    abcdPathPrefix = "/s3/abcdRelease3_dMRIHarmonized/Derivatives"
     if useFullFibers:
-      pathPrefix = "/s3/abcdRelease3_WMA/Deviceid_4/Target_harmonization/harmonized_sub-"
+      abcdPathPostfix = "ses-baselineYear1Arm1/tractography/AnatomicalTracts"
     else:
-      pathPrefix = "/mnt/extra/pieper/data/abcd/batchTracts/Deviceid_4/Target_harmonization/harmonized_sub-"
-    pathPostfix = "_ses-baselineYear1Arm1_run-01_dwi_b3000_UKF2T/AnatomicalTracts/"
+      abcdPathPostfix = "ses-baselineYear1Arm1/tractography/AnatomicalTracts_downsampled"
     tractNodes = []
     for tract in tracts:
       colorString = tractColors[tract].lstrip("#")
@@ -432,9 +454,8 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
       try:
         tractNode = slicer.util.getNode(tractName)
       except slicer.util.MRMLNodeNotFoundException:
-        filePath = f"{pathPrefix}{subjectID}{pathPostfix}{tract}"
+        filePath = f"{abcdPathPrefix}/{subjectID}/{abcdPathPostfix}/{tract}"
         logging.info(f"Loading {filePath}")
-        #filePath = f"/mnt/extra/pieper/data/abcd/batchTracts/{tract}"
         tractNode = slicer.util.loadFiberBundle(filePath)
       tractNode.SetName(tractName)
       tractNode.GetTubeDisplayNode().SetColor(*tractColor)
@@ -449,10 +470,9 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
       tractNode.GetTubeDisplayNode().SetColorModeToSolid()
       tractNode.GetTubeDisplayNode().SetTubeRadius(0.2)
       tractNode.SetSubsamplingRatio(.5)
-      tractNode.GetTubeDisplayNode().SetAmbient(0.15)
+      tractNode.GetTubeDisplayNode().SetAmbient(0.25)
       tractNode.GetTubeDisplayNode().SetDiffuse(0.95)
       tractNode.GetTubeDisplayNode().SetSpecular(0.0)
-      tractNode.GetTubeDisplayNode().SetPower(0.15)
       tractNode.GetTubeDisplayNode().SetPower(0.05)
       tractNode.GetTubeDisplayNode().SetMetallic(0.75)
       tractNode.GetTubeDisplayNode().SetRoughness(0.1)
