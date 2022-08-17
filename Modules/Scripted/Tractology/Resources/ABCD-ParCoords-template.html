@@ -32,6 +32,8 @@ const categoricals = %%categoricals%%;
 
 const renderState = {};
 
+let colorByCategorical = "sex_x";
+
 const colorFunction = function(dataObject) {
 
   let opacity = 0.6;
@@ -41,11 +43,22 @@ const colorFunction = function(dataObject) {
     }
   });
 
-  if (dataObject.sex_x == "M") {
-    color = `rgba(0,0,200,${opacity})`
+  if (colorByCategorical == "sex_x") {
+    if (dataObject[colorByCategorical] == "M") {
+      color = `rgba(0,0,200,${opacity})`
+    } else {
+      color = `rgba(200,100,100,${opacity})`
+    }
   } else {
-    color = `rgba(200,100,100,${opacity})`
+    if (dataObject[colorByCategorical] == "0") {
+      color = `rgba(255,0,0,${opacity})`
+    } else if (dataObject[colorByCategorical] == "1") {
+      color = `rgba(0,255,0,${opacity})`
+    } else {
+      color = `rgba(0,0,255,${opacity})`
+    }
   }
+
   return (color);
 }
 
@@ -94,6 +107,20 @@ slicer.modules.TractologyWidget.logic.showABCDBrushedTract(${dataString})
   }
 }
 
+function highlightCategoricals(subjectData) {
+  Object.keys(categoricals).forEach(categorical => {
+    Object.keys(categoricals[categorical]).forEach(valueKey => {
+      const value = categoricals[categorical][valueKey];
+      valueLabelID = categorical+"-label-"+value[0];
+      const valueLabel = document.getElementById(valueLabelID);
+      if (subjectData[categorical] == value[0]) {
+        valueLabel.style = "font-weight: bold;";
+      } else {
+        valueLabel.style = "";
+      }
+    });
+  });
+}
 
 parcoords.on("brush", brushedData => {
   parcoords.clear('marked');
@@ -112,6 +139,7 @@ parcoords.on("brush", brushedData => {
     if (mode == "showBrushedTract") {
       showTractImage(brushedData[0].id, brushedTracts[0]);
       showTractInSlicer(brushedData[0].id, brushedTracts[0]);
+      highlightCategoricals(brushedData[0]);
     }
   }
 })
@@ -149,6 +177,11 @@ document.addEventListener("keydown", event => {
   }
 });
 
+chart.addEventListener("mouseleave", event => {
+  parcoords.clear('marked');
+  highlightCategoricals({});
+});
+
 chart.addEventListener("mousemove", event => {
   if (hoveredTract == undefined) {
     return;
@@ -176,6 +209,7 @@ chart.addEventListener("mousemove", event => {
     shownSubjectID  = pickedSubjectID;
   }
   showTractImage(shownSubjectID, hoveredTract);
+  highlightCategoricals(dataToPlot[closestSubject]);
 });
 
 parcoords.updateAxes();
@@ -217,6 +251,13 @@ Object.keys(categoricals).forEach(categorical => {
   categoricalsDiv.appendChild(categoryDiv);
   const categoryLabel = document.createElement("p");
   categoryLabel.innerText = categorical;
+  categoryLabel.classList.add("categoryLabel");
+  categoryLabel.addEventListener("click", (event) => {
+    colorByCategorical = categorical;
+    document.querySelectorAll(".categoryLabel").forEach(label => {label.style = ""});
+    categoryLabel.style = "font-weight: bold;";
+    parcoords.render();
+  });
   categoryDiv.appendChild(categoryLabel);
   const valuesDiv = document.createElement("div");
   valuesDiv.setAttribute("style", "display: grid; grid-template-columns: repeat(2, 1fr)");
@@ -234,6 +275,7 @@ Object.keys(categoricals).forEach(categorical => {
      });
     const valueLabel = document.createElement("a");
     valueLabel.innerText = `${value[0]} (${value[1]})`;
+    valueLabel.id = categorical+"-label-"+value[0];
     valuesDiv.appendChild(valueCheck);
     valuesDiv.appendChild(valueLabel);
   });
