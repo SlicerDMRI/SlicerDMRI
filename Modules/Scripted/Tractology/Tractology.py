@@ -49,7 +49,10 @@ class TractologyWidget(ScriptedLoadableModuleWidget):
   def setup(self):
     ScriptedLoadableModuleWidget.setup(self)
 
-    self.logic = TractologyLogic()
+    def showStatusMessage(message):
+        slicer.util.showStatusMessage(message, 2000)
+        slicer.app.processEvents(qt.QEventLoop.ExcludeUserInputEvents)
+    self.logic = TractologyLogic(showStatusMessage=showStatusMessage)
 
     # Instantiate and connect widgets ...
 
@@ -86,7 +89,6 @@ class TractologyWidget(ScriptedLoadableModuleWidget):
     self.useFullFibersCheckBox.toolTip = "When checked, visualize the full resolution fiber bundle files with scalar overlay options (slower)"
     self.networksFormLayout.addRow("Use full fibers", self.useFullFibersCheckBox)
 
-
     subjectID = "sub-NDARINVTPCLKWJ5"
     self.subjectIDEdit = qt.QLineEdit()
     self.subjectIDEdit.text = subjectID
@@ -96,23 +98,42 @@ class TractologyWidget(ScriptedLoadableModuleWidget):
     self.networksFormLayout.addWidget(self.randomSubjectButton)
     self.randomSubjectButton.connect("clicked()", self.onRandomSubjectClicked)
 
-    modulePath = os.path.dirname(slicer.modules.tractology.path)
-    networksFilePath = os.path.join(modulePath, "Resources", "PUTATIVE_NETWORKS_TRACTS - Steve_format_revised-2022-03-10.csv")
-
-    self.tractNames, self.tractColors,self.networks = self.logic.loadNetworks(networksFilePath)
-
-    for networkName in self.networks.keys():
-      button = qt.QPushButton(f"{networkName} - {len(self.networks[networkName])} tracts")
+    self.networkRadioButtons = []
+    for networkName in self.logic.networks.keys():
+      button = qt.QRadioButton(f"{networkName} - {len(self.logic.networks[networkName])} tracts")
+      self.networkRadioButtons.append(button)
       toolTip = ""
-      for tract in self.networks[networkName]:
-        toolTip += self.tractNames[tract] + ", "
+      for tract in self.logic.networks[networkName]:
+        toolTip += self.logic.tractNames[tract] + ", "
       button.toolTip = toolTip[:-2]
       self.networksFormLayout.addWidget(button)
       button.connect("clicked()", lambda networkName=networkName: self.onNetworkClicked(networkName))
 
-    button = qt.QPushButton(f"Load all")
+    button = qt.QRadioButton(f"All networks")
     self.networksFormLayout.addWidget(button)
-    button.connect("clicked()", self.onLoadAll)
+    button.connect("clicked()", self.onShowAll)
+
+    #
+    # Stats area
+    #
+    statsCollapsibleButton = ctk.ctkCollapsibleButton()
+    statsCollapsibleButton.text = "Statistics"
+    self.layout.addWidget(statsCollapsibleButton)
+
+    # Layout within the dummy collapsible button
+    self.statsFormLayout = qt.QFormLayout(statsCollapsibleButton)
+
+    self.significancePValue = ctk.ctkDoubleSpinBox()
+    self.significancePValue.decimals = 5
+    self.significancePValue.value = 0.05
+    self.statsFormLayout.addRow("Threshold", self.significancePValue)
+
+    self.regressedElementRadioButtons = []
+    for element in self.logic.abcdElements:
+      button = qt.QRadioButton(f"{element}")
+      self.regressedElementRadioButtons.append(button)
+      self.statsFormLayout.addWidget(button)
+      button.connect("clicked()", lambda element=element: self.onElementClicked(element))
 
     # Add vertical spacer
     self.layout.addStretch(1)
@@ -149,14 +170,21 @@ class TractologyWidget(ScriptedLoadableModuleWidget):
     self.subjectIDEdit.text = self.logic.randomABCDSubject()
 
   def onNetworkClicked(self, networkName):
-    print(f"Showing {networkName}, with {self.networks[networkName]}")
-    self.logic.showNetwork(self.subjectIDEdit.text, self.networks[networkName], self.tractNames, self.tractColors, self.useFullFibersCheckBox.checked)
+    print(f"Showing {networkName}, with {self.logic.networks[networkName]}")
+    self.logic.showNetwork(self.subjectIDEdit.text, self.logic.networks[networkName], self.useFullFibersCheckBox.checked)
     print(f"done showing {networkName}")
 
-  def onLoadAll(self):
-    self.logic.showNetwork(self.subjectIDEdit.text, self.tractNames.keys(), self.tractNames, self.tractColors, self.useFullFibersCheckBox.checked)
+  def onShowAll(self):
+    self.logic.showNetwork(self.subjectIDEdit.text, self.logic.tractNames.keys(), self.useFullFibersCheckBox.checked)
+    for button in self.networkRadioButtons:
+        button.checked = False
     print(f"All tracts loaded")
 
+  def onElementClicked(self, element):
+    print(f"Showing regression for {element}")
+    self.logic.showSignificantTracts(self.subjectIDEdit.text, element, self.significancePValue.value, self.useFullFibersCheckBox.checked)
+    print(f"done showing {element}")
+    
 
 #
 # TractologyLogic
@@ -175,36 +203,18 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
   https://vtk.org/Wiki/VTK/Examples/Python/Infovis/ParallelCoordinatesExtraction
   """
 
-  def __init__(self):
+  def __init__(self, showStatusMessage=lambda message : None):
     ScriptedLoadableModuleLogic.__init__(self)
 
+    self.showStatusMessage = showStatusMessage
     self.directoryPathByID = {}
     self.tractFileNameByLabel = {}
     self.subjects = []
     self.categoricals = []
     self.abcdSubjects = None
+    self.abcdAccessMethod = "s5cmd" # "s5cmd" or "s3fs"
 
-  def abcdTractologyDemo(self, addElements=True):
-    """To be restored from backup"""
-    pass
-
-  def abcdDeviceidTractologyDemo(self, deviceId=4, addElements=True):
-
-    directoryPattern = f"/home/ubuntu/data/abcd/Deviceid_{deviceId}/harmonized*"
-    directoryPattern = f"/s3/abcdRelease3_WMA/Deviceid_{deviceId}/Target_harmonization/harmonized*"
-    print(directoryPattern)
-    pickleFile = f"/home/ubuntu/data/abcd/tractology-Deviceid_{deviceId}.pickle"
-    if os.path.exists(pickleFile):
-      [self.subjects, self.tractFileNameByLabel, self.directoryPathByID] = pickle.load(open(pickleFile, "rb"))
-    else:
-      self.subjects,self.tractFileNameByLabel = self.collectABCDSubjectTractStatistics(directoryPattern)
-      pickle.dump([self.subjects,self.tractFileNameByLabel, self.directoryPathByID], open(pickleFile, "wb"))
-
-    if addElements:
-      dataPath = "/home/ubuntu/data/abcd/abcdRelease3_merged_DWI_withoutPhilips.csv"
-      elementDataFrame = pandas.read_csv(dataPath)
-      slicer.modules.elementDataFrame = elementDataFrame
-      elements = [
+    self.abcdElements = [
         "nihtbx_totalcomp_fc",
         "scrn_hr_slowfriend",
         "scrn_hr_liecheat",
@@ -215,7 +225,96 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
         "scrn_hr_disobey",
         "interview_age",
         "sex_x",
-      ]
+    ]
+
+    self.loadNetworks()
+    self.loadABCDStatistics()
+
+
+  def loadABCDStatistics(self):
+    diffutionPath = f"/mnt/extra/pieper/data/abcd/ABCD-DiffusionFeature-NDA-submission/ABCD-DiffusionMeasure-data_NDA.csv"
+    self.diffusionDataFrame = pandas.read_csv(diffutionPath).set_index("src_subject_id")
+    elementsPath = "/mnt/extra/pieper/data/abcd/abcdRelease3_merged_DWI_withoutPhilips.csv"
+    elementDataFrame = pandas.read_csv(elementsPath).set_index("src_subject_id")
+    elementColumns = [col for col in elementDataFrame.columns if col in self.abcdElements]
+    faColumns = [col for col in self.diffusionDataFrame.columns if col.endswith("FA")]
+    fa = self.diffusionDataFrame[faColumns]
+    fa = fa[(fa>0).all(1)] # remove neg FA, means missing tract
+    self.faDataFrame = elementDataFrame[elementColumns].merge(fa, on="src_subject_id")
+
+    networkDataFrame = pandas.DataFrame(index=self.faDataFrame.index)
+    tractToColumn = lambda t: (t[2:-4]+"_Ten1_FA").replace("-","_").replace("&","_")
+    for network,tracts in self.networks.items():
+        columns = map(tractToColumn, tracts)
+        networkDataFrame[network] = self.faDataFrame.loc[:,columns].mean(axis=1)
+    self.networkDataFrame = elementDataFrame[elementColumns].merge(networkDataFrame, on="src_subject_id")
+    slicer.modules.networkDataFrame = networkDataFrame
+    slicer.app.pythonManager().executeString("netdf = slicer.modules.networkDataFrame")
+
+
+    TSNEexperiment = """
+    import sklearn.preprocessing
+    standardScaler = sklearn.preprocessing.StandardScaler()
+    faScaled = standardScaler.fit_transform(faDataFrame[faColumns])
+    import sklearn.manifold
+    tsne = sklearn.manifold.TSNE(n_components=2, random_state=1)
+    faTSNE = tsne.fit_transform(faScaled)
+    import matplotlib.pyplot
+    matplotlib.pyplot.clf()
+    import seaborn
+    plot = seaborn.scatterplot(faTSNE[:,0], faTSNE[:,1], hue=faDataFrame['sex_x'])
+    plot.get_figure().savefig("/tmp/x.png")
+    """
+
+  def showSignificantTracts(self, subjectID, element, significancePValue, useFullFibers):
+    import patsy
+    import statsmodels.api
+
+    excludeColumns = list(self.abcdElements)
+    excludeColumns.append("memory")
+
+    formula = f"{element} ~ "
+    for column in self.networkDataFrame.columns:
+        formula += f" {column} +" if column not in excludeColumns else ""
+    formula = formula[:-2]
+    print(formula)
+    y, X = patsy.dmatrices(formula, data=self.networkDataFrame, return_type='dataframe')
+    model = statsmodels.api.OLS(y, X)
+    residuals = model.fit()
+    print(residuals.summary())
+
+    significantTracts = []
+    for network in self.networks.keys():
+        if network == "memory":
+            continue
+        if residuals.pvalues[network] < significancePValue:
+            significantTracts.extend(self.networks[network])
+    print(residuals.pvalues[residuals.pvalues < significancePValue])
+    self.showNetwork(subjectID, significantTracts, useFullFibers)
+
+  def abcdNetworkTractologyDemo(self):
+    # TODO: 
+    # - columns are networks instead of tracts
+    # - make dataToPlot be average FA for networks
+    # - color the networks by categorical
+    pass
+
+  def abcdDeviceidTractologyDemo(self, deviceId=4, addElements=True):
+
+    directoryPattern = f"/mnt/extra/pieper/data/abcd/Deviceid_{deviceId}/harmonized*"
+    directoryPattern = f"/s3/abcdRelease3_WMA/Deviceid_{deviceId}/Target_harmonization/harmonized*"
+    print(directoryPattern)
+    pickleFile = f"/mnt/extra/pieper/data/abcd/tractology-Deviceid_{deviceId}.pickle"
+    if os.path.exists(pickleFile):
+      [self.subjects, self.tractFileNameByLabel, self.directoryPathByID] = pickle.load(open(pickleFile, "rb"))
+    else:
+      self.subjects,self.tractFileNameByLabel = self.collectABCDSubjectTractStatistics(directoryPattern)
+      pickle.dump([self.subjects,self.tractFileNameByLabel, self.directoryPathByID], open(pickleFile, "wb"))
+
+    if addElements:
+      dataPath = "/mnt/extra/pieper/data/abcd/abcdRelease3_merged_DWI_withoutPhilips.csv"
+      elementDataFrame = pandas.read_csv(dataPath)
+      slicer.modules.elementDataFrame = elementDataFrame
       elementMins = {}
       elementMaxes = {}
       minMaxSubjects = {}
@@ -224,7 +323,7 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
         if not isinstance(subjectID, int):
           elementSubjectID = subjectID.replace("_ses", "").replace("NDAR", "NDAR_")
           row = elementDataFrame[elementDataFrame['src_subject_id'] == elementSubjectID]
-        for element in elements:
+        for element in self.abcdElements:
           if subjectID not in [0, 1]:
             subject[element] = row[element].values[0]
             if isinstance(subject[element], numpy.int64):
@@ -233,7 +332,7 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
             elementMaxes[element] = max(subject[element], elementMaxes[element]) if element in elementMaxes else subject[element]
           else:
             minMaxSubjects[subjectID] = subject
-      for element in elements:
+      for element in self.abcdElements:
         minMaxSubjects[0][element] = elementMins[element]
         minMaxSubjects[1][element] = elementMaxes[element]
 
@@ -278,7 +377,7 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
     print(f"Saved to {htmlPath}")
     tractImagePath = slicer.app.temporaryPath+"/TractImages"
     if not os.path.exists(tractImagePath):
-      os.symlink("/home/ubuntu/data/abcd/TractImages", slicer.app.temporaryPath+"/TractImages")
+      os.symlink("/mnt/extra/pieper/data/abcd/TractImages", slicer.app.temporaryPath+"/TractImages")
     self.webWidget.url = "file://"+htmlPath
 
   def collectABCDJSONSubjectData(self):
@@ -420,41 +519,74 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
       self.abcdSubjects = open(resourceFilePath).read().strip().split("\n")
     return random.choice(self.abcdSubjects)
 
-  def loadNetworks(self,csvFilePath):
-    tractNames = {}
-    tractColors = {}
-    networks = {}
-    with open(csvFilePath) as csvFile:
+  def loadNetworks(self):
+    modulePath = os.path.dirname(slicer.modules.tractology.path)
+    networksFilePath = os.path.join(modulePath, "Resources", "PUTATIVE_NETWORKS_TRACTS - Steve_format_revised-2022-03-10.csv")
+
+    self.tractNames = {}
+    self.tractColors = {}
+    self.networks = {}
+    with open(networksFilePath) as csvFile:
       csvReader = csv.reader(csvFile)
       headers = csvReader.__next__()
       for header in headers[3:]:
         networkName = header.split("_")[0]
-        networks[networkName] = []
-      networkKeys = list(networks.keys())
+        self.networks[networkName] = []
+      networkKeys = list(self.networks.keys())
       for row in csvReader:
-        tractNames[row[0]] = row[1]
-        tractColors[row[0]] = row[2]
+        self.tractNames[row[0]] = row[1]
+        self.tractColors[row[0]] = row[2]
         for networkIndex in range(3, len(row)):
           if row[networkIndex] != "":
-           networks[networkKeys[networkIndex-3]].append(row[0])
-    return tractNames,tractColors,networks
+           self.networks[networkKeys[networkIndex-3]].append(row[0])
 
-  def showNetwork(self, subjectID, tracts, tractNames, tractColors, useFullFibers):
-    abcdPathPrefix = "/s3/abcdRelease3_dMRIHarmonized/Derivatives"
+  def downloadFilesFromBucket(self, s3Path, fileName):
+    s5cmdPath = "/mnt/extra/pieper/s5cmd/s5cmd"
+    cacheManager = slicer.mrmlScene.GetCacheManager()
+    if cacheManager.GetCurrentCacheSize() > cacheManager.GetRemoteCacheLimit():
+      cacheManager.ClearCache() # TODO: could remove just the older half or something
+    destFolderPath = cacheManager.GetRemoteCacheDirectory()
+    if not os.access(destFolderPath, os.W_OK):
+      try:
+        os.makedirs(destFolderPath, exist_ok=True)
+      except:
+        self.logMessage('<b>Failed to create cache folder %s</b>' % destFolderPath, logging.ERROR)
+      if not os.access(destFolderPath, os.W_OK):
+        self.logMessage('<b>Cache folder %s is not writable</b>' % destFolderPath, logging.ERROR)
+    targetPath = os.path.join(destFolderPath, fileName)
+    if not os.path.exists(targetPath):
+      command = [s5cmdPath, "cp", s3Path, targetPath]
+      process = slicer.util.launchConsoleProcess(command, updateEnvironment={"AWS_PROFILE": "NDA"})
+      process.wait()
+      print(process.communicate())
+    return(targetPath)
+  
+  def pathForTract(self, subjectID, tract, tractName, useFullFibers):
     if useFullFibers:
       abcdPathPostfix = "ses-baselineYear1Arm1/tractography/AnatomicalTracts"
     else:
       abcdPathPostfix = "ses-baselineYear1Arm1/tractography/AnatomicalTracts_downsampled"
+    if self.abcdAccessMethod == "s3fs":
+      abcdPathPrefix = "/s3/abcdRelease3_dMRIHarmonized/Derivatives"
+      filePath = f"{abcdPathPrefix}/{subjectID}/{abcdPathPostfix}/{tract}"
+    elif self.abcdAccessMethod == "s5cmd":
+      abcdS3PathPrefix = "s3://nda-enclave-c3371/abcdRelease3_dMRIHarmonized/Derivatives"
+      s3Path = f"{abcdS3PathPrefix}/{subjectID}/{abcdPathPostfix}/{tract}"
+      filePath = self.downloadFilesFromBucket(s3Path, tractName+".vtp")
+    return filePath
+
+  def showNetwork(self, subjectID, tracts, useFullFibers):
     tractNodes = []
     for tract in tracts:
-      colorString = tractColors[tract].lstrip("#")
+      colorString = self.tractColors[tract].lstrip("#")
       tractColor = tuple((int(colorString[i:i+2], 16)/255 for i in (0, 2, 4)))
-      tractName = f"{subjectID}-{tractNames[tract]}"
-      print(tractName, tractColor)
+      tractName = f"{subjectID}-{self.tractNames[tract]}"
+      self.showStatusMessage(f"Loading {tractName}...")
       try:
         tractNode = slicer.util.getNode(tractName)
+        self.showStatusMessage(f"{tract} already loaded")
       except slicer.util.MRMLNodeNotFoundException:
-        filePath = f"{abcdPathPrefix}/{subjectID}/{abcdPathPostfix}/{tract}"
+        filePath = self.pathForTract(subjectID, tract, tractName, useFullFibers)
         logging.info(f"Loading {filePath}")
         tractNode = slicer.util.loadFiberBundle(filePath)
       tractNode.SetName(tractName)
@@ -475,8 +607,9 @@ class TractologyLogic(ScriptedLoadableModuleLogic):
       tractNode.GetTubeDisplayNode().SetSpecular(0.0)
       tractNode.GetTubeDisplayNode().SetPower(0.05)
       tractNode.GetTubeDisplayNode().SetMetallic(0.75)
-      tractNode.GetTubeDisplayNode().SetRoughness(0.1)
+      tractNode.GetTubeDisplayNode().SetRoughness(0.1)      
       tractNodes.append(tractNode)
+    self.showStatusMessage(f"Showing {len(tractNodes)} loaded tracts")
     self.showTractsOnly(tractNodes)
     return(tractNodes)
 
@@ -542,7 +675,7 @@ class TractologyTest(ScriptedLoadableModuleTest):
 """
 paste script below then run this:
 
-import os; generateABCDTractImages("/home/ubuntu/data/abcd/TractImages")
+import os; generateABCDTractImages("/mnt/extra/pieper/data/abcd/TractImages")
 
 """
 
@@ -589,7 +722,7 @@ def generateABCDTractImages(targetDirectoryPath):
 """
 paste script below then run this:
 
-import os; generateABCD_WMA("/home/ubuntu/data/abcd/abcdRelease3_WMA")
+import os; generateABCD_WMA("/mnt/extra/pieper/data/abcd/abcdRelease3_WMA")
 
 """
 
@@ -597,8 +730,8 @@ import os; generateABCD_WMA("/home/ubuntu/data/abcd/abcdRelease3_WMA")
 generateABCD_WMA(filePrefix):
 
 import pandas
-dataPath = "/home/ubuntu/data/abcd/abcdRelease3_merged_DWI_withoutPhilips.csv"
-resultPath = "/home/ubuntu/data/abcd/abcdRelease3_merged_DWI_withoutPhilips+WMA.csv"
+dataPath = "/mnt/extra/pieper/data/abcd/abcdRelease3_merged_DWI_withoutPhilips.csv"
+resultPath = "/mnt/extra/pieper/data/abcd/abcdRelease3_merged_DWI_withoutPhilips+WMA.csv"
 elementDataFrame = pandas.read_csv(dataPath)
 filesNotFound = []
 emptyFiles = []
@@ -639,7 +772,7 @@ import os
 
 def refreshMount():
     print(slicer.util.launchConsoleProcess("umount /s3".split()).communicate())
-    print(slicer.util.launchConsoleProcess("python3 /home/ubuntu/nda_aws_token_generator/python/get_token.py".split()).communicate())
+    print(slicer.util.launchConsoleProcess("python3 /mnt/extra/pieper/nda_aws_token_generator/python/get_token.py".split()).communicate())
     print(slicer.util.launchConsoleProcess("s3fs nda-enclave-c3371:/ /s3 -o profile=NDA".split()).communicate())
 
 
