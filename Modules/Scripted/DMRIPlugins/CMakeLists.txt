@@ -1,4 +1,14 @@
+#-----------------------------------------------------------------------------
+set(MODULE_NAME DMRIPlugins)
+
+#-----------------------------------------------------------------------------
+set(MODULE_PYTHON_SCRIPTS
+  DICOMDiffusionVolumePlugin.py
+  RegisterDMRIModuleTemplates.py
+  )
+
+#-----------------------------------------------------------------------------
 slicerMacroBuildScriptedModule(
-  NAME    DMRIPlugins
-  SCRIPTS DICOMDiffusionVolumePlugin.py RegisterDMRIModuleTemplates.py
+  NAME ${MODULE_NAME}
+  SCRIPTS ${MODULE_PYTHON_SCRIPTS}
   )
