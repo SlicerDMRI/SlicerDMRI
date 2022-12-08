@@ -157,9 +157,9 @@ bool qMRMLTractographyDisplayTreeView::viewportEvent(QEvent* e)
 #endif
 
 //------------------------------------------------------------------------------
-void qMRMLTractographyDisplayTreeView::dataChanged ( const QModelIndex & topLeft, const QModelIndex & bottomRight )
+void qMRMLTractographyDisplayTreeView::dataChanged ( const QModelIndex & topLeft, const QModelIndex & bottomRight, const QVector<int> &roles )
 {
-  qMRMLTreeView::dataChanged(topLeft, bottomRight);
+  qMRMLTreeView::dataChanged(topLeft, bottomRight, roles);
   if (!this->currentIndex().isValid())
     this->setCurrentIndex(topLeft);
 }
