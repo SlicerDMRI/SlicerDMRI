@@ -88,14 +88,6 @@ if (${SlicerDMRI_ENABLE_TRACTIO})
 endif()
 
 #-----------------------------------------------------------------------------
-# include module templates in the distribution package
-install(
-  DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/DMRIModuleTemplates"
-  DESTINATION ${Slicer_INSTALL_ROOT}${Slicer_BUNDLE_EXTENSIONS_LOCATION}
-  COMPONENT RuntimeLibraries
-  )
-
-#-----------------------------------------------------------------------------
 set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_BINARY_DIR};${EXTENSION_NAME};ALL;/")
 #set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${Foo_DIR};Foo;RuntimeLibraries;/")
 include(${Slicer_EXTENSION_CPACK})
