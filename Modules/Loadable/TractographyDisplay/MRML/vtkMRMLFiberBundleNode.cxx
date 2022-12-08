@@ -100,13 +100,13 @@ vtkMRMLFiberBundleNode::~vtkMRMLFiberBundleNode()
 
 //-----------------------------------------------------------------------------
 vtkMRMLFiberBundleNode::vtkMRMLFiberBundleNode() :
-  ExtractSubsample(vtkExtractSelectedPolyDataIds::New()),
-  ExtractFromROI(vtkExtractPolyDataGeometry::New()),
-  Planes(vtkPlanes::New()),
   ShuffledIds(vtkIdTypeArray::New()),
-  LocalPassThrough(vtkPassThrough::New()),
   AnnotationNode(NULL),
-  AnnotationNodeID(NULL)
+  AnnotationNodeID(NULL),
+  ExtractFromROI(vtkExtractPolyDataGeometry::New()),
+  ExtractSubsample(vtkExtractSelectedPolyDataIds::New()),
+  Planes(vtkPlanes::New()),
+  LocalPassThrough(vtkPassThrough::New())
 {
   this->SubsamplingRatio = 1.0;
   this->SelectWithAnnotation = false;
@@ -612,7 +612,7 @@ vtkMRMLStorageNode* vtkMRMLFiberBundleNode::CreateDefaultStorageNode()
 }
 
 //---------------------------------------------------------------------------
-std::string vtkMRMLFiberBundleNode:: GetDefaultStorageNodeClassName(const char* filename /* =nullptr */)
+std::string vtkMRMLFiberBundleNode:: GetDefaultStorageNodeClassName(const char* vtkNotUsed(filename) /* =nullptr */)
 {
   vtkDebugMacro("vtkMRMLFiberBundleNode::GetDefaultStorageNodeClassName");
   return "vtkMRMLFiberBundleStorageNode";

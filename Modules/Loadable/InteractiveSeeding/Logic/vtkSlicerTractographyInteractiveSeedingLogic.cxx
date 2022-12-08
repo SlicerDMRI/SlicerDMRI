@@ -106,9 +106,6 @@ void vtkSlicerTractographyInteractiveSeedingLogic::AddMRMLNodesObservers()
 {
   if (this->TractographyInteractiveSeedingNode)
     {
-    vtkMRMLDiffusionTensorVolumeNode *dtiNode = vtkMRMLDiffusionTensorVolumeNode::SafeDownCast(
-          this->GetMRMLScene()->GetNodeByID(this->TractographyInteractiveSeedingNode->GetInputVolumeRef()));
-
     vtkMRMLNode *seedinNode = this->GetMRMLScene()->GetNodeByID(this->TractographyInteractiveSeedingNode->GetInputFiducialRef());
 
     vtkMRMLAnnotationHierarchyNode *annotationHierarchyNode = vtkMRMLAnnotationHierarchyNode::SafeDownCast(seedinNode);
@@ -405,7 +402,7 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTracts(vtkMRMLTractograp
                                                             double regionSize, double sampleStep,
                                                             int maxNumberOfSeeds,
                                                             int seedSelectedFiducials,
-                                                            int displayMode)
+                                                            int vtkNotUsed(displayMode))
 {
   // 0. check inputs
   if (volumeNode == NULL || seedingNode == NULL || fiberNode == NULL ||
@@ -418,13 +415,9 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTracts(vtkMRMLTractograp
     return 0;
     }
 
-  vtkPolyData *oldPoly = fiberNode->GetPolyData();
-
   vtkNew<vtkSeedTracts> seed;
 
   //1. Set Input
-
-  vtkMRMLTransformNode* vxformNode = volumeNode->GetParentTransformNode();
 
   vtkMRMLAnnotationHierarchyNode *annotationListNode = vtkMRMLAnnotationHierarchyNode::SafeDownCast(seedingNode);
   vtkMRMLAnnotationControlPointsNode *annotationNode = vtkMRMLAnnotationControlPointsNode::SafeDownCast(seedingNode);

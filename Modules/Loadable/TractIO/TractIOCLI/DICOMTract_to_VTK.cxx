@@ -99,7 +99,6 @@ int main(int argc, char * argv[])
 size_t count_points(OFVector<TrcTrack*> tracks)
   {
   size_t points = 0;
-  size_t count = 0;
   for (OFVector<TrcTrack*>::iterator iter = tracks.begin();
        iter != tracks.end(); iter++)
     {

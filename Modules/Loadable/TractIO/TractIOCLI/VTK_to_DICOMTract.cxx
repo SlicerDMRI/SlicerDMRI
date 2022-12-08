@@ -114,7 +114,6 @@ int main(int argc, char *argv[])
   //   std::string vtk_fiberbundle reference_dicom output_directory output_filename
   //   bool ras_to_lps
 
-  int result = 0;
   std::string polydata_file = vtk_fiberbundle;
 
   std::stringstream output_tmp;
@@ -315,7 +314,7 @@ int insert_polydata_tracts(TrcTrackSet *trackset,
 
 
   /* add points for each track */
-  for (size_t i = 0; i < polydata->GetNumberOfCells(); i++)
+  for (vtkIdType i = 0; i < polydata->GetNumberOfCells(); i++)
     {
     vtkCell *cell = polydata->GetCell(i);
     vtkIdType numPoints   = cell->GetNumberOfPoints();
@@ -425,7 +424,7 @@ int insert_polydata_scalars(TrcTrackSet* trackset,
       tmp_float.reserve(numpts);
 
       // copy the measures to tmp array. (no contiguity assumption for cells)
-      for (size_t pt_idx = 0; pt_idx < numpts; pt_idx++)
+      for (vtkIdType pt_idx = 0; pt_idx < numpts; pt_idx++)
         tmp_float.push_back(*array->GetTuple(pt_idx));
 
       // copy the data into the TrcMeasurement

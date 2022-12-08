@@ -850,6 +850,8 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::toggleEnableInteractiveS
 bool qSlicerTractographyInteractiveSeedingModuleWidget::setEditedNode(
   vtkMRMLNode* node, QString role/*=QString()*/, QString context/*=QString()*/ )
 {
+  Q_UNUSED(role);
+  Q_UNUSED(context);
   Q_D(qSlicerTractographyInteractiveSeedingModuleWidget);
   if (vtkMRMLDiffusionTensorVolumeNode::SafeDownCast(node))
     {
