@@ -167,7 +167,7 @@ double computeMeanLineLength(vtkSmartPointer<vtkPolyData> poly)
     poly->GetPoints()->GetPoint(pointIds->GetId(0), prev.data_block());
 
     // count by segments
-    size_t n = 1;
+    vtkIdType n = 1;
 
     for ( ; n < pointIds->GetNumberOfIds(); n++)
       {
