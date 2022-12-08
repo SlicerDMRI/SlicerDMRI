@@ -738,7 +738,6 @@ void qSlicerTractographyDisplayWidget::updateWidgetFromMRML()
 
             d->ColorByScalarInvariantRadioButton->setChecked(1);
             }
-          break;
           }
         else if (d->FiberBundleNode && d->FiberBundleNode->GetPolyData() &&
                  d->FiberBundleNode->GetPolyData()->GetPoints() &&
@@ -747,6 +746,7 @@ void qSlicerTractographyDisplayWidget::updateWidgetFromMRML()
          // no tensors in a valid polydata
          d->FiberBundleDisplayNode->SetColorMode(vtkMRMLFiberBundleDisplayNode::colorModeSolid);
          }
+        break;
       case vtkMRMLFiberBundleDisplayNode::colorModeSolid:
         {
         double color[3];
