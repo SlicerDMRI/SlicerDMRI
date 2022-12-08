@@ -624,8 +624,8 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::updateWidgetFromMRML()
       QString target;
       switch (paramNode->GetDisplayMode())
         {
-        case vtkMRMLTractographyInteractiveSeedingNode::Tubes: target = "Tubes";
-        case vtkMRMLTractographyInteractiveSeedingNode::Lines: target = "Lines";
+        case vtkMRMLTractographyInteractiveSeedingNode::Tubes: target = "Tubes"; break;
+        case vtkMRMLTractographyInteractiveSeedingNode::Lines: target = "Lines"; break;
         default: assert("Unknown display mode type!"); target = "Lines";
         }
       d->DisplayTracksComboBox->setCurrentIndex(d->DisplayTracksComboBox->findText(target));
