@@ -298,7 +298,6 @@ void vtkMRMLTractographyDisplayDisplayableManager::DeletePickedFibers(vtkMRMLFib
     {
     if (cellIDs[i] >= 0)
       {
-      vtkIdType cellID = fiberBundleNode->GetUnShuffledFiberID(cellIDs[i]);
       polyData->DeleteCell(cellIDs[i]);
       }
     }

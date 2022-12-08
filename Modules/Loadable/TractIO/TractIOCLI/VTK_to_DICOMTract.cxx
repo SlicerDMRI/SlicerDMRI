@@ -114,7 +114,6 @@ int main(int argc, char *argv[])
   //   std::string vtk_fiberbundle reference_dicom output_directory output_filename
   //   bool ras_to_lps
 
-  int result = 0;
   std::string polydata_file = vtk_fiberbundle;
 
   std::stringstream output_tmp;
