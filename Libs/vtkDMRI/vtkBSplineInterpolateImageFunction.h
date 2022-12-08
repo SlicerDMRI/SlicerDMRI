@@ -42,6 +42,7 @@ class  vtkDMRI_EXPORT vtkBSplineInterpolateImageFunction : public vtkImplicitFun
   vtkTypeMacro(vtkBSplineInterpolateImageFunction, vtkImplicitFunction );
   virtual void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  using vtkImplicitFunction::EvaluateFunction;
   virtual double EvaluateFunction (double x[ImageDimension]) override;
 
   virtual void EvaluateGradient (double x[ImageDimension],

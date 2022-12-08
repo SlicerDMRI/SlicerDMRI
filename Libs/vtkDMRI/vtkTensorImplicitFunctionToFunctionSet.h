@@ -32,6 +32,7 @@ public:
   static vtkTensorImplicitFunctionToFunctionSet *New();
   vtkTypeMacro(vtkTensorImplicitFunctionToFunctionSet, vtkFunctionSet );
   virtual void PrintSelf(ostream& os, vtkIndent indent) override;
+  using vtkFunctionSet::FunctionValues;
   virtual int FunctionValues(double* x, double* f) override;
   int GetTensor(double *x, double * f);
   virtual void AddDataSet(vtkDataSet* ) {}
