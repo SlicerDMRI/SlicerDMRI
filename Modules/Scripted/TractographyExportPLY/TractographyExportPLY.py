@@ -163,10 +163,15 @@ class TractographyExportPLYWidget(ScriptedLoadableModuleWidget):
 
 class TractographyExportPLYLogic(ScriptedLoadableModuleLogic):
 
-  def exportFiberBundleToPLYPath(self, inputFiberBundle, outputFilePath, radius = 0.5, number_of_sides = 6, native_scalar_range = False):
+  def exportFiberBundleToPLYPath(self, inputFiberBundle, outputFilePath, radius = 0.5, number_of_sides = 6, native_scalar_range = False, outputCoordinateSystem = None):
     """
-    Do the actual export
+    Export fiber bundle as colored tubes into PLY file.
+    outputCoordinateSystem: LPS or RAS. Default is LPS to match the most commonly image coordinate system.
     """
+
+    if outputCoordinateSystem is None:
+        outputCoordinateSystem = "LPS"
+
     if not float(number_of_sides).is_integer():
         import warnings
         warnings.warn("Attempted inexact conversion for non-integer number_of_sides {}. This should never happen.".format(number_of_sides))
@@ -203,7 +208,21 @@ class TractographyExportPLYLogic(ScriptedLoadableModuleLogic):
       lookupTable.SetTableRange(0,1)
 
     plyWriter = vtk.vtkPLYWriter()
-    plyWriter.SetInputData(triangles.GetOutput())
+    if outputCoordinateSystem == "RAS":
+        plyWriter.SetInputData(triangles.GetOutput())
+    elif outputCoordinateSystem == "LPS":
+        transformRasToLps = vtk.vtkTransformPolyDataFilter()
+        rasToLps = vtk.vtkTransform()
+        rasToLps.Scale(-1, -1, 1)
+        transformRasToLps.SetTransform(rasToLps)
+        transformRasToLps.SetInputData(triangles.GetOutput())
+        plyWriter.SetInputConnection(transformRasToLps.GetOutputPort())
+    else:
+        raise RuntimeError("Invalid output coordinate system")
+
+    # Save coordinate system information in the file header
+    # (It allows reading of the 
+    plyWriter.AddComment(f"3D Slicer output. SPACE={outputCoordinateSystem}")
 
     if lineDisplayNode.GetColorMode() == lineDisplayNode.colorModeSolid:
         # for solid colors we need to set uniform mode in the exporter,
