@@ -36,10 +36,8 @@
 #include <vtkMRMLThreeDViewDisplayableManagerFactory.h>
 
 // DisplayableManager initialization
-#if Slicer_VERSION_MAJOR == 4 && Slicer_VERSION_MINOR >= 9
 #include <vtkAutoInit.h>
 VTK_MODULE_INIT(vtkTractographyDisplayMRMLDM)
-#endif
 
 //-----------------------------------------------------------------------------
 qSlicerTractographyDisplayModule::
