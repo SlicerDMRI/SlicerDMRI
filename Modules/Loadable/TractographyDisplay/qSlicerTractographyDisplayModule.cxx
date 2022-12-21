@@ -18,7 +18,7 @@
 
 ==============================================================================*/
 
-// SlicerQt includes
+// Slicer includes
 #include <qSlicerCoreApplication.h>
 #include <qSlicerCoreIOManager.h>
 #include <qSlicerNodeWriter.h>
@@ -36,17 +36,8 @@
 #include <vtkMRMLThreeDViewDisplayableManagerFactory.h>
 
 // DisplayableManager initialization
-#if Slicer_VERSION_MAJOR == 4 && Slicer_VERSION_MINOR >= 9
 #include <vtkAutoInit.h>
 VTK_MODULE_INIT(vtkTractographyDisplayMRMLDM)
-#endif
-
-//-----------------------------------------------------------------------------
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-// QT includes
-#include <QtPlugin>
-Q_EXPORT_PLUGIN2(qSlicerTractographyDisplayModule, qSlicerTractographyDisplayModule);
-#endif
 
 //-----------------------------------------------------------------------------
 qSlicerTractographyDisplayModule::
