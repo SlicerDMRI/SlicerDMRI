@@ -6,13 +6,6 @@
 #include "qSlicerTractographyInteractiveSeedingModuleWidget.h"
 
 //-----------------------------------------------------------------------------
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-// QT includes
-#include <QtPlugin>
-Q_EXPORT_PLUGIN2(qSlicerTractographyInteractiveSeedingModule, qSlicerTractographyInteractiveSeedingModule);
-#endif
-
-//-----------------------------------------------------------------------------
 qSlicerTractographyInteractiveSeedingModule::
 qSlicerTractographyInteractiveSeedingModule(QObject* _parent):Superclass(_parent)
 {
