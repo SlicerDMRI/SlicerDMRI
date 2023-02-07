@@ -341,7 +341,7 @@ void vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForOneSeed(vtkSee
     }
   else if (markupsFiducialNode && markupsFiducialNode->GetNumberOfControlPoints())
     {
-    int numberOfFiducials = markupsFiducialNode->GetNumberOfMarkups();
+    int numberOfFiducials = markupsFiducialNode->GetNumberOfControlPoints();
     for (int i = 0; i < numberOfFiducials; ++i)
       {
       if (!seedSelectedFiducials ||

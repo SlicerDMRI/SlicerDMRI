@@ -37,7 +37,7 @@ set(MODULE_UI_SRCS
 set(MODULE_TARGET_LIBRARIES
   vtkDMRI
   vtkIntxSeedingLogic
-  vtkSlicerAnnotationsModuleMRML
+  vtkSlicerMarkupsModuleMRML
   )
 
 set(MODULE_RESOURCES
