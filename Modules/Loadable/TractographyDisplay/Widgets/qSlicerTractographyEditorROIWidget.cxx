@@ -59,6 +59,13 @@ void qSlicerTractographyEditorROIWidgetPrivate::init()
 
   this->EnableFiberEdit->setToolTip(QString("Click in 3D view to focus\n s: toggle select/unselect individual fibers\n x: unselect all selected fibers\n d: delete selected fibers or an individual fiber, if none is selected"));
 
+#ifndef ENABLE_FIBER_EDIT
+  // This feature stopped working sometime during the evolution of Slicer 4/5.
+  // Rather than remove all the code, we hide it away with the idea that it
+  // can be re-enabled and debugged in the future if needed.
+  this->EnableFiberEdit->hide();
+#endif
+
   QObject::connect(this->ROIForFiberSelectionMRMLNodeSelector, SIGNAL(currentNodeChanged(vtkMRMLNode*)),
                    q, SLOT(setMarkupsMRMLNodeForFiberSelection(vtkMRMLNode*)));
   QObject::connect(this->ROIForFiberSelectionMRMLNodeSelector, SIGNAL(nodeAddedByUser(vtkMRMLNode*)),
