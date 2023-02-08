@@ -30,7 +30,7 @@
 
 class vtkMRMLFiberBundleDisplayNode;
 class vtkExtractSelectedPolyDataIds;
-class vtkMRMLAnnotationNode;
+class vtkMRMLMarkupsNode;
 class vtkIdTypeArray;
 class vtkExtractPolyDataGeometry;
 class vtkPlanes;
@@ -102,16 +102,16 @@ public:
 
   ///
   /// Get annotation MRML object.
-  vtkMRMLAnnotationNode* GetAnnotationNode ( );
+  vtkMRMLMarkupsNode* GetMarkupsNode ( );
 
 
   ///
   /// Set the ID annotation node for interactive selection.
-  void SetAndObserveAnnotationNodeID ( const char *ID );
+  void SetAndObserveMarkupsNodeID ( const char *ID );
 
   ///
   /// Get ID of diffusion tensor display MRML object for fiber glyph.
-  vtkGetStringMacro(AnnotationNodeID);
+  vtkGetStringMacro(MarkupsNodeID);
 
   //--------------------------------------------------------------------------
   /// Interactive Selection Support
@@ -119,8 +119,8 @@ public:
 
   ///
   /// Enable or disable the selection with an annotation node
-  virtual void SetSelectWithAnnotation(bool);
-  vtkGetMacro(SelectWithAnnotation, bool);
+  virtual void SetSelectWithMarkups(bool);
+  vtkGetMacro(SelectWithMarkups, bool);
 
   enum SelectionModeEnum
   {
@@ -132,8 +132,8 @@ public:
 
   ///
   /// Set the mode (positive or negative) of the selection with the annotation node
-  vtkGetMacro(AnnotationSelectionMode, SelectionModeEnum);
-  virtual void SetAnnotationSelectionMode(SelectionModeEnum);
+  vtkGetMacro(MarkupsSelectionMode, SelectionModeEnum);
+  virtual void SetMarkupsSelectionMode(SelectionModeEnum);
 
   ///
   /// Reimplemented from internal reasons
@@ -206,13 +206,13 @@ protected:
 
   /// ALL MRML nodes
   bool EnableShuffleIDs;
-  bool SelectWithAnnotation;
-  SelectionModeEnum AnnotationSelectionMode;
+  bool SelectWithMarkups;
+  SelectionModeEnum MarkupsSelectionMode;
 
-  vtkMRMLAnnotationNode *AnnotationNode;
-  char *AnnotationNodeID;
+  vtkMRMLMarkupsNode *MarkupsNode;
+  char *MarkupsNodeID;
 
-  virtual void SetAnnotationNodeID(const char* id);
+  virtual void SetMarkupsNodeID(const char* id);
 
   // Pipeline filter objects
   vtkExtractPolyDataGeometry* ExtractFromROI;

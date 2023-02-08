@@ -34,7 +34,7 @@
      </property>
      <property name="nodeTypes">
       <stringlist>
-       <string>vtkMRMLAnnotationROINode</string>
+       <string>vtkMRMLMarkupsROINode</string>
       </stringlist>
      </property>
      <property name="showHidden">
@@ -82,16 +82,6 @@
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QCheckBox" name="InteractiveROI">
-     <property name="text">
-      <string>Interactive ROI Updates</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
     </widget>
    </item>
    <item row="2" column="1">

@@ -32,8 +32,8 @@ public:
 public slots:
   void setFiberBundleNode(vtkMRMLNode *);
   void setFiberBundleNode(vtkMRMLFiberBundleNode*);
-  void setAnnotationMRMLNodeForFiberSelection(vtkMRMLNode*);
-  void setAnnotationROIMRMLNodeToFiberBundleEnvelope(vtkMRMLNode*);
+  void setMarkupsMRMLNodeForFiberSelection(vtkMRMLNode*);
+  void setMarkupsROIMRMLNodeToFiberBundleEnvelope(vtkMRMLNode*);
   void disableROISelection(bool);
   void positiveROISelection(bool);
   void negativeROISelection(bool);

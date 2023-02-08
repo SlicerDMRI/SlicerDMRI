@@ -18,7 +18,7 @@ set(${KIT}_SRCS
 set(${KIT}_TARGET_LIBRARIES
   vtkDMRI
   ${ITK_LIBRARIES}
-  vtkSlicerAnnotationsModuleMRML
+  vtkSlicerMarkupsModuleMRML
   vtkSlicerMarkupsModuleMRML
   vtkSlicerTractographyDisplayModuleMRML
   )
