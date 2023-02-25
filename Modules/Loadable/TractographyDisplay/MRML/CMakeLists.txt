@@ -28,9 +28,9 @@ set(${KIT}_TARGET_LIBRARIES
   vtkDMRI
   ${MRML_LIBRARIES}
   ${VTK_LIBRARIES}
-   vtkSlicerAnnotationsModuleMRML
-   vtkTeem
-   )
+  vtkSlicerMarkupsModuleMRML
+  vtkTeem
+  )
 
 #-----------------------------------------------------------------------------
 SlicerMacroBuildModuleMRML(
