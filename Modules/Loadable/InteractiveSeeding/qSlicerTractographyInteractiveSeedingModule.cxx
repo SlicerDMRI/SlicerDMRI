@@ -34,8 +34,8 @@ QString qSlicerTractographyInteractiveSeedingModule::helpText()const
 {
   QString help =
     "The Tractography Interactive Seeding Module creates fiber tracts at specified seeding location. \n"
-    "<a href=%1/Documentation/%2.%3/Modules/TractographyInteractiveSeeding>%1/Documentation/%2.%3/Modules/TractographyInteractiveSeeding</a>";
-  return help.arg(this->slicerWikiUrl()).arg(Slicer_VERSION_MAJOR).arg(Slicer_VERSION_MINOR);
+    "<a href=http://dmri.slicer.org/docs</a>";
+  return help;
 }
 
 //-----------------------------------------------------------------------------
