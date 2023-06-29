@@ -251,7 +251,7 @@ bool qMRMLTractographyDisplayTreeView::clickDecoration(const QModelIndex& index)
     {
     if (tubeDisplayNode)
       {
-      tubeDisplayNode->SetSliceIntersectionVisibility(tubeDisplayNode->GetSliceIntersectionVisibility() ? 0 : 1);
+      tubeDisplayNode->SetVisibility2D(tubeDisplayNode->GetSliceIntersectionVisibility() ? 0 : 1);
       res = true;
       }
   }

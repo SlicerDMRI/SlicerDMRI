@@ -379,7 +379,7 @@ updateVilibilityFromItem(QStandardItem* item, vtkMRMLNode* node, bool slice)
     {
     if (slice)
       {
-      displayNode->SetSliceIntersectionVisibility(visible);
+      displayNode->SetVisibility2D(visible);
       }
     else
       {
