@@ -210,5 +210,5 @@ void qSlicerTractographyDisplayBasicWidget::
     return;
   vtkMRMLFiberBundleDisplayNode* dNode = d->FiberBundleNode->GetTubeDisplayNode();
   if(dNode)
-    dNode->SetSliceIntersectionVisibility(state > 0);
+    dNode->SetVisibility2D(state > 0);
 }

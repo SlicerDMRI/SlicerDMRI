@@ -261,10 +261,10 @@ execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Pyt
       tubeDisplay = fiberNode.GetTubeDisplayNode()
       if tractName == whichTract:
         tubeDisplay.SetVisibility(1)
-        tubeDisplay.SetSliceIntersectionVisibility(1)
+        tubeDisplay.SetVisibility2D(1)
       else:
         tubeDisplay.SetVisibility(0)
-        tubeDisplay.SetSliceIntersectionVisibility(0)
+        tubeDisplay.SetVisibility2D(0)
 
   def storeSceneView(self,name,description=""):
     """  Store a scene view into the current scene.
