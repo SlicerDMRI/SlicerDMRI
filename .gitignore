@@ -12,6 +12,9 @@
 # ... and .circleci
 !.circleci
 
+# .. and .github
+!.github
+
 # Exclude Kdevelop4 files ...
 .kdev*
 

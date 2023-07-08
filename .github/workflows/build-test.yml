@@ -1,0 +1,80 @@
+name: Build, test
+
+on: [push, pull_request]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-22.04
+
+    env:
+      BUILD_TYPE: Release
+      QTDIR: /opt/qt
+      QTVER: 5.15.2
+      SLICER_SRC_DIR: ${{ github.workspace }}/../../slicer-src
+      SLICER_BLD_DIR: ${{ github.workspace }}/../../slicer-build
+      SLICER_DMRI_BLD_DIR: ${{ github.workspace }}/../../slicerdmri-build
+
+    steps:
+
+    - name: Checkout out SlicerDMRI
+      uses: actions/checkout@v3
+
+    - name: Get specific version of CMake, Ninja
+      uses: lukka/get-cmake@v3.24.2
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: '5.15.2'
+        host: 'linux'
+        dir: '/opt/qt'  # ToDo: Using $QTDIR does not work here
+        modules: 'qtwebengine'
+
+    - name: Check out Slicer
+      run: |
+        git clone https://github.com/Slicer/Slicer.git $SLICER_SRC_DIR
+
+    - name: Build Slicer
+      run: |
+        mkdir $SLICER_BLD_DIR
+        cd $SLICER_BLD_DIR
+        cmake \
+          -GNinja \
+          -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
+          -S $SLICER_SRC_DIR \
+          -DQt5_DIR:PATH=$QTDIR/Qt/$QTVER/gcc_64/lib/cmake/Qt5 \
+          -DBUILD_TESTING=OFF \
+          -DSlicer_USE_VTK_DEBUG_LEAKS=OFF \
+          -DSlicer_BUILD_APPLICATIONUPDATE_SUPPORT=OFF \
+          -DSlicer_BUILD_BRAINSTOOLS=OFF \
+          -DSlicer_BUILD_CompareVolumes=OFF \
+          -DSlicer_BUILD_DICOM_SUPPORT=ON \
+          -DSlicer_BUILD_DOCUMENTATION=OFF \
+          -DSlicer_BUILD_I18N_SUPPORT=OFF \
+          -DSlicer_BUILD_LandmarkRegistration=OFF \
+          -DSlicer_BUILD_MultiVolumeExplorer=OFF \
+          -DSlicer_BUILD_MultiVolumeImporter=OFF \
+          -DSlicer_BUILD_QT_DESIGNER_PLUGINS=OFF \
+          -DSlicer_BUILD_MULTIMEDIA_SUPPORT=OFF \
+          -DSlicer_BUILD_SimpleFilters=OFF \
+          -DSlicer_BUILD_SurfaceToolbox=OFF \
+          -DSlicer_BUILD_vtkAddon=ON \
+          -DSlicer_BUILD_WEBENGINE_SUPPORT=OFF \
+          -DSlicer_USE_NUMPY=OFF \
+          -DSlicer_USE_PYTHONQT=ON \
+          -DSlicer_USE_SCIPY=OFF \
+          -DSlicer_USE_TBB=OFF \
+          -DSlicer_USE_QtTesting=OFF \
+          -DSlicer_USE_SimpleITK=OFF
+        ninja -j $(nproc)
+
+    - name: Build SlicerDMRI
+      run: |
+        mkdir $SLICER_DMRI_BLD_DIR
+        cd $SLICER_DMRI_BLD_DIR
+        cmake \
+          -GNinja \
+          -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
+          -S ${{ github.workspace }} \
+          -DSlicer_DIR=$SLICER_BLD_DIR/Slicer-build
+        ninja -j $(nproc)
