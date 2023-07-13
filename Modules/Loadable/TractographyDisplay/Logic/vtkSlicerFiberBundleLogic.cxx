@@ -129,6 +129,7 @@ vtkMRMLFiberBundleNode* vtkSlicerFiberBundleLogic::AddFiberBundle (const char* f
     fiberBundleNode->SetName(volumeName.c_str());
 
     fiberBundleNode->SetScene(this->GetMRMLScene());
+    this->GetMRMLScene()->AddNode(storageNode);
     fiberBundleNode->SetAndObserveStorageNodeID(storageNode->GetID());
     this->GetMRMLScene()->AddNode(fiberBundleNode);
     fiberBundleNode->CreateDefaultDisplayNodes();
