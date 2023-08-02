@@ -24,6 +24,7 @@ jobs:
         host: 'linux'
         dir: '/opt/qt'
         modules: 'qtwebengine'
+        setup-python: false
 
     - name: Check out Slicer
       run: |
