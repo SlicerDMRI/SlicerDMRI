@@ -69,7 +69,6 @@ jobs:
           -DSlicer_BUILD_QT_DESIGNER_PLUGINS:BOOL=OFF \
           -DSlicer_BUILD_SurfaceToolbox:BOOL=OFF \
           -DSlicer_BUILD_WEBENGINE_SUPPORT:BOOL=OFF \
-          -DSlicer_USE_NUMPY:BOOL=OFF \
           -DSlicer_USE_PYTHONQT:BOOL=ON \
           -DSlicer_USE_QtTesting:BOOL=OFF \
           -DSlicer_USE_SCIPY:BOOL=OFF \
