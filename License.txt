@@ -1,6 +1,7 @@
+
 For more information, please see:
 
-                      http://www.slicer.org
+                      https://www.slicer.org
 
 The 3D Slicer license below is a BSD style license, with extensions
 to cover contributions and other issues specific to 3D Slicer.
@@ -78,7 +79,7 @@ Sublicense ("Contribution Agreement").
    your breach of any of the terms of this Agreement.
 
 6. YOU WARRANT THAT TO THE BEST OF YOUR KNOWLEDGE YOUR CONTRIBUTION
-   DOES NOT CONTAIN ANY CODE THAT REQURES OR PRESCRIBES AN "OPEN
+   DOES NOT CONTAIN ANY CODE THAT REQUIRES OR PRESCRIBES AN "OPEN
    SOURCE LICENSE" FOR DERIVATIVE WORKS (by way of non-limiting
    example, the GNU General Public License or other so-called
    "reciprocal" license that requires any derived work to be licensed
@@ -195,4 +196,4 @@ This Agreement shall be governed by and construed in accordance with
 the laws of The Commonwealth of Massachusetts without regard to
 principles of conflicts of law. This Agreement shall supercede and
 replace any license terms that you may have agreed to previously with
-respect to Slicer. 
+respect to Slicer.
