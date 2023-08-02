@@ -8,9 +8,6 @@ jobs:
 
     env:
       BUILD_TYPE: Release
-      SLICER_SRC_DIR: ${{ github.workspace }}/../../slicer-src
-      SLICER_BLD_DIR: ${{ github.workspace }}/../../slicer-build
-      SLICER_DMRI_BLD_DIR: ${{ github.workspace }}/../../slicerdmri-build
 
     steps:
 
@@ -30,14 +27,16 @@ jobs:
 
     - name: Check out Slicer
       run: |
-        git clone https://github.com/Slicer/Slicer.git $SLICER_SRC_DIR
+        git clone https://github.com/Slicer/Slicer.git ${{ github.workspace }}/../../Slicer
 
-    - name: Build Slicer
+    - id: slicer-build
+      name: Build Slicer
       run: |
         Qt5_DIR=$QT_ROOT_DIR/lib/cmake/Qt5
 
-        mkdir $SLICER_BLD_DIR
-        cd $SLICER_BLD_DIR
+        Slicer_SOURCE_DIR=${{ github.workspace }}/../../Slicer
+        Slicer_BUILD_DIR=${{ github.workspace }}/../../Slicer-build
+
         cmake \
           -GNinja \
           -DBUILD_TESTING:BOOL=OFF \
@@ -62,16 +61,26 @@ jobs:
           -DSlicer_USE_SimpleITK:BOOL=OFF \
           -DSlicer_USE_TBB:BOOL=OFF \
           -DSlicer_USE_VTK_DEBUG_LEAKS:BOOL=OFF \
-          -S $SLICER_SRC_DIR
+          -S $Slicer_SOURCE_DIR \
+          -B $Slicer_BUILD_DIR
+
         ninja -j $(nproc)
+
+        echo "Slicer_DIR=$Slicer_BUILD_DIR/Slicer-build" >> $GITHUB_OUTPUT
 
     - name: Build SlicerDMRI
       run: |
-        mkdir $SLICER_DMRI_BLD_DIR
-        cd $SLICER_DMRI_BLD_DIR
+        Slicer_DIR=${{ steps.slicer-build.outputs.Slicer_DIR }}
+
+        EXTENSION_NAME=SlicerDMRI
+        EXTENSION_SOURCE_DIR=${{ github.workspace }}
+        EXTENSION_BUILD_DIR=${{ github.workspace }}/../$EXTENSION_NAME-build
+
         cmake \
           -GNinja \
           -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
-          -S ${{ github.workspace }} \
-          -DSlicer_DIR:PATH=$SLICER_BLD_DIR/Slicer-build
+          -DSlicer_DIR:PATH=$Slicer_DIR \
+          -S $EXTENSION_SOURCE_DIR \
+          -B $EXTENSION_BUILD_DIR
+
         ninja -j $(nproc)
