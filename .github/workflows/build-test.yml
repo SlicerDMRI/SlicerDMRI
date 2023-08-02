@@ -43,29 +43,29 @@ jobs:
           -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
           -S $SLICER_SRC_DIR \
           -DQt5_DIR:PATH=$QTDIR/Qt/$QTVER/gcc_64/lib/cmake/Qt5 \
-          -DBUILD_TESTING=OFF \
-          -DSlicer_USE_VTK_DEBUG_LEAKS=OFF \
-          -DSlicer_BUILD_APPLICATIONUPDATE_SUPPORT=OFF \
-          -DSlicer_BUILD_BRAINSTOOLS=OFF \
-          -DSlicer_BUILD_CompareVolumes=OFF \
-          -DSlicer_BUILD_DICOM_SUPPORT=ON \
-          -DSlicer_BUILD_DOCUMENTATION=OFF \
-          -DSlicer_BUILD_I18N_SUPPORT=OFF \
-          -DSlicer_BUILD_LandmarkRegistration=OFF \
-          -DSlicer_BUILD_MultiVolumeExplorer=OFF \
-          -DSlicer_BUILD_MultiVolumeImporter=OFF \
-          -DSlicer_BUILD_QT_DESIGNER_PLUGINS=OFF \
-          -DSlicer_BUILD_MULTIMEDIA_SUPPORT=OFF \
-          -DSlicer_BUILD_SimpleFilters=OFF \
-          -DSlicer_BUILD_SurfaceToolbox=OFF \
-          -DSlicer_BUILD_vtkAddon=ON \
-          -DSlicer_BUILD_WEBENGINE_SUPPORT=OFF \
-          -DSlicer_USE_NUMPY=OFF \
-          -DSlicer_USE_PYTHONQT=ON \
-          -DSlicer_USE_SCIPY=OFF \
-          -DSlicer_USE_TBB=OFF \
-          -DSlicer_USE_QtTesting=OFF \
-          -DSlicer_USE_SimpleITK=OFF
+          -DBUILD_TESTING:BOOL=OFF \
+          -DSlicer_USE_VTK_DEBUG_LEAKS:BOOL==OFF \
+          -DSlicer_BUILD_APPLICATIONUPDATE_SUPPORT:BOOL=OFF \
+          -DSlicer_BUILD_BRAINSTOOLS:BOOL=OFF \
+          -DSlicer_BUILD_CompareVolumes:BOOL=OFF \
+          -DSlicer_BUILD_DICOM_SUPPORT:BOOL=ON \
+          -DSlicer_BUILD_DOCUMENTATION:BOOL=OFF \
+          -DSlicer_BUILD_I18N_SUPPORT:BOOL=OFF \
+          -DSlicer_BUILD_LandmarkRegistration:BOOL=OFF \
+          -DSlicer_BUILD_MultiVolumeExplorer:BOOL=OFF \
+          -DSlicer_BUILD_MultiVolumeImporter:BOOL=OFF \
+          -DSlicer_BUILD_QT_DESIGNER_PLUGINS:BOOL=OFF \
+          -DSlicer_BUILD_MULTIMEDIA_SUPPORT:BOOL=OFF \
+          -DSlicer_BUILD_SimpleFilters:BOOL=OFF \
+          -DSlicer_BUILD_SurfaceToolbox:BOOL=OFF \
+          -DSlicer_BUILD_vtkAddon:BOOL=ON \
+          -DSlicer_BUILD_WEBENGINE_SUPPORT:BOOL=OFF \
+          -DSlicer_USE_NUMPY:BOOL=OFF \
+          -DSlicer_USE_PYTHONQT:BOOL=ON \
+          -DSlicer_USE_SCIPY:BOOL=OFF \
+          -DSlicer_USE_TBB:BOOL=OFF \
+          -DSlicer_USE_QtTesting:BOOL=OFF \
+          -DSlicer_USE_SimpleITK:BOOL=OFF
         ninja -j $(nproc)
 
     - name: Build SlicerDMRI
@@ -76,5 +76,5 @@ jobs:
           -GNinja \
           -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
           -S ${{ github.workspace }} \
-          -DSlicer_DIR=$SLICER_BLD_DIR/Slicer-build
+          -DSlicer_DIR:PATH=$SLICER_BLD_DIR/Slicer-build
         ninja -j $(nproc)
