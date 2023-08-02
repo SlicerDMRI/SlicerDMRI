@@ -50,9 +50,8 @@ jobs:
           -DSlicer_BUILD_DICOM_SUPPORT:BOOL=ON \
           -DSlicer_BUILD_I18N_SUPPORT:BOOL=OFF \
           -DSlicer_BUILD_LandmarkRegistration:BOOL=OFF \
-          -DSlicer_BUILD_MultiVolumeExplorer:BOOL=OFF \
-          -DSlicer_BUILD_MultiVolumeImporter:BOOL=OFF \
           -DSlicer_BUILD_MULTIMEDIA_SUPPORT:BOOL=OFF \
+          -DSlicer_BUILD_MULTIVOLUME_SUPPORT:BOOL=OFF \
           -DSlicer_BUILD_QT_DESIGNER_PLUGINS:BOOL=OFF \
           -DSlicer_BUILD_SurfaceToolbox:BOOL=OFF \
           -DSlicer_BUILD_WEBENGINE_SUPPORT:BOOL=OFF \
