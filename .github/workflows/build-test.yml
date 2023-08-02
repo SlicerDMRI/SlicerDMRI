@@ -64,7 +64,9 @@ jobs:
           -S $Slicer_SOURCE_DIR \
           -B $Slicer_BUILD_DIR
 
-        ninja -j $(nproc)
+        cmake \
+          --build $Slicer_BUILD_DIR \
+          --config $BUILD_TYPE
 
         echo "Slicer_DIR=$Slicer_BUILD_DIR/Slicer-build" >> $GITHUB_OUTPUT
 
@@ -83,4 +85,6 @@ jobs:
           -S $EXTENSION_SOURCE_DIR \
           -B $EXTENSION_BUILD_DIR
 
-        ninja -j $(nproc)
+        cmake \
+          --build $EXTENSION_BUILD_DIR \
+          --config $BUILD_TYPE
