@@ -1,6 +1,12 @@
 name: Build, test
 
-on: [push, pull_request]
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "**.md"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
