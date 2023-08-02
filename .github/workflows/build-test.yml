@@ -8,8 +8,6 @@ jobs:
 
     env:
       BUILD_TYPE: Release
-      QTDIR: /opt/qt
-      QTVER: 5.15.2
       SLICER_SRC_DIR: ${{ github.workspace }}/../../slicer-src
       SLICER_BLD_DIR: ${{ github.workspace }}/../../slicer-build
       SLICER_DMRI_BLD_DIR: ${{ github.workspace }}/../../slicerdmri-build
@@ -27,7 +25,7 @@ jobs:
       with:
         version: '5.15.2'
         host: 'linux'
-        dir: '/opt/qt'  # ToDo: Using $QTDIR does not work here
+        dir: '/opt/qt'
         modules: 'qtwebengine'
 
     - name: Check out Slicer
@@ -36,13 +34,15 @@ jobs:
 
     - name: Build Slicer
       run: |
+        Qt5_DIR=$QT_ROOT_DIR/lib/cmake/Qt5
+
         mkdir $SLICER_BLD_DIR
         cd $SLICER_BLD_DIR
         cmake \
           -GNinja \
           -DBUILD_TESTING:BOOL=OFF \
           -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
-          -DQt5_DIR:PATH=$QTDIR/Qt/$QTVER/gcc_64/lib/cmake/Qt5 \
+          -DQt5_DIR:PATH=$Qt5_DIR \
           -DSlicer_BUILD_APPLICATIONUPDATE_SUPPORT:BOOL=OFF \
           -DSlicer_BUILD_DOCUMENTATION:BOOL=OFF \
           -DSlicer_BUILD_BRAINSTOOLS:BOOL=OFF \
