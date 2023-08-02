@@ -40,32 +40,32 @@ jobs:
         cd $SLICER_BLD_DIR
         cmake \
           -GNinja \
-          -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
-          -S $SLICER_SRC_DIR \
-          -DQt5_DIR:PATH=$QTDIR/Qt/$QTVER/gcc_64/lib/cmake/Qt5 \
           -DBUILD_TESTING:BOOL=OFF \
-          -DSlicer_USE_VTK_DEBUG_LEAKS:BOOL==OFF \
+          -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
+          -DQt5_DIR:PATH=$QTDIR/Qt/$QTVER/gcc_64/lib/cmake/Qt5 \
           -DSlicer_BUILD_APPLICATIONUPDATE_SUPPORT:BOOL=OFF \
+          -DSlicer_BUILD_DOCUMENTATION:BOOL=OFF \
           -DSlicer_BUILD_BRAINSTOOLS:BOOL=OFF \
           -DSlicer_BUILD_CompareVolumes:BOOL=OFF \
           -DSlicer_BUILD_DICOM_SUPPORT:BOOL=ON \
-          -DSlicer_BUILD_DOCUMENTATION:BOOL=OFF \
           -DSlicer_BUILD_I18N_SUPPORT:BOOL=OFF \
           -DSlicer_BUILD_LandmarkRegistration:BOOL=OFF \
           -DSlicer_BUILD_MultiVolumeExplorer:BOOL=OFF \
           -DSlicer_BUILD_MultiVolumeImporter:BOOL=OFF \
-          -DSlicer_BUILD_QT_DESIGNER_PLUGINS:BOOL=OFF \
           -DSlicer_BUILD_MULTIMEDIA_SUPPORT:BOOL=OFF \
           -DSlicer_BUILD_SimpleFilters:BOOL=OFF \
+          -DSlicer_BUILD_QT_DESIGNER_PLUGINS:BOOL=OFF \
           -DSlicer_BUILD_SurfaceToolbox:BOOL=OFF \
           -DSlicer_BUILD_vtkAddon:BOOL=ON \
           -DSlicer_BUILD_WEBENGINE_SUPPORT:BOOL=OFF \
           -DSlicer_USE_NUMPY:BOOL=OFF \
           -DSlicer_USE_PYTHONQT:BOOL=ON \
-          -DSlicer_USE_SCIPY:BOOL=OFF \
-          -DSlicer_USE_TBB:BOOL=OFF \
           -DSlicer_USE_QtTesting:BOOL=OFF \
-          -DSlicer_USE_SimpleITK:BOOL=OFF
+          -DSlicer_USE_SCIPY:BOOL=OFF \
+          -DSlicer_USE_SimpleITK:BOOL=OFF \
+          -DSlicer_USE_TBB:BOOL=OFF \
+          -DSlicer_USE_VTK_DEBUG_LEAKS:BOOL=OFF \
+          -S $SLICER_SRC_DIR
         ninja -j $(nproc)
 
     - name: Build SlicerDMRI
