@@ -23,6 +23,8 @@ jobs:
 
     - name: Checkout out SlicerDMRI
       uses: actions/checkout@v3
+      with:
+        path: ${{ github.workspace }}/SlicerDMRI
 
     - name: Get specific version of CMake, Ninja
       uses: lukka/get-cmake@v3.24.2
@@ -36,17 +38,19 @@ jobs:
         modules: 'qtwebengine'
         setup-python: false
 
-    - name: Check out Slicer
-      run: |
-        git clone https://github.com/Slicer/Slicer.git ${{ github.workspace }}/../../Slicer
+    - name: Checkout out Slicer
+      uses: actions/checkout@v3
+      with:
+        repository: Slicer/Slicer
+        path: ${{ github.workspace }}/Slicer
 
     - id: slicer-build
       name: Build Slicer
       run: |
         Qt5_DIR=$QT_ROOT_DIR/lib/cmake/Qt5
 
-        Slicer_SOURCE_DIR=${{ github.workspace }}/../../Slicer
-        Slicer_BUILD_DIR=${{ github.workspace }}/../../Slicer-build
+        Slicer_SOURCE_DIR=${{ github.workspace }}/Slicer
+        Slicer_BUILD_DIR=${{ github.workspace }}/Slicer-build
 
         cmake \
           -GNinja \
@@ -86,8 +90,8 @@ jobs:
         Slicer_DIR=${{ steps.slicer-build.outputs.Slicer_DIR }}
 
         EXTENSION_NAME=SlicerDMRI
-        EXTENSION_SOURCE_DIR=${{ github.workspace }}
-        EXTENSION_BUILD_DIR=${{ github.workspace }}/../$EXTENSION_NAME-build
+        EXTENSION_SOURCE_DIR=${{ github.workspace }}/$EXTENSION_NAME
+        EXTENSION_BUILD_DIR=${{ github.workspace }}/$EXTENSION_NAME-build
 
         cmake \
           -GNinja \
