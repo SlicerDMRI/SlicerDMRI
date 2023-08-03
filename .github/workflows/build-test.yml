@@ -1,6 +1,16 @@
 name: Build, test
 
-on: [push, pull_request]
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-test:
@@ -8,16 +18,13 @@ jobs:
 
     env:
       BUILD_TYPE: Release
-      QTDIR: /opt/qt
-      QTVER: 5.15.2
-      SLICER_SRC_DIR: ${{ github.workspace }}/../../slicer-src
-      SLICER_BLD_DIR: ${{ github.workspace }}/../../slicer-build
-      SLICER_DMRI_BLD_DIR: ${{ github.workspace }}/../../slicerdmri-build
 
     steps:
 
     - name: Checkout out SlicerDMRI
       uses: actions/checkout@v3
+      with:
+        path: ${{ github.workspace }}/SlicerDMRI
 
     - name: Get specific version of CMake, Ninja
       uses: lukka/get-cmake@v3.24.2
@@ -27,54 +34,72 @@ jobs:
       with:
         version: '5.15.2'
         host: 'linux'
-        dir: '/opt/qt'  # ToDo: Using $QTDIR does not work here
+        dir: '/opt/qt'
         modules: 'qtwebengine'
+        setup-python: false
 
-    - name: Check out Slicer
-      run: |
-        git clone https://github.com/Slicer/Slicer.git $SLICER_SRC_DIR
+    - name: Checkout out Slicer
+      uses: actions/checkout@v3
+      with:
+        repository: Slicer/Slicer
+        path: ${{ github.workspace }}/Slicer
 
-    - name: Build Slicer
+    - id: slicer-build
+      name: Build Slicer
       run: |
-        mkdir $SLICER_BLD_DIR
-        cd $SLICER_BLD_DIR
+        Qt5_DIR=$QT_ROOT_DIR/lib/cmake/Qt5
+
+        Slicer_SOURCE_DIR=${{ github.workspace }}/Slicer
+        Slicer_BUILD_DIR=${{ github.workspace }}/Slicer-build
+
         cmake \
           -GNinja \
+          -DBUILD_TESTING:BOOL=OFF \
           -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
-          -S $SLICER_SRC_DIR \
-          -DQt5_DIR:PATH=$QTDIR/Qt/$QTVER/gcc_64/lib/cmake/Qt5 \
-          -DBUILD_TESTING=OFF \
-          -DSlicer_USE_VTK_DEBUG_LEAKS=OFF \
-          -DSlicer_BUILD_APPLICATIONUPDATE_SUPPORT=OFF \
-          -DSlicer_BUILD_BRAINSTOOLS=OFF \
-          -DSlicer_BUILD_CompareVolumes=OFF \
-          -DSlicer_BUILD_DICOM_SUPPORT=ON \
-          -DSlicer_BUILD_DOCUMENTATION=OFF \
-          -DSlicer_BUILD_I18N_SUPPORT=OFF \
-          -DSlicer_BUILD_LandmarkRegistration=OFF \
-          -DSlicer_BUILD_MultiVolumeExplorer=OFF \
-          -DSlicer_BUILD_MultiVolumeImporter=OFF \
-          -DSlicer_BUILD_QT_DESIGNER_PLUGINS=OFF \
-          -DSlicer_BUILD_MULTIMEDIA_SUPPORT=OFF \
-          -DSlicer_BUILD_SimpleFilters=OFF \
-          -DSlicer_BUILD_SurfaceToolbox=OFF \
-          -DSlicer_BUILD_vtkAddon=ON \
-          -DSlicer_BUILD_WEBENGINE_SUPPORT=OFF \
-          -DSlicer_USE_NUMPY=OFF \
-          -DSlicer_USE_PYTHONQT=ON \
-          -DSlicer_USE_SCIPY=OFF \
-          -DSlicer_USE_TBB=OFF \
-          -DSlicer_USE_QtTesting=OFF \
-          -DSlicer_USE_SimpleITK=OFF
-        ninja -j $(nproc)
+          -DQt5_DIR:PATH=$Qt5_DIR \
+          -DSlicer_BUILD_APPLICATIONUPDATE_SUPPORT:BOOL=OFF \
+          -DSlicer_BUILD_DOCUMENTATION:BOOL=OFF \
+          -DSlicer_BUILD_BRAINSTOOLS:BOOL=OFF \
+          -DSlicer_BUILD_CompareVolumes:BOOL=OFF \
+          -DSlicer_BUILD_DICOM_SUPPORT:BOOL=ON \
+          -DSlicer_BUILD_I18N_SUPPORT:BOOL=OFF \
+          -DSlicer_BUILD_LandmarkRegistration:BOOL=OFF \
+          -DSlicer_BUILD_MULTIMEDIA_SUPPORT:BOOL=OFF \
+          -DSlicer_BUILD_MULTIVOLUME_SUPPORT:BOOL=OFF \
+          -DSlicer_BUILD_QT_DESIGNER_PLUGINS:BOOL=OFF \
+          -DSlicer_BUILD_SurfaceToolbox:BOOL=OFF \
+          -DSlicer_BUILD_WEBENGINE_SUPPORT:BOOL=OFF \
+          -DSlicer_USE_NUMPY:BOOL=OFF \
+          -DSlicer_USE_PYTHONQT:BOOL=ON \
+          -DSlicer_USE_QtTesting:BOOL=OFF \
+          -DSlicer_USE_SCIPY:BOOL=OFF \
+          -DSlicer_USE_SimpleITK:BOOL=OFF \
+          -DSlicer_USE_TBB:BOOL=OFF \
+          -DSlicer_USE_VTK_DEBUG_LEAKS:BOOL=OFF \
+          -S $Slicer_SOURCE_DIR \
+          -B $Slicer_BUILD_DIR
+
+        cmake \
+          --build $Slicer_BUILD_DIR \
+          --config $BUILD_TYPE
+
+        echo "Slicer_DIR=$Slicer_BUILD_DIR/Slicer-build" >> $GITHUB_OUTPUT
 
     - name: Build SlicerDMRI
       run: |
-        mkdir $SLICER_DMRI_BLD_DIR
-        cd $SLICER_DMRI_BLD_DIR
+        Slicer_DIR=${{ steps.slicer-build.outputs.Slicer_DIR }}
+
+        EXTENSION_NAME=SlicerDMRI
+        EXTENSION_SOURCE_DIR=${{ github.workspace }}/$EXTENSION_NAME
+        EXTENSION_BUILD_DIR=${{ github.workspace }}/$EXTENSION_NAME-build
+
         cmake \
           -GNinja \
           -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
-          -S ${{ github.workspace }} \
-          -DSlicer_DIR=$SLICER_BLD_DIR/Slicer-build
-        ninja -j $(nproc)
+          -DSlicer_DIR:PATH=$Slicer_DIR \
+          -S $EXTENSION_SOURCE_DIR \
+          -B $EXTENSION_BUILD_DIR
+
+        cmake \
+          --build $EXTENSION_BUILD_DIR \
+          --config $BUILD_TYPE
