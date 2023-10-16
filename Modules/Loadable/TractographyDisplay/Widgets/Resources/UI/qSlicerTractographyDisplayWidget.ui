@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>441</width>
-    <height>779</height>
+    <width>391</width>
+    <height>841</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,29 +20,6 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QCheckBox" name="VisibilityCheckBox">
-     <property name="styleSheet">
-      <string notr="true">QCheckBox::indicator {
-     width: 21px;
-     height: 21px;
- }
-
- QCheckBox::indicator:checked {
-     image: url(:/Icons/Medium/SlicerVisible.png);
- }
-QCheckBox::indicator:unchecked {
-     image: url(:/Icons/Medium/SlicerInvisible.png);
- }</string>
-     </property>
-     <property name="text">
-      <string>Visibility</string>
-     </property>
-     <property name="autoExclusive">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="2">
     <widget class="QLabel" name="OpacityLabel">
      <property name="enabled">
@@ -109,14 +86,14 @@ QCheckBox::indicator:unchecked {
           <layout class="QHBoxLayout" name="Layout_TensorSelect">
            <item>
             <widget class="QLabel" name="ActiveTensorLabel">
-             <property name="text">
-               <string>Active Tensor:</string>
-             </property>
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Active Tensor:</string>
              </property>
             </widget>
            </item>
@@ -143,7 +120,7 @@ QCheckBox::indicator:unchecked {
               <bool>true</bool>
              </property>
              <attribute name="buttonGroup">
-              <string>buttonGroup</string>
+              <string notr="true">buttonGroup</string>
              </attribute>
             </widget>
            </item>
@@ -173,7 +150,7 @@ QCheckBox::indicator:unchecked {
               <string>Of Scalar Value</string>
              </property>
              <attribute name="buttonGroup">
-              <string>buttonGroup</string>
+              <string notr="true">buttonGroup</string>
              </attribute>
             </widget>
            </item>
@@ -198,7 +175,7 @@ QCheckBox::indicator:unchecked {
             <string>Color Fibers By Mean Orientation</string>
            </property>
            <attribute name="buttonGroup">
-            <string>buttonGroup</string>
+            <string notr="true">buttonGroup</string>
            </attribute>
           </widget>
          </item>
@@ -208,7 +185,7 @@ QCheckBox::indicator:unchecked {
             <string>Color Fibers By Segment Orientation</string>
            </property>
            <attribute name="buttonGroup">
-            <string>buttonGroup</string>
+            <string notr="true">buttonGroup</string>
            </attribute>
           </widget>
          </item>
@@ -224,7 +201,7 @@ QCheckBox::indicator:unchecked {
             <bool>true</bool>
            </property>
            <attribute name="buttonGroup">
-            <string>buttonGroup</string>
+            <string notr="true">buttonGroup</string>
            </attribute>
           </widget>
          </item>
@@ -236,7 +213,7 @@ QCheckBox::indicator:unchecked {
               <string>Solid Color</string>
              </property>
              <attribute name="buttonGroup">
-              <string>buttonGroup</string>
+              <string notr="true">buttonGroup</string>
              </attribute>
             </widget>
            </item>
@@ -299,6 +276,21 @@ QCheckBox::indicator:unchecked {
         </layout>
        </widget>
       </item>
+      <item>
+       <widget class="ctkCollapsibleGroupBox" name="ColorLegendCollapsibleGroupBox">
+        <property name="title">
+         <string>Color Legend</string>
+        </property>
+        <property name="collapsed">
+         <bool>true</bool>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0">
+          <widget class="qMRMLColorLegendDisplayNodeWidget" name="ColorLegendDisplayNodeWidget"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -306,6 +298,29 @@ QCheckBox::indicator:unchecked {
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QCheckBox" name="VisibilityCheckBox">
+     <property name="styleSheet">
+      <string notr="true">QCheckBox::indicator {
+     width: 21px;
+     height: 21px;
+ }
+
+ QCheckBox::indicator:checked {
+     image: url(:/Icons/Medium/SlicerVisible.png);
+ }
+QCheckBox::indicator:unchecked {
+     image: url(:/Icons/Medium/SlicerInvisible.png);
+ }</string>
+     </property>
+     <property name="text">
+      <string>Visibility</string>
+     </property>
+     <property name="autoExclusive">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -325,27 +340,6 @@ QCheckBox::indicator:unchecked {
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>qMRMLColorTableComboBox</class>
-   <extends>qMRMLNodeComboBox</extends>
-   <header>qMRMLColorTableComboBox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>qMRMLNodeComboBox</class>
-   <extends>QWidget</extends>
-   <header>qMRMLNodeComboBox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>qMRMLRangeWidget</class>
-   <extends>ctkRangeWidget</extends>
-   <header>qMRMLRangeWidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>qSlicerWidget</class>
-   <extends>QWidget</extends>
-   <header>qSlicerWidget.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>ctkVTKDataSetArrayComboBox</class>
    <extends>QComboBox</extends>
@@ -376,6 +370,40 @@ QCheckBox::indicator:unchecked {
    <class>ctkSliderWidget</class>
    <extends>QWidget</extends>
    <header>ctkSliderWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>qMRMLColorTableComboBox</class>
+   <extends>qMRMLNodeComboBox</extends>
+   <header>qMRMLColorTableComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>qMRMLNodeComboBox</class>
+   <extends>QWidget</extends>
+   <header>qMRMLNodeComboBox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>qMRMLRangeWidget</class>
+   <extends>ctkRangeWidget</extends>
+   <header>qMRMLRangeWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>qMRMLWidget</class>
+   <extends>QWidget</extends>
+   <header>qMRMLWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>qSlicerWidget</class>
+   <extends>QWidget</extends>
+   <header>qSlicerWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>qMRMLColorLegendDisplayNodeWidget</class>
+   <extends>qMRMLWidget</extends>
+   <header>qMRMLColorLegendDisplayNodeWidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>

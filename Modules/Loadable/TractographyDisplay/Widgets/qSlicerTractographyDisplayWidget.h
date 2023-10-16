@@ -77,6 +77,9 @@ public slots:
   void setSpecularPower(double);
   void setBackfaceCulling(bool);
 
+  /// Create or get first color legend if group box is expanded
+  void onColorLegendCollapsibleGroupBoxToggled(bool);
+
 protected slots:
   void updateWidgetFromMRML();
 
