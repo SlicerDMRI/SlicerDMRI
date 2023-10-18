@@ -8,6 +8,10 @@ set(${KIT}_INCLUDE_DIRECTORIES
   ${CMAKE_BUILD_DIR}
   ${vtkSlicerTractographyDisplayModuleMRML_SOURCE_DIR}
   ${vtkSlicerTractographyDisplayModuleMRML_BINARY_DIR}
+  ${qSlicerColorsModuleWidgets_INCLUDE_DIRS}
+  ${vtkSlicerColorsModuleMRML_INCLUDE_DIRS}
+  ${vtkSlicerColorsModuleLogic_INCLUDE_DIRS}
+  ${vtkSlicerTractographyDisplayModuleLogic_INCLUDE_DIRS}
   )
 
 set(${KIT}_SRCS
@@ -52,6 +56,9 @@ set(${KIT}_TARGET_LIBRARIES
   vtkSlicerTractographyDisplayModuleLogic
   ${MRML_LIBRARIES}
   vtkSlicerMarkupsModuleMRML
+  qSlicerColorsModuleWidgets
+  vtkSlicerColorsModuleLogic
+  vtkSlicerColorsModuleMRML
   )
 
 #-----------------------------------------------------------------------------

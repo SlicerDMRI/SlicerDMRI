@@ -1,4 +1,11 @@
 // QT includes
+#include <QDebug>
+
+// SlicerQt includes
+#include <qSlicerCoreApplication.h>
+#include <qSlicerModuleManager.h>
+#include <qSlicerAbstractCoreModule.h>
+#include <qSlicerApplication.h>
 
 // qMRML includes
 #include "qSlicerTractographyDisplayWidget.h"
@@ -14,6 +21,13 @@
 #include <vtkMRMLFiberBundleDisplayNode.h>
 #include <vtkMRMLFiberBundleLineDisplayNode.h>
 #include <vtkMRMLDiffusionTensorDisplayPropertiesNode.h>
+
+// Logic includes
+#include <vtkSlicerFiberBundleLogic.h>
+
+// Colors MRML and Logic includes
+#include <vtkSlicerColorLogic.h>
+#include <vtkMRMLColorLegendDisplayNode.h>
 
 // VTK includes
 
@@ -112,6 +126,9 @@ void qSlicerTractographyDisplayWidgetPrivate::init()
                   q, SLOT(setWindowLevel(double, double)));
   QObject::connect(this->FiberBundleColorRangeWidget, SIGNAL(rangeChanged(double, double)),
                   q, SLOT(setWindowLevelLimits(double, double)));
+
+  QObject::connect(this->ColorLegendCollapsibleGroupBox, SIGNAL(toggled(bool)),
+                  q, SLOT(onColorLegendCollapsibleGroupBoxToggled(bool)));
 }
 
 //------------------------------------------------------------------------------
@@ -804,5 +821,56 @@ void qSlicerTractographyDisplayWidget::updateWidgetFromMRML()
   d->MaterialPropertyWidget->setSpecularPower(d->FiberBundleDisplayNode->GetPower());
   d->MaterialPropertyWidget->setBackfaceCulling(d->FiberBundleDisplayNode->GetBackfaceCulling());
 
+  // Color legend
+  vtkMRMLColorLegendDisplayNode* colorLegendNode = nullptr;
+  colorLegendNode = vtkSlicerColorLogic::GetColorLegendDisplayNode(d->FiberBundleDisplayNode);
+  d->ColorLegendDisplayNodeWidget->setMRMLColorLegendDisplayNode(colorLegendNode);
+
+  if (!colorLegendNode)
+    {
+    d->ColorLegendCollapsibleGroupBox->setCollapsed(true);
+    }
+  d->ColorLegendCollapsibleGroupBox->setEnabled(d->FiberBundleDisplayNode && d->FiberBundleDisplayNode->GetColorNode());
+
   this->m_updating = 0;
+}
+
+//------------------------------------------------------------------------------
+void qSlicerTractographyDisplayWidget::onColorLegendCollapsibleGroupBoxToggled(bool toggled)
+{
+  Q_D(qSlicerTractographyDisplayWidget);
+
+  // Make sure a legend display node exists if the color legend section is opened
+  if (!toggled)
+    {
+    return;
+    }
+
+  vtkMRMLFiberBundleDisplayNode* displayNode = this->FiberBundleDisplayNode();
+  vtkMRMLColorLegendDisplayNode* colorLegendNode = vtkSlicerColorLogic::GetColorLegendDisplayNode(displayNode);
+  if (!colorLegendNode)
+    {
+    // color legend node does not exist, we need to create it now
+
+    vtkSlicerFiberBundleLogic* tractographyDisplayModuleLogic = vtkSlicerFiberBundleLogic::SafeDownCast(qSlicerApplication::application()->moduleLogic("TractographyDisplay"));
+    if (!tractographyDisplayModuleLogic)
+      {
+      qCritical() << Q_FUNC_INFO << " failed: \"TractographyDisplay\" module logic is not available";
+      return;
+      }
+
+    // Pause render to prevent the new Color legend displayed for a moment before it is hidden.
+    vtkMRMLApplicationLogic* mrmlAppLogic = tractographyDisplayModuleLogic->GetMRMLApplicationLogic();
+    if (mrmlAppLogic)
+      {
+      mrmlAppLogic->PauseRender();
+      }
+    colorLegendNode = vtkSlicerColorLogic::AddDefaultColorLegendDisplayNode(displayNode);
+    colorLegendNode->SetVisibility(false); // just because the groupbox is opened, don't show color legend yet
+    if (mrmlAppLogic)
+      {
+      mrmlAppLogic->ResumeRender();
+      }
+    }
+  d->ColorLegendDisplayNodeWidget->setMRMLColorLegendDisplayNode(colorLegendNode);
 }
