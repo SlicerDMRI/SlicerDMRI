@@ -5,7 +5,7 @@ set(EXTENSION_NAME SlicerDMRI)
 
 #-----------------------------------------------------------------------------
 # Extension meta-information
-set(EXTENSION_HOMEPAGE "http://slicerdmri.github.io")
+set(EXTENSION_HOMEPAGE "https://dmri.slicer.org/")
 set(EXTENSION_CATEGORY "Diffusion")
 set(EXTENSION_CONTRIBUTORS "Isaiah Norton, Lauren O'Donnell (Brigham & Women's Hospital)")
 set(EXTENSION_DESCRIPTION "SlicerDMRI is an umbrella extension for Slicer Diffusion MRI functionality.")
