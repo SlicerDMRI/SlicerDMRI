@@ -29,7 +29,7 @@ Version:   $Revision: 1.3 $
 #include <vtkAlgorithmOutput.h>
 #include <vtkCommand.h>
 #include <vtkExtractPolyDataGeometry.h>
-#include <vtkExtractSelectedPolyDataIds.h>
+#include <vtkExtractSelection.h>
 #include <vtkIdTypeArray.h>
 #include <vtkInformation.h>
 #include <vtkNew.h>
@@ -104,7 +104,7 @@ vtkMRMLFiberBundleNode::vtkMRMLFiberBundleNode() :
   MarkupsNode(NULL),
   MarkupsNodeID(NULL),
   ExtractFromROI(vtkExtractPolyDataGeometry::New()),
-  ExtractSubsample(vtkExtractSelectedPolyDataIds::New()),
+  ExtractSubsample(vtkExtractSelection::New()),
   Planes(vtkPlanes::New()),
   LocalPassThrough(vtkPassThrough::New())
 {
