@@ -1021,7 +1021,7 @@ int main( int argc, char * argv[] )
       {
       vtkNew<vtkPolyDataReader> reader;
       std::string fileName = fileNamesVTK->GetValue(i);
-      reader->SetFileName(fileNamesVTK->GetValue(i));
+      reader->SetFileName(fileNamesVTK->GetValue(i).c_str());
       reader->Update();
 
       vtkSmartPointer<vtkPolyData> data = reader->GetOutput();
