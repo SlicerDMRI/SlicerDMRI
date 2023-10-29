@@ -29,7 +29,7 @@
 #include "vtkSlicerTractographyDisplayModuleMRMLExport.h"
 
 class vtkMRMLFiberBundleDisplayNode;
-class vtkExtractSelectedPolyDataIds;
+class vtkExtractSelection;
 class vtkMRMLMarkupsNode;
 class vtkIdTypeArray;
 class vtkExtractPolyDataGeometry;
@@ -219,7 +219,7 @@ protected:
 
 private:
   // Pipeline filter objects
-  vtkExtractSelectedPolyDataIds* ExtractSubsample;
+  vtkExtractSelection* ExtractSubsample;
   vtkPlanes *Planes;
   vtkPassThrough* LocalPassThrough;
 

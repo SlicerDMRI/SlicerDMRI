@@ -182,7 +182,7 @@ class FiberBundleToLabelMapLogic(object):
     selectionNode.SetFieldType(vtk.vtkSelectionNode.CELL)
     selectionNode.SetContentType(vtk.vtkSelectionNode.INDICES)
 
-    extractor = vtk.vtkExtractSelectedPolyDataIds()
+    extractor = vtk.vtkExtractSelection()
     extractor.SetInputData(0, polyData)
 
     resampler = vtk.vtkPolyDataPointSampler()
