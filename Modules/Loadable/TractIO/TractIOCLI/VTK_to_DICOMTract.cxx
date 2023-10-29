@@ -460,7 +460,7 @@ int add_tracts(SP<TrcTractographyResults> dcmtract,
   algorithmId.setAlgorithmSource("");
 
   char buf_label[100];
-  sprintf(buf_label, "%s", info.label.c_str());
+  snprintf(buf_label, sizeof(buf_label), "%s", info.label.c_str());
 
   TrcTrackSet *trackset = NULL;
   result = dcmtract->addTrackSet(
