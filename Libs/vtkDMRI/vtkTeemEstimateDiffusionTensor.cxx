@@ -501,7 +501,7 @@ int vtkTeemEstimateDiffusionTensor::SetGradientsToContext(tenEstimateContext *te
   double *data = (double *) this->RescaledDiffusionGradients->GetVoidPointer(0);
   if(nrrdWrap_nva(ngrad ,data,type,2,size)) {
     biffAdd(NRRD, err);
-    snprintf(err, sizeof(err), "%s:",this->GetClassName());
+    snprintf(err, sizeof(*err), "%s:",this->GetClassName());
     return 1;
   }
 
@@ -509,7 +509,7 @@ int vtkTeemEstimateDiffusionTensor::SetGradientsToContext(tenEstimateContext *te
 
   if (tenBMatrixCalc(nbmat,ngrad) ) {
     biffAdd(NRRD, err);
-    snprintf(err, sizeof(err), "%s:",this->GetClassName());
+    snprintf(err, sizeof(*err), "%s:",this->GetClassName());
     return 1;
   }
 
