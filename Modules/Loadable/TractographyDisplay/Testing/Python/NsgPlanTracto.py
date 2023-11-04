@@ -129,7 +129,7 @@ class NeurosurgicalPlanningTutorialTractographySelfTestWidget(object):
     logic = NeurosurgicalPlanningTutorialTractographySelfTestLogic()
     enableScreenshotsFlag = self.enableScreenshotsFlagCheckBox.checked
     screenshotScaleFactor = int(self.screenshotScaleFactorSliderWidget.value)
-    print("Run the logic method, enable screen shots = %s" % enableScreenshotsFlag)
+    print(f"Run the logic method, enable screen shots = {enableScreenshotsFlag}")
     logic.run(enableScreenshotsFlag,screenshotScaleFactor)
 
   def onReload(self,moduleName="NeurosurgicalPlanningTutorialTractographySelfTest"):
@@ -141,7 +141,7 @@ class NeurosurgicalPlanningTutorialTractographySelfTestWidget(object):
   def onReloadAndTest(self,moduleName="NeurosurgicalPlanningTutorialTractographySelfTest"):
     try:
       self.onReload()
-      evalString = 'globals()["%s"].%sTest()' % (moduleName, moduleName)
+      evalString = f'globals()["{moduleName}"].{moduleName}Test()'
       tester = eval(evalString)
       tester.runTest()
     except Exception as e:
@@ -161,7 +161,7 @@ class NeurosurgicalPlanningTutorialTractographySelfTestLogic(object):
     pass
 
   def delayDisplay(self,message,msec=1000):
-    print(message)
+    print(f"{message}")
     self.info = qt.QDialog()
     self.infoLayout = qt.QVBoxLayout()
     self.info.setLayout(self.infoLayout)
@@ -406,7 +406,7 @@ class NeurosurgicalPlanningTutorialTractographySelfTestTest(unittest.TestCase):
     shows the user/developer/tester the state of the test
     so that we'll know when it breaks.
     """
-    print(message)
+    print(f"{message}")
     self.info = qt.QDialog()
     self.infoLayout = qt.QVBoxLayout()
     self.info.setLayout(self.infoLayout)

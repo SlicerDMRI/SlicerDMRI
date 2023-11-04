@@ -102,7 +102,7 @@ class fiber_visibility_crash2438Widget(object):
 
   def onReloadAndTest(self,moduleName="fiber_visibility_crash2438"):
     self.onReload()
-    evalString = 'globals()["%s"].%sTest()' % (moduleName, moduleName)
+    evalString = f'globals()["{moduleName}"].{moduleName}Test()'
     tester = eval(evalString)
     tester.runTest()
 
@@ -147,7 +147,7 @@ class fiber_visibility_crash2438Test(unittest.TestCase):
     shows the user/developer/tester the state of the test
     so that we'll know when it breaks.
     """
-    print(message)
+    print(f"{message}")
     self.info = qt.QDialog()
     self.infoLayout = qt.QVBoxLayout()
     self.info.setLayout(self.infoLayout)

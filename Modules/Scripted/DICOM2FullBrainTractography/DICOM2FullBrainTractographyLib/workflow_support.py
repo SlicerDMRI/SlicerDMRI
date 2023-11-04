@@ -201,10 +201,10 @@ def create_volume_node(volume_type, attach_display_node = False, dimensions=None
     Creates a volume node and inserts it into the MRML tree
     """
     if volume_type not in __VOLUME_TYPES__:
-        raise ValueError('Volume type %s is not valid' % volume_type )
+        raise ValueError(f'Volume type {volume_type} is not valid')
 
-    volume_node = eval('slicer.vtkMRML%sVolumeNode()' % volume_type)
-    volume_node.SetName(slicer.mrmlScene.GetUniqueNameByString('%s%s' % (prefix, volume_type)))
+    volume_node = eval(f'slicer.vtkMRML{volume_type}VolumeNode()')
+    volume_node.SetName(slicer.mrmlScene.GetUniqueNameByString(f'{prefix}{volume_type}'))
 
     if dimensions:
         image_data = vtk.vtkImageData()
@@ -216,7 +216,7 @@ def create_volume_node(volume_type, attach_display_node = False, dimensions=None
     slicer.mrmlScene.AddNode(volume_node)
 
     if attach_display_node:
-        display_node = eval('slicer.vtkMRML%sVolumeDisplayNode()' % volume_type)
+        display_node = eval(f'slicer.vtkMRML{volume_type}VolumeDisplayNode()')
         slicer.mrmlScene.AddNode(display_node)
         volume_node.AddAndObserveDisplayNodeID( display_node.GetID() )
 
@@ -233,9 +233,8 @@ for volume_type in __VOLUME_TYPES__:
 
     setattr(this_module, function_name,
             eval(
-                'lambda attach_display_node=False, dimensions=None, prefix="":\
-                create_volume_node( "%s", attach_display_node=attach_display_node, dimensions=dimensions, prefix=prefix)' %\
-                volume_type)
+                f'lambda attach_display_node=False, dimensions=None, prefix="":\
+                create_volume_node( "{volume_type}", attach_display_node=attach_display_node, dimensions=dimensions, prefix=prefix)'
                )
 
     this_module.__all__.append(function_name)

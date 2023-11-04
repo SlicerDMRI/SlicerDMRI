@@ -147,7 +147,7 @@ class TractographyDownsampleWidget(ScriptedLoadableModuleWidget):
     # check box to trigger taking screen shots for later use in tutorials
     #
     self.enableScreenshotsFlagCheckBox = qt.QCheckBox()
-    print(defaults)
+    print(f"{defaults}")
     self.enableScreenshotsFlagCheckBox.checked = defaults['enableScreenshots']
     self.enableScreenshotsFlagCheckBox.setToolTip("If checked, take screen shots for tutorials. Use Save Data to write them to disk.")
     parametersFormLayout.addRow("Enable Screenshots", self.enableScreenshotsFlagCheckBox)
@@ -648,7 +648,7 @@ class TractographyDownsampleTest(ScriptedLoadableModuleTest):
         uris=uris,
         loadFileTypes=loadFileTypes
         )
-      self.delayDisplay('Finished with download and loading of %s' % str(fileNames))
+      self.delayDisplay(f'Finished with download and loading of {fileNames}')
 
     fiberBundleNode = slicer.util.getNode(pattern="fiber_ply_export_test")
     logic = TractographyDownsampleLogic()
@@ -670,8 +670,8 @@ class TractographyDownsampleTest(ScriptedLoadableModuleTest):
     l2 = outpd.GetNumberOfLines()
     p1 = pd.GetNumberOfPoints()
     p2 = outpd.GetNumberOfPoints()
-    logging.info('Input/Output number of lines %d / %d' % (l1,l2))
-    logging.info('Input/Output number of points %d / %d' % (p1,p2))
+    logging.info(f'Input/Output numbers of lines {l1} / {l2}')
+    logging.info(f'Input/Output numbers of points {p1} / {p2}')
     if l1 == l2:
       logging.info('TEST 1 synthetic data passed, number of lines is equal')
     else:
@@ -684,8 +684,8 @@ class TractographyDownsampleTest(ScriptedLoadableModuleTest):
     l2 = outpd.GetNumberOfLines()
     p1 = pd.GetNumberOfPoints()
     p2 = outpd.GetNumberOfPoints()
-    logging.info('Input/Output number of lines %d / %d' % (l1,l2))
-    logging.info('Input/Output number of points %d / %d' % (p1,p2))
+    logging.info(f'Input/Output numbers of lines {l1} / {l2}')
+    logging.info(f'Input/Output numbers of points {p1} / {p2}')
     if p1 > p2:
       logging.info('TEST2 synthetic data passed, number of points is reduced')
     else:

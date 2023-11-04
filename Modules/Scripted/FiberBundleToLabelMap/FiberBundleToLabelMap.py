@@ -258,7 +258,7 @@ class FiberBundleToLabelMapTest(unittest.TestCase):
     shows the user/developer/tester the state of the test
     so that we'll know when it breaks.
     """
-    print(message)
+    print(f"{message}")
     self.info = qt.QDialog()
     self.infoLayout = qt.QVBoxLayout()
     self.info.setLayout(self.infoLayout)
@@ -309,7 +309,7 @@ class FiberBundleToLabelMapTest(unittest.TestCase):
         uris=uris,
         loadFileTypes=loadFileTypes
         )
-      self.delayDisplay('Finished with download and loading of %s' % str(fileNames))
+      self.delayDisplay(f'Finished with download and loading of {fileNames}')
 
     volumeNode = slicer.util.getNode(pattern="FA")
     fiberNode = slicer.util.getNode(pattern="tract1")

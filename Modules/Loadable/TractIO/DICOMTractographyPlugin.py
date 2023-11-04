@@ -74,7 +74,7 @@ class DICOMTractographyPluginClass(DICOMPlugin):
       loadable.files = files
       loadable.name = name + ' - as DWI Volume'
       loadable.selected = False
-      loadable.tooltip = "Appears to be DWI from vendor %s" % vendorName
+      loadable.tooltip = f"Appears to be DWI from vendor {vendorName}"
       loadable.confidence = 0.75
       loadables = [loadable]
     return loadables
