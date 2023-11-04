@@ -670,8 +670,8 @@ class TractographyDownsampleTest(ScriptedLoadableModuleTest):
     l2 = outpd.GetNumberOfLines()
     p1 = pd.GetNumberOfPoints()
     p2 = outpd.GetNumberOfPoints()
-    logging.info('Input/Output numbers of lines %d / %d' % (l1,l2))
-    logging.info('Input/Output numbers of points %d / %d' % (p1,p2))
+    logging.info('Input/Output number of lines %d / %d' % (l1,l2))
+    logging.info('Input/Output number of points %d / %d' % (p1,p2))
     if l1 == l2:
       logging.info('TEST 1 synthetic data passed, number of lines is equal')
     else:
@@ -684,8 +684,8 @@ class TractographyDownsampleTest(ScriptedLoadableModuleTest):
     l2 = outpd.GetNumberOfLines()
     p1 = pd.GetNumberOfPoints()
     p2 = outpd.GetNumberOfPoints()
-    logging.info('Input/Output numbers of lines %d / %d' % (l1,l2))
-    logging.info('Input/Output numbers of points %d / %d' % (p1,p2))
+    logging.info('Input/Output number of lines %d / %d' % (l1,l2))
+    logging.info('Input/Output number of points %d / %d' % (p1,p2))
     if p1 > p2:
       logging.info('TEST2 synthetic data passed, number of points is reduced')
     else:
