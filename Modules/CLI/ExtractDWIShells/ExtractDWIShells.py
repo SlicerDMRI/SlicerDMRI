@@ -5,9 +5,8 @@ from __future__ import division
 import sys
 import argparse
 
-import slicer, slicer.util, mrml
+import vtk, slicer, slicer.util, mrml
 import numpy as np
-import vtk
 from vtk.util import numpy_support
 
 if sys.version_info[0] == 2:
