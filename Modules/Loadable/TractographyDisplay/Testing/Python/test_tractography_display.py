@@ -146,7 +146,7 @@ class test_tractography_displayTest(unittest.TestCase):
     SampleData.downloadFromURL(
       nodeNames='tract1',
       fileNames='tract1.vtk',
-      uris='http://slicer.kitware.com/midas3/download?items=5768',
+      uris='https://github.com/Slicer/slicer.kitware.com-midas3-archive/releases/download/SHA256/06d5b5777915857fbac7b3cbd9c371523d1371f29b0c89eb7a33d86d780d5b2b',
       loadFileTypes='FiberBundleFile')
     self.delayDisplay('Finished with download and loading\n')
 

@@ -68,8 +68,9 @@ execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Pyt
     #
     if self.useCase == 'small':
       downloads = (
-          ('FA', 'FA.nrrd', 'http://slicer.kitware.com/midas3/download?items=5767', 'VolumeFile'),
-          ('tract1', 'tract1.vtk', 'http://slicer.kitware.com/midas3/download?items=5768', 'FiberBundleFile'),
+           # Setting here the correct links not seem to solve all issues
+          ('FA', 'FA.nrrd', 'https://github.com/Slicer/SlicerTestingData/releases/download/SHA256/12d17fba4f2e1f1a843f0757366f28c3f3e1a8bb38836f0de2a32bb1cd476560', 'VolumeFile'),
+          ('tract1', 'tract1.vtk', 'https://github.com/Slicer/slicer.kitware.com-midas3-archive/releases/download/SHA256/06d5b5777915857fbac7b3cbd9c371523d1371f29b0c89eb7a33d86d780d5b2b', 'FiberBundleFile'),
           )
       tracts = ('tract1',)
       tractColors = ( (0.2, 0.9, 0.3), )
@@ -78,13 +79,13 @@ execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Pyt
           (
             (None, 'DTIVolume'),
             ('DTIVolume.raw.gz', 'DTIVolume.nhdr'),
-            ('http://slicer.kitware.com/midas3/download?items=5766', 'http://slicer.kitware.com/midas3/download?items=5765'),
+            ('https://github.com/Slicer/slicer.kitware.com-midas3-archive/releases/download/SHA256/7bc095de85275609135617bf0026f124d8f7680d0fb8b4aa70c0c9e2565f4b94', 'https://github.com/Slicer/slicer.kitware.com-midas3-archive/releases/download/SHA256/2116f09b145a66c4f36157bea4928dc9c0078374d0e8a902d99ca9ef159bb1e9'),
             'VolumeFile'
           ),
-          ('FA', 'FA.nrrd', 'http://slicer.kitware.com/midas3/download?items=5767', 'VolumeFile'),
-          ('tract1', 'tract1.vtk', 'http://slicer.kitware.com/midas3/download?items=5768', 'FiberBundleFile'),
-          ('tract2', 'tract2.vtk', 'http://slicer.kitware.com/midas3/download?items=5769', 'FiberBundleFile'),
-          ('tract3', 'tract3.vtk', 'http://slicer.kitware.com/midas3/download?items=5770', 'FiberBundleFile'),
+          ('FA', 'FA.nrrd', 'https://github.com/Slicer/SlicerTestingData/releases/download/SHA256/12d17fba4f2e1f1a843f0757366f28c3f3e1a8bb38836f0de2a32bb1cd476560', 'VolumeFile'),
+          ('tract1', 'tract1.vtk', 'https://github.com/Slicer/slicer.kitware.com-midas3-archive/releases/download/SHA256/06d5b5777915857fbac7b3cbd9c371523d1371f29b0c89eb7a33d86d780d5b2b', 'FiberBundleFile'),
+          ('tract2', 'tract2.vtk', 'https://github.com/Slicer/slicer.kitware.com-midas3-archive/releases/download/SHA256/93c4a33fc2b6da2bdbd881e981042400253c25da133024126ca577467a2e9206', 'FiberBundleFile'),
+          ('tract3', 'tract3.vtk', 'https://github.com/Slicer/slicer.kitware.com-midas3-archive/releases/download/SHA256/cf2690b249d7d866de5fbace353e6e00c6705f40f2cbcb1f188781d64d4f8dc0', 'FiberBundleFile'),
           )
       tracts = ('tract1', 'tract2', 'tract3',)
       tractColors = ( (0.2, 0.9, 0.3), (0.9, 0.3, 0.3), (0.2, 0.4, 0.9) )
