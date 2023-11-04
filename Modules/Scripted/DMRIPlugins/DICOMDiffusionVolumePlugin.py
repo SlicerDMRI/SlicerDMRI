@@ -1,4 +1,3 @@
-from __future__ import print_function
 import os
 import vtk, qt, ctk, slicer
 from DICOMLib import DICOMPlugin
