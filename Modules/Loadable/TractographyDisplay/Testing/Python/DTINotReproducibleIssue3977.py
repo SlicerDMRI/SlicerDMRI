@@ -76,7 +76,7 @@ class DTINotReproducibleIssue3977Logic(ScriptedLoadableModuleLogic):
 
     # Compute the DTI output volume using the "DWI to DTI estimation" CLI module
     module = slicer.modules.dwitodtiestimation
-    self.delayDisplay(module.title)
+    slicer.util.delayDisplay(module.title)
     logging.info('"%s" started' % module.title)
     cliParams = {
       'inputVolume': inputVolume.GetID(),
@@ -91,7 +91,7 @@ class DTINotReproducibleIssue3977Logic(ScriptedLoadableModuleLogic):
 
     # Compute FA output volume using "Diffusion Tensor Scalar Measurements" CLI module
     module = slicer.modules.diffusiontensorscalarmeasurements
-    self.delayDisplay(module.title)
+    slicer.util.delayDisplay(module.title)
     logging.info('"%s" started' % module.title)
     cliParams = {
       'inputVolume': dtiVolume.GetID(),
@@ -141,7 +141,9 @@ class DTINotReproducibleIssue3977Test(ScriptedLoadableModuleTest):
     SampleData.downloadFromURL(
       nodeNames=(None, 'dwi'),
       fileNames=('dwi.raw.gz', 'dwi.nhdr'),
-      uris=('http://slicer.kitware.com/midas3/download/item/10304', 'http://slicer.kitware.com/midas3/download/item/10303'))
+      uris=(
+        'https://github.com/Slicer/SlicerTestingData/releases/download/SHA256/cf03fd53583dc05120d3314d0a82bdf5946799b1f72f2a7f08963f3fd24ca692',
+        'https://github.com/Slicer/SlicerTestingData/releases/download/SHA256/7666d83bc205382e418444ea60ab7df6dba6a0bd684933df8809da6b476b0fed'))
     self.delayDisplay('Finished with download and loading')
 
     volumeNode = slicer.util.getNode(pattern="dwi")
