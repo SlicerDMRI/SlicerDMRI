@@ -280,7 +280,7 @@ void qSlicerTractographyDisplayWidget::setActiveTensorName(const QString& arrayN
     {
     return;
     }
-  d->FiberBundleDisplayNode->SetActiveTensorName(arrayName.toLatin1());
+  d->FiberBundleDisplayNode->SetActiveTensorName(arrayName.toStdString().c_str());
 }
 
 //------------------------------------------------------------------------------
@@ -386,7 +386,7 @@ void qSlicerTractographyDisplayWidget::onColorByScalarChanged(int scalarIndex)
     }
 
   QString activeScalarName = d->ColorByScalarComboBox->itemText(scalarIndex);
-  d->FiberBundleDisplayNode->SetActiveScalarName(activeScalarName.toLatin1());
+  d->FiberBundleDisplayNode->SetActiveScalarName(activeScalarName.toStdString().c_str());
 }
 
 //------------------------------------------------------------------------------
