@@ -74,6 +74,10 @@ int vtkPolyDataColorLinesByOrientation::RequestData(
 
   vtkDebugMacro(<< "Executing color cells by mean orientation");
 
+  if (!input)
+    {
+    return 0;
+    }
   points = input->GetPoints();
   pd = input->GetPointData();
   cd = input->GetCellData();

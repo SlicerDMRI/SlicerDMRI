@@ -36,6 +36,7 @@ class vtkExtractPolyDataGeometry;
 class vtkPlanes;
 class vtMRMLModelDisplayNode;
 class vtkPassThrough;
+class vtkGeometryFilter;
 
 class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleNode : public vtkMRMLModelNode
 {
@@ -219,7 +220,8 @@ protected:
 
 private:
   // Pipeline filter objects
-  vtkExtractSelection* ExtractSubsample;
+  vtkExtractSelection* ExtractSubsampleUG;
+  vtkGeometryFilter* ExtractSubsample;
   vtkPlanes *Planes;
   vtkPassThrough* LocalPassThrough;
 

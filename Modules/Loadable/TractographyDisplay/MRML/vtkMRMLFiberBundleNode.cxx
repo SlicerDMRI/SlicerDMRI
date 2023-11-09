@@ -18,6 +18,7 @@ Version:   $Revision: 1.3 $
 #include "vtkMRMLFiberBundleNode.h"
 #include "vtkMRMLFiberBundleStorageNode.h"
 #include "vtkMRMLFiberBundleTubeDisplayNode.h"
+#include "vtkGeometryFilter.h"
 
 // MRML includes
 #include <vtkMRMLDiffusionTensorDisplayPropertiesNode.h>
@@ -77,6 +78,7 @@ vtkMRMLFiberBundleNode::~vtkMRMLFiberBundleNode()
 {
   this->SetAndObserveMarkupsNodeID(NULL);
 
+  this->ExtractSubsampleUG->Delete();
   this->ExtractSubsample->Delete();
   this->ExtractFromROI->Delete();
   this->Planes->Delete();
@@ -104,7 +106,8 @@ vtkMRMLFiberBundleNode::vtkMRMLFiberBundleNode() :
   MarkupsNode(NULL),
   MarkupsNodeID(NULL),
   ExtractFromROI(vtkExtractPolyDataGeometry::New()),
-  ExtractSubsample(vtkExtractSelection::New()),
+  ExtractSubsampleUG(vtkExtractSelection::New()),
+  ExtractSubsample(vtkGeometryFilter::New()),
   Planes(vtkPlanes::New()),
   LocalPassThrough(vtkPassThrough::New())
 {
@@ -128,7 +131,9 @@ vtkMRMLFiberBundleNode::vtkMRMLFiberBundleNode() :
     node->SetSelectionList(arr.GetPointer());
 
   sel->AddNode(node.GetPointer());
-  this->ExtractSubsample->SetInputData(1, sel.GetPointer());
+  this->ExtractSubsampleUG->SetInputData(1, sel.GetPointer());
+
+  this->ExtractSubsample->SetInputConnection(this->ExtractSubsampleUG->GetOutputPort());
 
   // set up pipeline
   this->ExtractFromROI->SetInputConnection(
