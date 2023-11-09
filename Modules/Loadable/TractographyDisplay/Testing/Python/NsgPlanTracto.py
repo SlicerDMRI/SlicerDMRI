@@ -386,7 +386,7 @@ class NeurosurgicalPlanningTutorialTractographySelfTestLogic(object):
     for y in range(-20, 100, 5):
       msg = "Moving the fiducial to y = " + str(y)
       self.delayDisplay(msg,250)
-      fidNode.SetNthFiducialPosition(0, r, y, s)
+      fidNode.SetNthControlPointPosition(0, r, y, s)
 
     self.takeScreenshot('NeurosurgicalPlanning-TIS-Moved','Moved fiducial and did Tractography Interactive Seeding',-1)
     
