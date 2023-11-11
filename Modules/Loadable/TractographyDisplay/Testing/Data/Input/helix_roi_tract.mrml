@@ -4,9 +4,9 @@
 <Interaction
  id="vtkMRMLInteractionNode1" name="vtkMRMLInteractionNode1" hideFromEditors="true" selectable="true"  currentInteractionMode="ViewTransform" lastInteractionMode="ViewTransform"></Interaction>
 <View
- id="vtkMRMLViewNode1" name="vtkMRMLViewNode1" hideFromEditors="true" selectable="true"  active="false" fieldOfView="200" letterSize="0.05" boxVisible="true" fiducialsVisible="true" fiducialLabelsVisible="true" axisLabelsVisible="true" backgroundColor="0.70196 0.70196 0.90588" animationMode="Off" viewAxisMode="LookFrom" spinDegrees="2" spinMs="5" spinDirection="YawLeft" rotateDegrees="5" rockLength="200" rockCount="0" stereoType="NoStereo" renderMode="Perspective"></View>
+ id="vtkMRMLViewNode1" name="vtkMRMLViewNode1" hideFromEditors="true" selectable="true" singletonTag="1" attributes="MappedInLayout:1" layoutName="1" layoutLabel="1" active="false" fieldOfView="200" letterSize="0.05" boxVisible="true" fiducialsVisible="true" fiducialLabelsVisible="true" axisLabelsVisible="true" backgroundColor="0.70196 0.70196 0.90588" animationMode="Off" viewAxisMode="LookFrom" spinDegrees="2" spinMs="5" spinDirection="YawLeft" rotateDegrees="5" rockLength="200" rockCount="0" stereoType="NoStereo" renderMode="Perspective"></View>
 <Camera
- id="vtkMRMLCameraNode1" name="vtkMRMLCameraNode1" hideFromEditors="true" selectable="true"  position="15.0675 489.199 102.258" focalPoint="0 0 0" viewUp="0.441524 -0.196596 0.875447" parallelProjection="false" parallelScale="1" active="false"></Camera>
+ id="vtkMRMLCameraNode1" name="vtkMRMLCameraNode1" hideFromEditors="true" selectable="true"  position="15.0675 489.199 102.258" focalPoint="0 0 0" viewUp="0.441524 -0.196596 0.875447" parallelProjection="false" parallelScale="1"></Camera>
 <Slice
  id="vtkMRMLSliceNode1" name="vtkMRMLSliceNode1" hideFromEditors="true" selectable="true"  fieldOfView="211.101 193.75 12.5" dimensions="292 268 1" layoutGridRows="1" layoutGridColumns="1" sliceToRAS="-1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" layoutName="Red" orientation="Axial" sliceVisibility="true"></Slice>
 <SliceComposite
