@@ -28,40 +28,6 @@ class Workflow(object):
 
         self.steps = []
 
-        def onEntryCallback(actual_step, comingFrom, transitionType):
-            data = self.extract_data()
-
-            method_name = 'on_entry_'+actual_step.id()
-            if hasattr(self.workflow_configuration, method_name):
-                on_entry = getattr(self.workflow_configuration, method_name)
-                on_entry(actual_step, comingFrom, transitionType, data)
-                self.update_data(data)
-
-        def onExitCallback(actual_step, comingFrom, transitionType):
-            data = self.extract_data()
-
-            method_name = 'on_exit_'+actual_step.id()
-            if hasattr(self.workflow_configuration, method_name):
-                on_exit = getattr(self.workflow_configuration, method_name)
-                on_exit(actual_step, comingFrom, transitionType, data)
-                self.update_data(data)
-
-        def validateCallback(actual_step, desiredBranchId):
-            data = self.extract_data()
-
-            method_name = 'validate_'+actual_step.id()
-            if hasattr(self.workflow_configuration, method_name):
-                validate = getattr(self.workflow_configuration, method_name)
-                return validate(actual_step, data)
-            else:
-                return True
-
-        self.callbacks = {
-                'onEntryCallback': onEntryCallback,
-                'onExitCallback': onExitCallback,
-                'validateCallback': validateCallback
-        }
-
         for step_widget_file in self.workflow_configuration.step_widget_files:
             path = os.path.join(
                  os.path.dirname(__file__), 'Resources', 'UI',
@@ -80,9 +46,9 @@ class Workflow(object):
                 self.workflow_configuration.post_widget_init(step_widget_file, widget)
 
             step = GeneralizedStep(step_widget_file, widget,
-                                   onEntryCallback=onEntryCallback,
-                                   onExitCallback=onExitCallback,
-                                   validateCallback=validateCallback)
+                                   onEntryCallback=self.onEntryCallback,
+                                   onExitCallback=self.onExitCallback,
+                                   validateCallback=self.validateCallback)
 
             self.steps.append((step_widget_file, step))
 
@@ -97,6 +63,35 @@ class Workflow(object):
             self.workflow.addTransition(self.steps[i][1], self.steps[i + 1][1])
 
         self.workflow.start()
+
+
+    def onEntryCallback(self, actual_step, comingFrom, transitionType):
+        data = self.extract_data()
+
+        method_name = 'on_entry_'+actual_step.id()
+        if hasattr(self.workflow_configuration, method_name):
+            on_entry = getattr(self.workflow_configuration, method_name)
+            on_entry(actual_step, comingFrom, transitionType, data)
+            self.update_data(data)
+
+    def onExitCallback(self, actual_step, comingFrom, transitionType):
+        data = self.extract_data()
+
+        method_name = 'on_exit_'+actual_step.id()
+        if hasattr(self.workflow_configuration, method_name):
+            on_exit = getattr(self.workflow_configuration, method_name)
+            on_exit(actual_step, comingFrom, transitionType, data)
+            self.update_data(data)
+
+    def validateCallback(self, actual_step, desiredBranchId):
+        data = self.extract_data()
+
+        method_name = 'validate_'+actual_step.id()
+        if hasattr(self.workflow_configuration, method_name):
+            validate = getattr(self.workflow_configuration, method_name)
+            return validate(actual_step, data)
+        else:
+            return True
 
     def extract_data(self):
 
