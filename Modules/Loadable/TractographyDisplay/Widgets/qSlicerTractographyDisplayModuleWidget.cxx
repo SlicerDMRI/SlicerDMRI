@@ -18,6 +18,8 @@
 // CTK includes
 //#include <ctkModelTester.h>
 
+#include "vtkCollection.h"
+
 #include "qSlicerTractographyDisplayModuleWidget.h"
 #include "ui_qSlicerTractographyDisplayModuleWidget.h"
 #include "qMRMLSceneTractographyDisplayModel.h"
@@ -194,13 +196,13 @@ void qSlicerTractographyDisplayModuleWidget::setPercentageOfFibersShown(double p
 }
 void qSlicerTractographyDisplayModuleWidget::setSolidTubeColor(bool solid)
 {
-  std::vector<vtkMRMLNode *> nodes;
-  this->mrmlScene()->GetNodesByClass("vtkMRMLFiberBundleTubeDisplayNode", nodes);
+  vtkSmartPointer<vtkCollection> nodes = vtkSmartPointer<vtkCollection>::Take(
+    this->mrmlScene()->GetNodesByClass("vtkMRMLFiberBundleTubeDisplayNode"));
 
   vtkMRMLFiberBundleTubeDisplayNode *node = 0;
-  for (unsigned int i=0; i<nodes.size(); i++)
+  for (int i=0; i<nodes->GetNumberOfItems(); i++)
     {
-    node = vtkMRMLFiberBundleTubeDisplayNode::SafeDownCast(nodes[i]);
+    node = vtkMRMLFiberBundleTubeDisplayNode::SafeDownCast(nodes->GetItemAsObject(i));
     if (solid)
       {
       node->SetColorMode(vtkMRMLFiberBundleDisplayNode::colorModeSolid);
