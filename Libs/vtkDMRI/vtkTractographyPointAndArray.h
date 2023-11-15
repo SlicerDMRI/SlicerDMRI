@@ -27,6 +27,7 @@
 class vtkDMRI_EXPORT vtkTractographyPoint { //;prevent man page generation
 public:
     vtkTractographyPoint(); /// method sets up storage
+    vtkTractographyPoint(const vtkTractographyPoint &) = default;
     vtkTractographyPoint &operator=(const vtkTractographyPoint& hp); //for resizing
 
     double   X[3];    /// position
