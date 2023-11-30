@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,56,172,83"/>
+<area shape="rect" id="node2" href="$classvtkPolyDataColorLinesByOrientation.html" title="Colors the lines in the polydata by their mean orientation." alt="" coords="220,5,480,32"/>
+<area shape="rect" id="node3" href="$classvtkPolyDataTensorToColor.html" title="Calculates scalar values from vtkPolyData tensors." alt="" coords="254,56,446,83"/>
+<area shape="rect" id="node4" href="$classvtkPreciseHyperStreamline.html" title="Generate hyperstreamline in arbitrary dataset." alt="" coords="250,107,450,133"/>
+<area shape="rect" id="node5" href="$classvtkPreciseHyperStreamlinePoints.html" title=" " alt="" coords="528,99,728,141"/>
+</map>

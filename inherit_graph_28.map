@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,85,215,112"/>
+<area shape="rect" id="node2" href="$classvtkImageGetTensorComponents.html" title="Six scalar components from tensor." alt="" coords="263,5,493,32"/>
+<area shape="rect" id="node3" href="$classvtkImageSetTensorComponents.html" title="Six scalar components to tensor." alt="" coords="263,56,493,83"/>
+<area shape="rect" id="node4" href="$classvtkTeemEstimateDiffusionTensor.html" title=" " alt="" coords="281,107,475,149"/>
+<area shape="rect" id="node5" href="$classvtkTensorRotate.html" title="flip Y axis and negate xy and zy terms." alt="" coords="314,173,442,200"/>
+</map>
