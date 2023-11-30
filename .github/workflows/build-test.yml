@@ -85,7 +85,8 @@ jobs:
 
         echo "Slicer_DIR=$Slicer_BUILD_DIR/Slicer-build" >> $GITHUB_OUTPUT
 
-    - name: Build SlicerDMRI
+    - id: slicerdmri-build
+      name: Build SlicerDMRI
       run: |
         Slicer_DIR=${{ steps.slicer-build.outputs.Slicer_DIR }}
 
@@ -103,3 +104,11 @@ jobs:
         cmake \
           --build $EXTENSION_BUILD_DIR \
           --config $BUILD_TYPE
+
+        echo "EXTENSION_BUILD_DIR=$EXTENSION_BUILD_DIR" >> $GITHUB_OUTPUT
+
+    - name: Test SlicerDMRI
+      uses: coactions/setup-xvfb@v1.0.1
+      with:
+        run:
+          ctest -V --test-dir ${{ steps.slicerdmri-build.outputs.EXTENSION_BUILD_DIR }}/inner-build
