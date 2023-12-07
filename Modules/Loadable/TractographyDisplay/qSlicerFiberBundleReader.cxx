@@ -115,7 +115,7 @@ bool qSlicerFiberBundleReader::load(const IOProperties& properties)
       // suffix should be of style: "*.png"
       foreach(const QString& fileName, QDir(fileName).entryList(suffixList))
         {
-        vtkMRMLFiberBundleNode* node = d->FiberBundleLogic->AddFiberBundle(fileName.toLatin1());
+        vtkMRMLFiberBundleNode* node = d->FiberBundleLogic->AddFiberBundle(fileName.toStdString().c_str());
         if (node)
           {
           nodeIDs << node->GetID();
@@ -131,7 +131,7 @@ bool qSlicerFiberBundleReader::load(const IOProperties& properties)
       name = properties["name"].toString();
       }
 
-    vtkMRMLFiberBundleNode* node = d->FiberBundleLogic->AddFiberBundle(fileName.toLatin1(), name.toLatin1());
+    vtkMRMLFiberBundleNode* node = d->FiberBundleLogic->AddFiberBundle(fileName.toStdString().c_str(), name.toStdString().c_str());
     if (node)
       {
       nodeIDs << node->GetID();
