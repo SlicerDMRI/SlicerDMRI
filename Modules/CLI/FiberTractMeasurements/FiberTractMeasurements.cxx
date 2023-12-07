@@ -560,13 +560,11 @@ void printTable(std::ostream &ofs, bool printHeader,
     {
 
     // find if this cluster in any other cluster
-    bool topCluster = true;
     std::map<std::string, std::string>::iterator itClusterNames1;
     for (itClusterNames1 = ClusterNames.begin(); itClusterNames1!= ClusterNames.end(); itClusterNames1++)
       {
       if (isInCluster(it->first, itClusterNames1->first) )
         {
-        topCluster = false;
         break;
         }
       }
