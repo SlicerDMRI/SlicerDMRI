@@ -98,64 +98,66 @@ $(function() {
 <div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html">   28</a></span>&#160;<span class="comment"></span><span class="keyword">class </span>vtkDMRI_EXPORT <a class="code" href="classvtkHyperPoint.html">vtkHyperPoint</a> { <span class="comment">//;prevent man page generation</span></div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <a class="code" href="classvtkHyperPoint.html">vtkHyperPoint</a>(); </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <a class="code" href="classvtkHyperPoint.html">vtkHyperPoint</a> &amp;operator=(<span class="keyword">const</span> <a class="code" href="classvtkHyperPoint.html">vtkHyperPoint</a>&amp; hp); <span class="comment">//for resizing</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordtype">double</span>   X[3];    </div>
-<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html#ad4dc75a3e72f1015f07e6217b2d204cb">   34</a></span>&#160;    vtkIdType     <a class="code" href="classvtkHyperPoint.html#ad4dc75a3e72f1015f07e6217b2d204cb">CellId</a>;  </div>
-<div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html#ab9f07a839282d156dc9f9dcbf8174205">   35</a></span>&#160;    <span class="keywordtype">int</span>     <a class="code" href="classvtkHyperPoint.html#ab9f07a839282d156dc9f9dcbf8174205">SubId</a>; </div>
-<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html#a240e5649bcdc015e274b6a8227540092">   36</a></span>&#160;    <span class="keywordtype">double</span>   P[3];    </div>
-<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html#a1b2fabfa937c9fafe655477925ed44c2">   37</a></span>&#160;    <span class="keywordtype">double</span>   W[3];    </div>
-<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html#a468b8c5725500bd25aad14a4eb3faf8e">   38</a></span>&#160;    <span class="keywordtype">double</span>      *V[3];   </div>
-<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html#a35343e5b4f0274133e9ce53badf2c1e4">   39</a></span>&#160;    <span class="keywordtype">double</span>   V0[3];   </div>
-<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html#a1ce6fe0001c5231d62357572f764aa7a">   40</a></span>&#160;    <span class="keywordtype">double</span>   V1[3];</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">double</span>   V2[3];</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">double</span>   S;       </div>
-<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html#a00a699b8a979e8680136e607384d5e31">   43</a></span>&#160;    <span class="keywordtype">double</span>   <a class="code" href="classvtkHyperPoint.html#a00a699b8a979e8680136e607384d5e31">D</a>;       </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;};</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="classvtkHyperArray.html">   46</a></span>&#160;<span class="keyword">class </span>vtkDMRI_EXPORT <a class="code" href="classvtkHyperArray.html">vtkHyperArray</a> { <span class="comment">//;prevent man page generation</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <a class="code" href="classvtkHyperArray.html">vtkHyperArray</a>();</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  ~<a class="code" href="classvtkHyperArray.html">vtkHyperArray</a>()</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    {</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;      <span class="keywordflow">if</span> (this-&gt;Array)</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="keyword">delete</span> [] this-&gt;Array;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        }</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    };</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  vtkIdType GetNumberOfPoints() {<span class="keywordflow">return</span> this-&gt;MaxId + 1;};</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <a class="code" href="classvtkHyperPoint.html">vtkHyperPoint</a> *GetHyperPoint(vtkIdType i) {<span class="keywordflow">return</span> this-&gt;Array + i;};</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <a class="code" href="classvtkHyperPoint.html">vtkHyperPoint</a> *InsertNextHyperPoint()</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    {</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordflow">if</span> ( ++this-&gt;MaxId &gt;= this-&gt;Size )</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      {</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      this-&gt;Resize(this-&gt;MaxId);</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      }</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keywordflow">return</span> this-&gt;Array + this-&gt;MaxId;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    }</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <a class="code" href="classvtkHyperPoint.html">vtkHyperPoint</a> *Resize(vtkIdType sz); <span class="comment">//reallocates data</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keywordtype">void</span> Reset() {this-&gt;MaxId = -1;};</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <a class="code" href="classvtkHyperPoint.html">vtkHyperPoint</a> *Array;  </div>
-<div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="classvtkHyperArray.html#a3b9303f138ebb8cd2f1c01ff00faea7a">   70</a></span>&#160;  vtkIdType <a class="code" href="classvtkHyperArray.html#a3b9303f138ebb8cd2f1c01ff00faea7a">MaxId</a>;             </div>
-<div class="line"><a name="l00071"></a><span class="lineno"><a class="line" href="classvtkHyperArray.html#a58f7d014bf171f67306e950b734c1d36">   71</a></span>&#160;  vtkIdType <a class="code" href="classvtkHyperArray.html#a58f7d014bf171f67306e950b734c1d36">Size</a>;              </div>
-<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="classvtkHyperArray.html#acc5528092661f4330fdfbcb67a948d59">   72</a></span>&#160;  vtkIdType <a class="code" href="classvtkHyperArray.html#acc5528092661f4330fdfbcb67a948d59">Extend</a>;            </div>
-<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="classvtkHyperArray.html#a72f35cdb704ca6731f52e26c44533743">   73</a></span>&#160;  <span class="keywordtype">double</span> <a class="code" href="classvtkHyperArray.html#a72f35cdb704ca6731f52e26c44533743">Direction</a>;       </div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;};</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">#define VTK_START_FROM_POSITION 0</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">#define VTK_START_FROM_LOCATION 1</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="aclassvtkHyperArray_html"><div class="ttname"><a href="classvtkHyperArray.html">vtkHyperArray</a></div><div class="ttdef"><b>Definition:</b> vtkHyperPointandArray.h:46</div></div>
-<div class="ttc" id="aclassvtkHyperArray_html_a3b9303f138ebb8cd2f1c01ff00faea7a"><div class="ttname"><a href="classvtkHyperArray.html#a3b9303f138ebb8cd2f1c01ff00faea7a">vtkHyperArray::MaxId</a></div><div class="ttdeci">vtkIdType MaxId</div><div class="ttdoc">pointer to data</div><div class="ttdef"><b>Definition:</b> vtkHyperPointandArray.h:70</div></div>
-<div class="ttc" id="aclassvtkHyperArray_html_a58f7d014bf171f67306e950b734c1d36"><div class="ttname"><a href="classvtkHyperArray.html#a58f7d014bf171f67306e950b734c1d36">vtkHyperArray::Size</a></div><div class="ttdeci">vtkIdType Size</div><div class="ttdoc">maximum index inserted thus far</div><div class="ttdef"><b>Definition:</b> vtkHyperPointandArray.h:71</div></div>
-<div class="ttc" id="aclassvtkHyperArray_html_a72f35cdb704ca6731f52e26c44533743"><div class="ttname"><a href="classvtkHyperArray.html#a72f35cdb704ca6731f52e26c44533743">vtkHyperArray::Direction</a></div><div class="ttdeci">double Direction</div><div class="ttdoc">grow array by this amount</div><div class="ttdef"><b>Definition:</b> vtkHyperPointandArray.h:73</div></div>
-<div class="ttc" id="aclassvtkHyperArray_html_acc5528092661f4330fdfbcb67a948d59"><div class="ttname"><a href="classvtkHyperArray.html#acc5528092661f4330fdfbcb67a948d59">vtkHyperArray::Extend</a></div><div class="ttdeci">vtkIdType Extend</div><div class="ttdoc">allocated size of data</div><div class="ttdef"><b>Definition:</b> vtkHyperPointandArray.h:72</div></div>
+<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html#a63d2feef1f4410266dcfa9a9bea6819f">   31</a></span>&#160;    <a class="code" href="classvtkHyperPoint.html#a63d2feef1f4410266dcfa9a9bea6819f">vtkHyperPoint</a>(<span class="keyword">const</span> <a class="code" href="classvtkHyperPoint.html">vtkHyperPoint</a> &amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <a class="code" href="classvtkHyperPoint.html">vtkHyperPoint</a> &amp;operator=(<span class="keyword">const</span> <a class="code" href="classvtkHyperPoint.html">vtkHyperPoint</a>&amp; hp); <span class="comment">//for resizing</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keywordtype">double</span>   X[3];    </div>
+<div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html#ad4dc75a3e72f1015f07e6217b2d204cb">   35</a></span>&#160;    vtkIdType     <a class="code" href="classvtkHyperPoint.html#ad4dc75a3e72f1015f07e6217b2d204cb">CellId</a>;  </div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html#ab9f07a839282d156dc9f9dcbf8174205">   36</a></span>&#160;    <span class="keywordtype">int</span>     <a class="code" href="classvtkHyperPoint.html#ab9f07a839282d156dc9f9dcbf8174205">SubId</a>; </div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html#a240e5649bcdc015e274b6a8227540092">   37</a></span>&#160;    <span class="keywordtype">double</span>   P[3];    </div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html#a1b2fabfa937c9fafe655477925ed44c2">   38</a></span>&#160;    <span class="keywordtype">double</span>   W[3];    </div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html#a468b8c5725500bd25aad14a4eb3faf8e">   39</a></span>&#160;    <span class="keywordtype">double</span>      *V[3];   </div>
+<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html#a35343e5b4f0274133e9ce53badf2c1e4">   40</a></span>&#160;    <span class="keywordtype">double</span>   V0[3];   </div>
+<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html#a1ce6fe0001c5231d62357572f764aa7a">   41</a></span>&#160;    <span class="keywordtype">double</span>   V1[3];</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">double</span>   V2[3];</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">double</span>   S;       </div>
+<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="classvtkHyperPoint.html#a00a699b8a979e8680136e607384d5e31">   44</a></span>&#160;    <span class="keywordtype">double</span>   <a class="code" href="classvtkHyperPoint.html#a00a699b8a979e8680136e607384d5e31">D</a>;       </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;};</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
+<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="classvtkHyperArray.html">   47</a></span>&#160;<span class="keyword">class </span>vtkDMRI_EXPORT <a class="code" href="classvtkHyperArray.html">vtkHyperArray</a> { <span class="comment">//;prevent man page generation</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <a class="code" href="classvtkHyperArray.html">vtkHyperArray</a>();</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  ~<a class="code" href="classvtkHyperArray.html">vtkHyperArray</a>()</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    {</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      <span class="keywordflow">if</span> (this-&gt;Array)</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        {</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="keyword">delete</span> [] this-&gt;Array;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        }</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    };</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  vtkIdType GetNumberOfPoints() {<span class="keywordflow">return</span> this-&gt;MaxId + 1;};</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <a class="code" href="classvtkHyperPoint.html">vtkHyperPoint</a> *GetHyperPoint(vtkIdType i) {<span class="keywordflow">return</span> this-&gt;Array + i;};</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <a class="code" href="classvtkHyperPoint.html">vtkHyperPoint</a> *InsertNextHyperPoint()</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    {</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordflow">if</span> ( ++this-&gt;MaxId &gt;= this-&gt;Size )</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      {</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      this-&gt;Resize(this-&gt;MaxId);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;      }</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordflow">return</span> this-&gt;Array + this-&gt;MaxId;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    }</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <a class="code" href="classvtkHyperPoint.html">vtkHyperPoint</a> *Resize(vtkIdType sz); <span class="comment">//reallocates data</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  <span class="keywordtype">void</span> Reset() {this-&gt;MaxId = -1;};</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  <a class="code" href="classvtkHyperPoint.html">vtkHyperPoint</a> *Array;  </div>
+<div class="line"><a name="l00071"></a><span class="lineno"><a class="line" href="classvtkHyperArray.html#a3b9303f138ebb8cd2f1c01ff00faea7a">   71</a></span>&#160;  vtkIdType <a class="code" href="classvtkHyperArray.html#a3b9303f138ebb8cd2f1c01ff00faea7a">MaxId</a>;             </div>
+<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="classvtkHyperArray.html#a58f7d014bf171f67306e950b734c1d36">   72</a></span>&#160;  vtkIdType <a class="code" href="classvtkHyperArray.html#a58f7d014bf171f67306e950b734c1d36">Size</a>;              </div>
+<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="classvtkHyperArray.html#acc5528092661f4330fdfbcb67a948d59">   73</a></span>&#160;  vtkIdType <a class="code" href="classvtkHyperArray.html#acc5528092661f4330fdfbcb67a948d59">Extend</a>;            </div>
+<div class="line"><a name="l00074"></a><span class="lineno"><a class="line" href="classvtkHyperArray.html#a72f35cdb704ca6731f52e26c44533743">   74</a></span>&#160;  <span class="keywordtype">double</span> <a class="code" href="classvtkHyperArray.html#a72f35cdb704ca6731f52e26c44533743">Direction</a>;       </div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;};</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">#define VTK_START_FROM_POSITION 0</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">#define VTK_START_FROM_LOCATION 1</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="aclassvtkHyperArray_html"><div class="ttname"><a href="classvtkHyperArray.html">vtkHyperArray</a></div><div class="ttdef"><b>Definition:</b> vtkHyperPointandArray.h:47</div></div>
+<div class="ttc" id="aclassvtkHyperArray_html_a3b9303f138ebb8cd2f1c01ff00faea7a"><div class="ttname"><a href="classvtkHyperArray.html#a3b9303f138ebb8cd2f1c01ff00faea7a">vtkHyperArray::MaxId</a></div><div class="ttdeci">vtkIdType MaxId</div><div class="ttdoc">pointer to data</div><div class="ttdef"><b>Definition:</b> vtkHyperPointandArray.h:71</div></div>
+<div class="ttc" id="aclassvtkHyperArray_html_a58f7d014bf171f67306e950b734c1d36"><div class="ttname"><a href="classvtkHyperArray.html#a58f7d014bf171f67306e950b734c1d36">vtkHyperArray::Size</a></div><div class="ttdeci">vtkIdType Size</div><div class="ttdoc">maximum index inserted thus far</div><div class="ttdef"><b>Definition:</b> vtkHyperPointandArray.h:72</div></div>
+<div class="ttc" id="aclassvtkHyperArray_html_a72f35cdb704ca6731f52e26c44533743"><div class="ttname"><a href="classvtkHyperArray.html#a72f35cdb704ca6731f52e26c44533743">vtkHyperArray::Direction</a></div><div class="ttdeci">double Direction</div><div class="ttdoc">grow array by this amount</div><div class="ttdef"><b>Definition:</b> vtkHyperPointandArray.h:74</div></div>
+<div class="ttc" id="aclassvtkHyperArray_html_acc5528092661f4330fdfbcb67a948d59"><div class="ttname"><a href="classvtkHyperArray.html#acc5528092661f4330fdfbcb67a948d59">vtkHyperArray::Extend</a></div><div class="ttdeci">vtkIdType Extend</div><div class="ttdoc">allocated size of data</div><div class="ttdef"><b>Definition:</b> vtkHyperPointandArray.h:73</div></div>
 <div class="ttc" id="aclassvtkHyperPoint_html"><div class="ttname"><a href="classvtkHyperPoint.html">vtkHyperPoint</a></div><div class="ttdoc">Special classes for manipulating data.</div><div class="ttdef"><b>Definition:</b> vtkHyperPointandArray.h:28</div></div>
-<div class="ttc" id="aclassvtkHyperPoint_html_a00a699b8a979e8680136e607384d5e31"><div class="ttname"><a href="classvtkHyperPoint.html#a00a699b8a979e8680136e607384d5e31">vtkHyperPoint::D</a></div><div class="ttdeci">double D</div><div class="ttdoc">scalar value</div><div class="ttdef"><b>Definition:</b> vtkHyperPointandArray.h:43</div></div>
-<div class="ttc" id="aclassvtkHyperPoint_html_ab9f07a839282d156dc9f9dcbf8174205"><div class="ttname"><a href="classvtkHyperPoint.html#ab9f07a839282d156dc9f9dcbf8174205">vtkHyperPoint::SubId</a></div><div class="ttdeci">int SubId</div><div class="ttdoc">cell</div><div class="ttdef"><b>Definition:</b> vtkHyperPointandArray.h:35</div></div>
-<div class="ttc" id="aclassvtkHyperPoint_html_ad4dc75a3e72f1015f07e6217b2d204cb"><div class="ttname"><a href="classvtkHyperPoint.html#ad4dc75a3e72f1015f07e6217b2d204cb">vtkHyperPoint::CellId</a></div><div class="ttdeci">vtkIdType CellId</div><div class="ttdoc">position</div><div class="ttdef"><b>Definition:</b> vtkHyperPointandArray.h:34</div></div>
+<div class="ttc" id="aclassvtkHyperPoint_html_a00a699b8a979e8680136e607384d5e31"><div class="ttname"><a href="classvtkHyperPoint.html#a00a699b8a979e8680136e607384d5e31">vtkHyperPoint::D</a></div><div class="ttdeci">double D</div><div class="ttdoc">scalar value</div><div class="ttdef"><b>Definition:</b> vtkHyperPointandArray.h:44</div></div>
+<div class="ttc" id="aclassvtkHyperPoint_html_a63d2feef1f4410266dcfa9a9bea6819f"><div class="ttname"><a href="classvtkHyperPoint.html#a63d2feef1f4410266dcfa9a9bea6819f">vtkHyperPoint::vtkHyperPoint</a></div><div class="ttdeci">vtkHyperPoint(const vtkHyperPoint &amp;)=default</div><div class="ttdoc">method sets up storage</div></div>
+<div class="ttc" id="aclassvtkHyperPoint_html_ab9f07a839282d156dc9f9dcbf8174205"><div class="ttname"><a href="classvtkHyperPoint.html#ab9f07a839282d156dc9f9dcbf8174205">vtkHyperPoint::SubId</a></div><div class="ttdeci">int SubId</div><div class="ttdoc">cell</div><div class="ttdef"><b>Definition:</b> vtkHyperPointandArray.h:36</div></div>
+<div class="ttc" id="aclassvtkHyperPoint_html_ad4dc75a3e72f1015f07e6217b2d204cb"><div class="ttname"><a href="classvtkHyperPoint.html#ad4dc75a3e72f1015f07e6217b2d204cb">vtkHyperPoint::CellId</a></div><div class="ttdeci">vtkIdType CellId</div><div class="ttdoc">position</div><div class="ttdef"><b>Definition:</b> vtkHyperPointandArray.h:35</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

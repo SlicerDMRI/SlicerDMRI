@@ -9,7 +9,7 @@ var searchData=
   ['vtkgetstringmacro_286',['vtkGetStringMacro',['../classvtkMRMLFiberBundleDisplayNode.html#ae81e5cb60b1b659072a75d751ea6323e',1,'vtkMRMLFiberBundleDisplayNode::vtkGetStringMacro(ActiveTensorName)'],['../classvtkMRMLFiberBundleDisplayNode.html#a7a33f2369b3c3a11c091a719cd550630',1,'vtkMRMLFiberBundleDisplayNode::vtkGetStringMacro(DiffusionTensorDisplayPropertiesNodeID)'],['../classvtkMRMLFiberBundleNode.html#a2ab4fffa7ecf495f120e65bb358f1899',1,'vtkMRMLFiberBundleNode::vtkGetStringMacro()']]],
   ['vtkgetvector3macro_287',['vtkGetVector3Macro',['../classvtkImageGetTensorComponents.html#ad531bfd7d923e4f1aab2b58f9de3b4db',1,'vtkImageGetTensorComponents::vtkGetVector3Macro()'],['../classvtkImageSetTensorComponents.html#a370b50f7f0555e6abac5c32544e90327',1,'vtkImageSetTensorComponents::vtkGetVector3Macro()']]],
   ['vtkhyperarray_288',['vtkHyperArray',['../classvtkHyperArray.html',1,'']]],
-  ['vtkhyperpoint_289',['vtkHyperPoint',['../classvtkHyperPoint.html',1,'']]],
+  ['vtkhyperpoint_289',['vtkHyperPoint',['../classvtkHyperPoint.html',1,'vtkHyperPoint'],['../classvtkHyperPoint.html#a63d2feef1f4410266dcfa9a9bea6819f',1,'vtkHyperPoint::vtkHyperPoint()']]],
   ['vtkhyperstreamlinedtmri_290',['vtkHyperStreamlineDTMRI',['../classvtkHyperStreamlineDTMRI.html',1,'']]],
   ['vtkhyperstreamlinesettings_291',['VtkHyperStreamlineSettings',['../classvtkSeedTracts.html#a0e1ebb438a2c5605d27ce9838aaeed82',1,'vtkSeedTracts']]],
   ['vtkhyperstreamlineteem_292',['vtkHyperStreamlineTeem',['../classvtkHyperStreamlineTeem.html',1,'']]],
