@@ -6,7 +6,7 @@
 
 Diffusion MRI in 3D Slicer open-source medical imaging software
 
-- **Website**: http://slicerdmri.github.io/
+- **Website**: https://dmri.slicer.org/
 - **Documentation**: https://dmri.slicer.org/SlicerDMRI/
 - **Wiki**: https://github.com/SlicerDMRI/SlicerDMRI/wiki
 
