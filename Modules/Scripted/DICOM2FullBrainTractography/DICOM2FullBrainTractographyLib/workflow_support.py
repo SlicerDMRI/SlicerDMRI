@@ -236,6 +236,7 @@ for volume_type in __VOLUME_TYPES__:
                 f'lambda attach_display_node=False, dimensions=None, prefix="":\
                 create_volume_node( "{volume_type}", attach_display_node=attach_display_node, dimensions=dimensions, prefix=prefix)'
                )
+    )
 
     this_module.__all__.append(function_name)
 
