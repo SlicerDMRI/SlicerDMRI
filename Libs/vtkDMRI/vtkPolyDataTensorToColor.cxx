@@ -121,6 +121,10 @@ int vtkPolyDataTensorToColor::RequestData(
 
   vtkDebugMacro(<< "Executing threshold points filter");
 
+  if (!input)
+    {
+    return 0;
+    }
   numPts = input->GetNumberOfPoints();
   newPoints = vtkPoints::New();
 
