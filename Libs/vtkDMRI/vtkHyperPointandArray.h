@@ -28,6 +28,7 @@
 class vtkDMRI_EXPORT vtkHyperPoint { //;prevent man page generation
 public:
     vtkHyperPoint(); /// method sets up storage
+    vtkHyperPoint(const vtkHyperPoint &) = default;
     vtkHyperPoint &operator=(const vtkHyperPoint& hp); //for resizing
 
     double   X[3];    /// position
