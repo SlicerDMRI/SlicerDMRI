@@ -303,6 +303,6 @@ class TractographyExportPLYTest(ScriptedLoadableModuleTest):
     except Exception as e:
       import traceback
       traceback.print_exc()
-      self.delayDisplay(f"Test caused exception!\n"{str(e)}")
+      self.delayDisplay(f"Test caused exception!\n{str(e)}")
 
 
