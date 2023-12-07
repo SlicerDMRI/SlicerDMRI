@@ -81,7 +81,7 @@ class test_tractography_displayWidget(object):
 
   def onReloadAndTest(self,moduleName="test_tractography_display"):
     self.onReload()
-    evalString = 'globals()["%s"].%sTest()' % (moduleName, moduleName)
+    evalString = f'globals()["{moduleName}"].{moduleName}Test()'
     tester = eval(evalString)
     tester.runTest()
 
@@ -126,7 +126,7 @@ class test_tractography_displayTest(unittest.TestCase):
     shows the user/developer/tester the state of the test
     so that we'll know when it breaks.
     """
-    print(message)
+    print(f"{message}")
     self.info = qt.QDialog()
     self.infoLayout = qt.QVBoxLayout()
     self.info.setLayout(self.infoLayout)
@@ -179,13 +179,13 @@ class test_tractography_displayTest(unittest.TestCase):
 
     self.delayDisplay('Selecting tract1\n')
     tractNode = slicer.util.getNode('tract1')
-    displayNode = getattr(tractNode, 'Get%sDisplayNode' % display_node)()
+    displayNode = getattr(tractNode, f'Get{display_node}DisplayNode')()
     tree = slicer.util.findChildren(name='TractographyDisplayTreeView')[0]
     model = tree.model()
     modelIndex = model.indexFromMRMLNode(tractNode)
     tree.setCurrentIndex(modelIndex)
 
-    tubeTab = slicer.util.findChildren(advancedDisplay, name='%sTab' % display_node)[0]
+    tubeTab = slicer.util.findChildren(advancedDisplay, name=f'{display_node}Tab')[0]
 
     visibility = slicer.util.findChildren(tubeTab, text='Visibility')[0]
 
@@ -205,16 +205,16 @@ class test_tractography_displayTest(unittest.TestCase):
 
         solidColor = slicer.util.findChildren(tubeTab, text=widget_text)
         if len(solidColor) == 0:
-            raise ValueError("Widget %s not found" % widget_text)
+            raise ValueError(f"Widget {widget_text} not found")
         else:
             solidColor = solidColor[0]
         solidColor.click()
 
         if displayNode and displayNode.GetColorMode() != color_code:
-            self.delayDisplay('Setting Color Mode To %s Did not Work' % widget_text)
+            self.delayDisplay(f'Setting Color Mode To {widget_text} Did not Work')
             raise Exception()
         else:
-            self.delayDisplay("Setting Color Mode To %s Worked" % widget_text)
+            self.delayDisplay(f"Setting Color Mode To {widget_text} Worked")
 
     visibility.click()
 
@@ -227,13 +227,13 @@ class test_tractography_displayTest(unittest.TestCase):
 
     self.delayDisplay('Selecting tract1\n')
     tractNode = slicer.util.getNode('tract1')
-    displayNode = getattr(tractNode, 'Get%sDisplayNode' % display_node)()
+    displayNode = getattr(tractNode, f'Get{display_node}DisplayNode')()
     tree = slicer.util.findChildren(name='TractographyDisplayTreeView')[0]
     model = tree.model()
     modelIndex = model.indexFromMRMLNode(tractNode)
     tree.setCurrentIndex(modelIndex)
 
-    tubeTab = slicer.util.findChildren(advancedDisplay, name='%sTab' % display_node)[0]
+    tubeTab = slicer.util.findChildren(advancedDisplay, name=f'{display_node}Tab')[0]
     slicer.util.findChildren(tubeTab, text='Of Tensor Property')[0].click()
 
 

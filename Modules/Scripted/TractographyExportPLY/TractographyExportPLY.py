@@ -152,7 +152,7 @@ class TractographyExportPLYWidget(ScriptedLoadableModuleWidget):
                                              native_scalar_range = self.nativeRangeCheckbox.checked)
       self.statusLabel.showMessage("Export succeeded!")
     except Exception as err:
-      self.statusLabel.showMessage("ExportFailed: {}".format(err))
+      self.statusLabel.showMessage(f"ExportFailed: {err}")
       # note: use `raise` alone here, *not* `raise err` in order to
       #       get the full trace in the log and Python interactor.
       raise
@@ -174,16 +174,16 @@ class TractographyExportPLYLogic(ScriptedLoadableModuleLogic):
 
     if not float(number_of_sides).is_integer():
         import warnings
-        warnings.warn("Attempted inexact conversion for non-integer number_of_sides {}. This should never happen.".format(number_of_sides))
+        warnings.warn(f"Attempted inexact conversion for non-integer number_of_sides {number_of_sides}. This should never happen.")
 
     lineDisplayNode = inputFiberBundle.GetLineDisplayNode()
 
     if lineDisplayNode is None:
-      raise Exception("No vtkMRMLFiberBundleLineDisplayNode found for node: {}".format(inputFiberBundle.GetName()))
+      raise Exception(f"No vtkMRMLFiberBundleLineDisplayNode found for node: {inputFiberBundle.GetName()}")
 
     outputDir = os.path.dirname(outputFilePath)
     if not os.path.isdir(outputDir):
-      raise Exception("Selected output directory does not exist: {}".format(outputDir))
+      raise Exception(f"Selected output directory does not exist: {outputDir}")
 
     tuber = vtk.vtkTubeFilter()
     tuber.SetNumberOfSides(int(number_of_sides))
@@ -276,7 +276,7 @@ class TractographyExportPLYTest(ScriptedLoadableModuleTest):
           uris=uris,
           loadFileTypes=loadFileTypes
           )
-        self.delayDisplay('Finished with download and loading of %s' % str(fileNames))
+        self.delayDisplay(f'Finished with download and loading of {fileNames}')
 
       # logic
       outputPath = os.path.join(slicer.app.temporaryPath, "fiber.ply")
@@ -285,7 +285,7 @@ class TractographyExportPLYTest(ScriptedLoadableModuleTest):
       logic.exportFiberBundleToPLYPath(fiberNode, outputPath, )
 
       if not slicer.util.loadModel(outputPath):
-        raise Exception("Failed to load expected output PLY file: {}".format(outputPath))
+        raise Exception(f"Failed to load expected output PLY file: {outputPath}")
 
       # gui
       outputPath2 = os.path.join(slicer.app.temporaryPath, "fiber2.ply")
@@ -295,7 +295,7 @@ class TractographyExportPLYTest(ScriptedLoadableModuleTest):
       widget.exportButton.click()
 
       if not slicer.util.loadModel(outputPath2):
-        raise Exception("Failed to load expected output PLY file: {}".format(outputPath2))
+        raise Exception(f"Failed to load expected output PLY file: {outputPath2}")
 
       # If it doesn't throw, it passes...
       self.delayDisplay('Test passed!')
@@ -303,6 +303,6 @@ class TractographyExportPLYTest(ScriptedLoadableModuleTest):
     except Exception as e:
       import traceback
       traceback.print_exc()
-      self.delayDisplay('Test caused exception!\n' + str(e))
+      self.delayDisplay(f"Test caused exception!\n"{str(e)}")
 
 

@@ -33,7 +33,7 @@ execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Pyt
     self.strict = strict
 
   def delayDisplay(self,message,msec=1000):
-    print(message)
+    print(f"{message}")
     self.info = qt.QDialog()
     self.infoLayout = qt.QVBoxLayout()
     self.info.setLayout(self.infoLayout)
@@ -58,9 +58,9 @@ execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Pyt
     """
 
     print("Running SlicerMRB Test case with:")
-    print("useCase : %s" % self.useCase)
-    print("uniqueDirectory : %s" % self.uniqueDirectory)
-    print("strict : %s" % self.strict)
+    print(f"useCase : {self.useCase}")
+    print(f"uniqueDirectory : {self.uniqueDirectory}")
+    print(f"strict : {self.strict}")
 
     #
     # first, get the data
@@ -97,7 +97,7 @@ execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Pyt
         uris=uris,
         loadFileTypes=loadFileTypes
         )
-      self.delayDisplay('Finished with download and loading of %s' % str(fileNames))
+      self.delayDisplay(f'Finished with download and loading of {fileNames}')
 
     # confirm that FA is in the background of the Red slice
     redComposite = slicer.util.getNode('vtkMRMLSliceCompositeNodeRed')
@@ -117,8 +117,8 @@ execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Pyt
     # turn on one at a time and save scene view
     for tractName in tracts:
       self.showOneTract(tracts,tractName)
-      self.delayDisplay('Showing %s' % tractName)
-      self.storeSceneView('%s-view' % tractName, "Only show tubes for %s" % tractName)
+      self.delayDisplay(f'Showing {tractName}')
+      self.storeSceneView(f'{tractName}-view', f"Only show tubes for {tractName}")
 
     #
     # save the mrml scene to a temp directory, then zip it
@@ -126,7 +126,7 @@ execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Pyt
     applicationLogic = slicer.app.applicationLogic()
     sceneSaveDirectory = self.tempDirectory('__scene__')
     mrbFilePath= self.tempDirectory('__mrb__') + '/test.mrb'
-    self.delayDisplay("Saving scene to: %s\n" % sceneSaveDirectory + "Saving mrb to: %s" % mrbFilePath)
+    self.delayDisplay(f"Saving scene to: {sceneSaveDirectory}\nSaving mrb to: {mrbFilePath}")
     self.assertTrue(
         applicationLogic.SaveSceneToSlicerDataBundleDirectory(sceneSaveDirectory, None)
     )
@@ -194,8 +194,8 @@ execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Pyt
       imagesAndNames = ((self.beforeImage,'before'), (self.sceneLoadedImage,'scene'), (self.mrbLoadedImage,'mrb'))
       for i,name in imagesAndNames:
         tmp = self.tempDirectory('')
-        filePath = tmp + '/' + name + '.png'
-        print("Saving image to %s" % filePath)
+        filePath = f"{tmp}/{name}.png"
+        print(f"Saving image to {filePath}")
         i.save(filePath)
 
     # images can differe due to widget size and rendering issues - only fail if in strict mode
@@ -204,9 +204,9 @@ execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Pyt
     self.delayDisplay("Scene and MRB loaded and compared")
 
     for tractName,tubeColor in zip(tracts, tractColors):
-      sceneView = slicer.util.getNode('%s-view' % tractName)
+      sceneView = slicer.util.getNode(f'{tractName}-view')
       sceneView.RestoreScene()
-      self.delayDisplay("Should now see tubes for tract %s in color %s" % (tractName, str(tractColors)))
+      self.delayDisplay(f"Should now see tubes for tract {tractName} in color {tractColors}")
 
     self.delayDisplay("Test Finished")
 
@@ -226,8 +226,8 @@ execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Pyt
         ('test./:', 'test.%2f%3a'),
       )
     for original,encoded in stringPairs:
-      self.delayDisplay("Testing that %s becomes %s" % (original,encoded), 150)
-      print ('%s becomes %s, should be %s' % (original, appLogic.PercentEncode(original), encoded))
+      self.delayDisplay(f"Testing that {original} becomes %{encoded}", 150)
+      print(f'{original} becomes {appLogic.PercentEncode(original)}, should be {encoded}')
       self.assertEqual( appLogic.PercentEncode(original), encoded )
     self.delayDisplay("Test Finished")
 

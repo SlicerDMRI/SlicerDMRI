@@ -27,7 +27,7 @@ def runtests(testdata_path):
     """
     returns array of bvalues
     """
-    print("ExtractDWIShell runtests, running: " + repr(args))
+    print(f"ExtractDWIShell runtests, running: {repr(args)}")
 
     proc = subprocess.Popen(args)
     proc.wait()
@@ -121,7 +121,7 @@ def main():
   sn = slicer.vtkMRMLNRRDStorageNode()
   sn.SetFileName(dwifile)
   node_in = mrml.vtkMRMLDiffusionWeightedVolumeNode()
-  print("loading: ", dwifile)
+  print(f"loading: {dwifile}")
   sn.ReadData(node_in)
   dwi_in = slicer.util.arrayFromVolume(node_in)
 
@@ -132,9 +132,9 @@ def main():
   grads_in = numpy_support.vtk_to_numpy(node_in.GetDiffusionGradients())
 
   print("  raw input gradients: ")
-  print(grads_in)
+  print(f"{grads_in}")
   print("  raw input bvals: ")
-  print(bvals_in)
+  print(f"{bvals_in}")
 
   for (i, g) in enumerate(grads_in):
     norm = np.linalg.norm(g)
@@ -147,13 +147,13 @@ def main():
       if abs(bval - check_bval) < bval_tolerance:
         indices.append(i)
 
-  print("selected indices: ", indices)
+  print(f"selected indices: {indices}")
 
   # output shape: (3d_vol_shape..., num_indices)
   num_indices = len(indices)
   shape_out = dwi_in.shape[:-1] + (num_indices,)
-  print("input shape: ", dwi_in.shape)
-  print("output shape: ", shape_out)
+  print(f"input shape: {dwi_in.shape}")
+  print(f"output shape: {shape_out}")
 
   # construct output subset
   vol_out = np.zeros(shape_out, dtype=dwi_in.dtype)
@@ -168,15 +168,15 @@ def main():
   if args.baseline_clamp:
     for (i, bval) in enumerate(bvals_out):
       if bval < bval_clamp:
-        print("  clamping baseline {} (gradient {}) to zero".format(bval, grads_out[i, :]))
+        print(f"  clamping baseline {bval} (gradient {grads_out[i, :]}) to zero")
         bvals_out[i] = 0
         grads_out[i, :] = np.array([0.,0.,0.])
 
 
-  print("selected bvals: ", bvals_out)
-  print("  grads_out shape:  ", grads_out.shape)
-  print("  vol_out shape:    ", vol_out.shape)
-  print("  output gradients: ", grads_out)
+  print(f"selected bvals: {bvals_out}")
+  print(f"  grads_out shape:  {grads_out.shape}")
+  print(f"  vol_out shape:    {vol_out.shape}")
+  print(f"  output gradients: {grads_out}")
 
   # write output
   sn_out = slicer.vtkMRMLNRRDStorageNode()

@@ -77,14 +77,14 @@ class DTINotReproducibleIssue3977Logic(ScriptedLoadableModuleLogic):
     # Compute the DTI output volume using the "DWI to DTI estimation" CLI module
     module = slicer.modules.dwitodtiestimation
     slicer.util.delayDisplay(module.title)
-    logging.info('"%s" started' % module.title)
+    logging.info(f'"{module.title}" started')
     cliParams = {
       'inputVolume': inputVolume.GetID(),
       'outputTensor': dtiVolume.GetID(),
       'outputBaseline' : outputBaseline.GetID()
     }
     cliNode = slicer.cli.run(module, None, cliParams, wait_for_completion=True)
-    logging.info('"%s" completed' % module.title)
+    logging.info(f'"{module.title}" completed')
 
     # Create output volume
     outputScalar = slicer.mrmlScene.AddNode(slicer.vtkMRMLScalarVolumeNode())
@@ -92,13 +92,13 @@ class DTINotReproducibleIssue3977Logic(ScriptedLoadableModuleLogic):
     # Compute FA output volume using "Diffusion Tensor Scalar Measurements" CLI module
     module = slicer.modules.diffusiontensorscalarmeasurements
     slicer.util.delayDisplay(module.title)
-    logging.info('"%s" started' % module.title)
+    logging.info(f'"{module.title}" started')
     cliParams = {
       'inputVolume': dtiVolume.GetID(),
       'outputScalar': outputScalar.GetID()
     }
     cliNode = slicer.cli.run(module, None, cliParams, wait_for_completion=True)
-    logging.info('"%s" completed' % module.title)
+    logging.info(f'"{module.title}" completed')
 
     return (outputBaseline, outputScalar)
 
