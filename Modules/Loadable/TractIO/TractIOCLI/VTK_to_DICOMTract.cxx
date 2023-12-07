@@ -393,17 +393,24 @@ int insert_polydata_scalars(TrcTrackSet* trackset,
     DSRBasicCodedEntry codedEntry(msrmap_iter->second);
     CodeSequenceMacro typeCode(codedEntry.CodeValue, codedEntry.CodingSchemeDesignator, codedEntry.CodeMeaning);
     // TODO some of these do have units
-    CodeSequenceMacro unitCode;
+
+    OFString polyDataScalarTypeCode{};
+    OFString polyDataScalarTypeModifierCode = "UCUM";
+    OFString polyDataScalarUnitsCode{};
 
     if ((arrayName == "Trace") ||
         (arrayName.find("Diffusivity") != std::string::npos))
       {
-      unitCode = CodeSequenceMacro("mm2/s", "UCUM", "mm2/s");
+      polyDataScalarTypeCode = "mm2/s";
+      polyDataScalarUnitsCode = "mm2/s";
       }
     else
       {
-      unitCode = CodeSequenceMacro("1", "UCUM", "no units");
+      polyDataScalarTypeCode = "1";
+      polyDataScalarUnitsCode = "no units";
       }
+
+    CodeSequenceMacro unitCode(polyDataScalarTypeCode, polyDataScalarTypeModifierCode, polyDataScalarUnitsCode);
 
     TrcMeasurement* measurement;
     //OFCondition res = TrcMeasurement::create(typeCode, unitCode, measurement);
