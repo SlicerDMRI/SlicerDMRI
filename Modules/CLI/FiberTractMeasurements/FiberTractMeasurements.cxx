@@ -541,7 +541,7 @@ void printTable(std::ostream &ofs, bool printHeader,
       it2 = names.find(*agg_iter);
       if (it2 != names.end())
         {
-        ofs       << " " << SEPARATOR << " " << it2->second;
+        ofs << SEPARATOR << it2->second;
         }
       }
 
@@ -549,7 +549,7 @@ void printTable(std::ostream &ofs, bool printHeader,
       {
       if (std::find(aggregate_names.begin(), aggregate_names.end(), it2->first) == aggregate_names.end())
         {
-        ofs       << " " << SEPARATOR << " " << it2->second;
+        ofs << SEPARATOR << it2->second;
         }
       }
     ofs << std::endl;
@@ -579,7 +579,7 @@ void printTable(std::ostream &ofs, bool printHeader,
       it2 = names.find(*agg_iter);
       if (it2 != names.end())
         {
-        ofs << " " << SEPARATOR << " ";
+        ofs << SEPARATOR;
         it1 = it->second.find(*agg_iter);
         if (it1 != it->second.end())
           {
@@ -600,7 +600,7 @@ void printTable(std::ostream &ofs, bool printHeader,
       {
       if (std::find(aggregate_names.begin(), aggregate_names.end(), it2->first) == aggregate_names.end())
         {
-        ofs << " " << SEPARATOR << " ";
+        ofs << SEPARATOR;
 
         it1 = it->second.find(it2->second);
         if (it1 != it->second.end() &&
