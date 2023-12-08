@@ -1,2 +1,2 @@
-Name 	 Num_Points 	 Num_Fibers 	 Mean_Length 	 RANDARRAY.Max 	 RANDARRAY.Mean 	 RANDARRAY.Median 	 RANDARRAY.Min 	 RANDARRAY.NAN 	 RANDARRAY.Variance
-/Users/inorton/work/git/SlicerDMRI/Modules/CLI/FiberTractMeasurements/Testing/../Data/Input/../ScalarOnlyInput/fiber_notensor_randscalar.vtk 	 60.000000 	 1.000000 	 105.450281 	 0.998970 	 0.577472 	 0.616722 	 0.014852 	 0.000000 	 0.099346
+Name	Num_Points	Num_Fibers	Mean_Length	RANDARRAY.Max	RANDARRAY.Mean	RANDARRAY.Median	RANDARRAY.Min	RANDARRAY.NAN	RANDARRAY.Variance
+/Users/inorton/work/git/SlicerDMRI/Modules/CLI/FiberTractMeasurements/Testing/../Data/Input/../ScalarOnlyInput/fiber_notensor_randscalar.vtk	60.000000	1.000000	105.450281	0.998970	0.577472	0.616722	0.014852	0.000000	0.099346
