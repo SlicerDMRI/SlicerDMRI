@@ -8,7 +8,7 @@ class SlicerMRB(unittest.TestCase):
   """ Test for slicer data bundle
 
 Run manually from within slicer by pasting an version of this with the correct path into the python console:
-execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Python/SlicerMRBTest.py'); t = SlicerMRB(); t.setUp(); t.runTest()
+exec(open("/Users/lj07/Downloads/SlicerMRBTest.py").read()); t = SlicerMRB(); t.setUp(); t.runTest()
 
   """
 
