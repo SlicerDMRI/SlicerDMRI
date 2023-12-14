@@ -706,7 +706,7 @@ void qSlicerTractographyDisplayWidget::updateWidgetFromMRML()
     (d->FiberBundleDisplayNode->GetColorNodeID());
 
   bool wasBlockingColorByScalarComboBox = d->ColorByScalarComboBox->blockSignals(true);
-  d->ColorByScalarComboBox->setDataSet(vtkDataSet::SafeDownCast(d->FiberBundleNode->GetPolyData()));
+  d->ColorByScalarComboBox->setDataSet(vtkDataSet::SafeDownCast(d->FiberBundleNode->GetMesh()));
   d->ColorByScalarComboBox->blockSignals(wasBlockingColorByScalarComboBox);
 
   bool hasTensors = false;
