@@ -297,8 +297,8 @@ class FiberBundleToLabelMapTest(unittest.TestCase):
     # first, get some data
     #
     downloads = (
-        ('FA', 'FA.nrrd', 'http://slicer.kitware.com/midas3/download?items=5767', 'VolumeFile'),
-        ('tract1', 'tract1.vtk', 'http://slicer.kitware.com/midas3/download?items=5768', 'FiberBundleFile'),
+        ('FA', 'FA.nrrd', 'https://github.com/Slicer/SlicerTestingData/releases/download/SHA256/12d17fba4f2e1f1a843f0757366f28c3f3e1a8bb38836f0de2a32bb1cd476560', 'VolumeFile'),
+        ('tract1', 'tract1.vtk', 'https://github.com/Slicer/slicer.kitware.com-midas3-archive/releases/download/SHA256/06d5b5777915857fbac7b3cbd9c371523d1371f29b0c89eb7a33d86d780d5b2b', 'FiberBundleFile'),
         )
     import SampleData
     for nodeNames, fileNames, uris, loadFileTypes  in downloads:
