@@ -256,8 +256,10 @@ class test_tractography_displayTest(unittest.TestCase):
         autoWL.click()
 
     slider = slicer.util.findChildren(tubeTab, name='FiberBundleColorRangeWidget')[0]
+    displayNode.SetAutoScalarRange(False)
     slider.setMinimumValue(.1)
     slider.setMaximumValue(.8)
+    displayNode.SetScalarRange(.1, .8)
     scalar_range = displayNode.GetScalarRange()
     self.assertEqual(scalar_range[0], .1)
     self.assertEqual(scalar_range[1], .8)
