@@ -15,3 +15,4 @@ CDash for extensions: [http://slicer.cdash.org](http://slicer.cdash.org/index.ph
 For publications please include this text (modifying the initial part to describe your SlicerDMRI use case):
 
 "We performed diffusion MRI and/or tractography analysis and/or visualization in 3D Slicer (https://www.slicer.org) via the SlicerDMRI project (https://dmri.slicer.org/), funded by NIH U01 CA199459."
+
