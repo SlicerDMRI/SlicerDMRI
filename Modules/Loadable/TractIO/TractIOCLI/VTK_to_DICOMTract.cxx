@@ -1,5 +1,6 @@
 // std includes
 #include <algorithm>
+#include <cmath>
 #include <iterator>
 #include <memory>
 #include <sstream>
@@ -20,7 +21,6 @@ using std::string;
 // DCMTK includes
 #include "dcmtk/config/osconfig.h"    /* make sure OS specific configuration is included first */
 
-#define INCLUDE_CMATH
 #include "dcmtk/dcmsr/codes/dcm.h"
 #include "dcmtk/ofstd/ofstdinc.h"
 #include "dcmtk/ofstd/ofcond.h"
@@ -31,6 +31,7 @@ using std::string;
 #include "dcmtk/dcmtract/trcmeasurement.h"
 #include "dcmtk/dcmtract/trctrack.h"
 #include "dcmtk/dcmtract/trctypes.h"
+#include "dcmtk/dcmdata/dcuid.h"
 
 // Slicer includes
 #ifdef HAVE_SSTREAM
