@@ -1,0 +1,50 @@
+default_language_version:
+  python: python3.10
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.4.0
+    hooks:
+      - id: check-added-large-files
+        name: check-added-large-files
+        description: Prevent giant files from being committed.
+      - id: check-ast
+        name: check-ast
+        description: Simply check whether files parse as valid python.
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+        name: check-merge-conflict
+        description: Check for files that contain merge conflict strings.
+      - id: check-toml
+      - id: check-yaml
+        exclude: .github/workflows
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+
+  - repo: https://github.com/timothycrosley/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        name: isort
+        args: [--settings-path, ./pyproject.toml]
+        types: [python]
+
+  - repo: https://github.com/psf/black
+    rev: 22.12.0
+    hooks:
+      - id: black
+        name: black
+        args: [--config, ./pyproject.toml]
+        types: [python]
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 3.9.2
+    hooks:
+      - id: flake8
+        name: flake8
+        additional_dependencies: [flake8-docstrings==1.6.0]
+        args: [--config, ./setup.cfg]
+        types: [python]
