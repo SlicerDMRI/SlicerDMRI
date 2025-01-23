@@ -180,10 +180,12 @@ class NIfTIFileTest(ScriptedLoadableModuleTest):
     # that writing is done before reading (it generates input data for reading).
 
     # TODO: rewrite this for NIfTI
+    pass
 
   def test_Writer(self):
     # Writer and reader tests are put in the same function to ensure
     # that writing is done before reading (it generates input data for reading).
 
     # TODO: rewrite this for NIfTI
+    pass
 
