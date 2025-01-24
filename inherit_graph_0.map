@@ -1,27 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" title=" " alt="" coords="5,770,68,797"/>
-<area shape="rect" id="node2" href="$classDICOM2FullBrainTractography_1_1DICOM2FullBrainTractography.html" title=" " alt="" coords="138,5,357,47"/>
-<area shape="rect" id="node3" href="$classDICOM2FullBrainTractography_1_1DICOM2FullBrainTractographyWidget.html" title=" " alt="" coords="116,71,379,112"/>
-<area shape="rect" id="node4" href="$classDICOM2FullBrainTractographyLib_1_1full__tractography__workflow_1_1Slicelet.html" title=" " alt="" coords="135,137,360,193"/>
-<area shape="rect" id="node6" href="$classDICOM2FullBrainTractographyLib_1_1full__tractography__workflow_1_1WorkflowConfiguration.html" title=" " alt="" coords="135,217,360,273"/>
-<area shape="rect" id="node7" href="$classDICOM2FullBrainTractographyLib_1_1workflow__support_1_1Workflow.html" title=" " alt="" coords="135,297,359,339"/>
-<area shape="rect" id="node8" href="$classDICOMDiffusionVolumePlugin_1_1DICOMDiffusionVolumePlugin.html" title=" " alt="" coords="138,363,357,404"/>
-<area shape="rect" id="node9" href="$classDICOMTractographyPlugin_1_1DICOMTractographyPlugin.html" title=" " alt="" coords="150,428,345,469"/>
-<area shape="rect" id="node10" href="$classFiberBundleToLabelMap_1_1FiberBundleToLabelMap.html" title=" " alt="" coords="141,493,353,535"/>
-<area shape="rect" id="node11" href="$classFiberBundleToLabelMap_1_1FiberBundleToLabelMapLogic.html" title=" " alt="" coords="141,559,353,600"/>
-<area shape="rect" id="node12" href="$classFiberBundleToLabelMap_1_1FiberBundleToLabelMapWidget.html" title=" " alt="" coords="141,624,353,665"/>
-<area shape="rect" id="node13" href="$classNsgPlanTracto_1_1NeurosurgicalPlanningTutorialTractographySelfTest.html" title=" " alt="" coords="117,689,378,731"/>
-<area shape="rect" id="node14" href="$classNsgPlanTracto_1_1NeurosurgicalPlanningTutorialTractographySelfTestLogic.html" title=" " alt="" coords="130,755,365,811"/>
-<area shape="rect" id="node15" href="$classNsgPlanTracto_1_1NeurosurgicalPlanningTutorialTractographySelfTestWidget.html" title=" " alt="" coords="130,835,365,891"/>
-<area shape="rect" id="node16" href="$classRegisterDMRIModuleTemplates_1_1RegisterDMRIModuleTemplates.html" title=" " alt="" coords="132,916,363,957"/>
-<area shape="rect" id="node17" href="$classSlicerMRBTest_1_1SlicerMRBTest.html" title=" " alt="" coords="142,982,353,1009"/>
-<area shape="rect" id="node18" href="$classSlicerMRBTest_1_1SlicerMRBTestWidget.html" title=" " alt="" coords="142,1033,353,1075"/>
-<area shape="rect" id="node19" href="$classTractographyExportPLY_1_1It.html" title=" " alt="" coords="157,1099,337,1126"/>
-<area shape="rect" id="node20" href="$classfiber__visibility__crash2438_1_1fiber__visibility__crash2438.html" title=" " alt="" coords="137,1151,358,1192"/>
-<area shape="rect" id="node21" href="$classfiber__visibility__crash2438_1_1fiber__visibility__crash2438Logic.html" title=" " alt="" coords="137,1216,358,1257"/>
-<area shape="rect" id="node22" href="$classfiber__visibility__crash2438_1_1fiber__visibility__crash2438Widget.html" title=" " alt="" coords="137,1281,358,1323"/>
-<area shape="rect" id="node23" href="$classtest__tractography__display_1_1TestTractographyDisplayLogic.html" title=" " alt="" coords="140,1347,355,1388"/>
-<area shape="rect" id="node24" href="$classtest__tractography__display_1_1test__tractography__display.html" title=" " alt="" coords="138,1412,357,1453"/>
-<area shape="rect" id="node25" href="$classtest__tractography__display_1_1test__tractography__displayWidget.html" title=" " alt="" coords="138,1477,357,1519"/>
-<area shape="rect" id="node5" href="$classDICOM2FullBrainTractographyLib_1_1full__tractography__workflow_1_1full__tractography__workflow__slicelet.html" title=" " alt="" coords="427,137,673,193"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,13,207,38"/>
+<area shape="rect" id="Node000001" href="$classDICOM2FullBrainTractographyLib_1_1workflow__support_1_1GeneralizedStep.html" title=" " alt="" coords="255,5,525,45"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="220,23,254,23,254,28,220,28"/>
 </map>

@@ -1,6 +1,9 @@
 <map id="vtkSlicerTractographyInteractiveSeedingLogic" name="vtkSlicerTractographyInteractiveSeedingLogic">
-<area shape="rect" id="node1" title=" " alt="" coords="36,185,269,227"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,89,167,115"/>
-<area shape="rect" id="node3" href="$classvtkMRMLTractographyInteractiveSeedingNode.html" title=" " alt="" coords="191,81,427,123"/>
-<area shape="rect" id="node4" title=" " alt="" coords="250,5,367,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="36,183,269,223"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,87,167,113"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,123,142,181,138,184,99,126"/>
+<area shape="rect" id="Node000003" href="$classvtkMRMLTractographyInteractiveSeedingNode.html" title=" " alt="" coords="191,80,427,120"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="269,130,183,185,180,180,266,125"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="250,5,367,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="311,44,311,80,306,80,306,44"/>
 </map>

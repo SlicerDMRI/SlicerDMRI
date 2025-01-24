@@ -1,10 +1,17 @@
 <map id="qSlicerTractographyDisplayWidgetPrivate" name="qSlicerTractographyDisplayWidgetPrivate">
-<area shape="rect" id="node1" title=" " alt="" coords="717,91,916,132"/>
-<area shape="rect" id="node2" title=" " alt="" coords="273,5,493,47"/>
-<area shape="rect" id="node3" href="$classvtkMRMLFiberBundleDisplayNode.html" title=" " alt="" coords="261,71,504,98"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,71,212,98"/>
-<area shape="rect" id="node5" href="$classqSlicerTractographyDisplayWidget.html" title=" " alt="" coords="283,123,482,164"/>
-<area shape="rect" id="node6" title=" " alt="" coords="53,130,165,157"/>
-<area shape="rect" id="node7" href="$classvtkMRMLFiberBundleNode.html" title=" " alt="" coords="285,189,480,215"/>
-<area shape="rect" id="node8" title=" " alt="" coords="30,189,187,215"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="717,96,916,136"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="273,5,493,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="507,41,694,77,753,93,752,99,693,83,506,46"/>
+<area shape="rect" id="Node000003" href="$classqSlicerTractographyDisplayWidget.html" title=" " alt="" coords="283,69,482,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="496,94,717,107,717,113,496,99"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="53,77,165,102"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="179,87,283,87,283,92,179,92"/>
+<area shape="rect" id="Node000005" href="$classvtkMRMLFiberBundleNode.html" title=" " alt="" coords="285,134,480,159"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="494,139,693,127,717,125,717,130,694,132,494,145"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="30,134,187,159"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="201,144,285,144,285,149,201,149"/>
+<area shape="rect" id="Node000007" href="$classvtkMRMLFiberBundleDisplayNode.html" title=" " alt="" coords="261,183,504,209"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="517,185,604,174,693,157,767,134,768,139,694,163,605,179,518,190"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="5,183,212,209"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="226,193,261,193,261,199,226,199"/>
 </map>

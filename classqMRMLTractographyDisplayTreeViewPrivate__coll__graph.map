@@ -1,7 +1,11 @@
 <map id="qMRMLTractographyDisplayTreeViewPrivate" name="qMRMLTractographyDisplayTreeViewPrivate">
-<area shape="rect" id="node1" title=" " alt="" coords="128,185,331,227"/>
-<area shape="rect" id="node2" href="$classqMRMLTractographyDisplayTreeView.html" title=" " alt="" coords="5,81,208,123"/>
-<area shape="rect" id="node3" title=" " alt="" coords="43,5,171,32"/>
-<area shape="rect" id="node4" href="$classqMRMLSceneTractographyDisplayModel.html" title="The Visibility icon is in the same column than the name by default." alt="" coords="232,81,475,123"/>
-<area shape="rect" id="node5" title=" " alt="" coords="240,5,467,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="128,183,331,223"/>
+<area shape="rect" id="Node000002" href="$classqMRMLTractographyDisplayTreeView.html" title=" " alt="" coords="5,80,208,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,127,208,181,205,185,138,131"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="43,5,171,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="109,44,109,80,104,80,104,44"/>
+<area shape="rect" id="Node000004" href="$classqMRMLSceneTractographyDisplayModel.html" title="The Visibility icon is in the same column than the name by default." alt="" coords="232,80,475,120"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="321,131,254,185,251,181,318,127"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="240,5,467,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="356,44,356,80,351,80,351,44"/>
 </map>

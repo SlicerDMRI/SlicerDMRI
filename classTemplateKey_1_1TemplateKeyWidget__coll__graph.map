@@ -1,4 +1,6 @@
 <map id="TemplateKey.TemplateKeyWidget" name="TemplateKey.TemplateKeyWidget">
-<area shape="rect" id="node1" title=" " alt="" coords="5,80,244,107"/>
-<area shape="rect" id="node2" title=" " alt="" coords="11,5,239,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,244,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="11,5,239,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,44,120,78,115,79,113,45"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="136,45,134,79,129,78,131,44"/>
 </map>

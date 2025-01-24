@@ -1,6 +1,9 @@
 <map id="vtkMRMLTractographyDisplayDisplayableManager" name="vtkMRMLTractographyDisplayDisplayableManager">
-<area shape="rect" id="node1" title=" " alt="" coords="28,185,243,227"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,81,223,123"/>
-<area shape="rect" id="node3" href="$classvtkMRMLFiberBundleNode.html" title=" " alt="" coords="247,89,442,115"/>
-<area shape="rect" id="node4" title=" " alt="" coords="266,5,423,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="28,183,243,223"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,80,223,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,133,134,182,129,183,118,134"/>
+<area shape="rect" id="Node000003" href="$classvtkMRMLFiberBundleNode.html" title=" " alt="" coords="247,87,442,113"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="310,121,176,185,174,180,307,116"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="266,5,423,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="347,44,347,87,342,87,342,44"/>
 </map>

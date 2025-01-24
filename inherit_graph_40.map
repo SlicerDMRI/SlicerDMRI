@@ -1,4 +1,11 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,124,32"/>
-<area shape="rect" id="node2" href="$classvtkTensorMask.html" title="Combines a mask and an image." alt="" coords="172,5,292,32"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,84,215,109"/>
+<area shape="rect" id="Node000001" href="$classvtkImageGetTensorComponents.html" title="Six scalar components from tensor." alt="" coords="263,5,493,31"/>
+<area shape="poly" id="edge93_Node000000_Node000001" title=" " alt="" coords="154,76,262,39,308,28,309,33,263,45,156,81"/>
+<area shape="rect" id="Node000002" href="$classvtkImageSetTensorComponents.html" title="Six scalar components to tensor." alt="" coords="263,55,493,80"/>
+<area shape="poly" id="edge94_Node000000_Node000002" title=" " alt="" coords="228,81,263,77,263,83,228,86"/>
+<area shape="rect" id="Node000003" href="$classvtkTeemEstimateDiffusionTensor.html" title=" " alt="" coords="281,105,475,145"/>
+<area shape="poly" id="edge95_Node000000_Node000003" title=" " alt="" coords="228,106,281,112,280,117,228,112"/>
+<area shape="rect" id="Node000004" href="$classvtkTensorRotate.html" title="flip Y axis and negate xy and zy terms." alt="" coords="314,169,442,195"/>
+<area shape="poly" id="edge96_Node000000_Node000004" title=" " alt="" coords="153,113,263,154,314,167,313,172,262,159,151,117"/>
 </map>

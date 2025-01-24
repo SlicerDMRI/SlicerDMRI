@@ -1,3 +1,13 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structTrackInfo.html" title=" " alt="" coords="5,5,87,32"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,149,140,174"/>
+<area shape="rect" id="Node000001" href="$classFiberBundleToLabelMap_1_1FiberBundleToLabelMapTest.html" title=" " alt="" coords="199,5,411,45"/>
+<area shape="poly" id="edge67_Node000000_Node000001" title=" " alt="" coords="92,136,133,95,159,73,187,55,213,43,215,48,189,60,162,78,136,99,96,140"/>
+<area shape="rect" id="Node000002" href="$classNsgPlanTracto_1_1NeurosurgicalPlanningTutorialTractographySelfTestTest.html" title=" " alt="" coords="188,70,423,125"/>
+<area shape="poly" id="edge68_Node000000_Node000002" title=" " alt="" coords="132,142,205,122,206,127,134,147"/>
+<area shape="rect" id="Node000003" href="$classSlicerMRBTest_1_1SlicerMRB.html" title=" " alt="" coords="213,149,397,174"/>
+<area shape="poly" id="edge69_Node000000_Node000003" title=" " alt="" coords="154,159,213,159,213,164,154,164"/>
+<area shape="rect" id="Node000004" href="$classfiber__visibility__crash2438_1_1fiber__visibility__crash2438Test.html" title=" " alt="" coords="195,199,416,239"/>
+<area shape="poly" id="edge70_Node000000_Node000004" title=" " alt="" coords="139,175,224,196,223,201,137,180"/>
+<area shape="rect" id="Node000005" href="$classtest__tractography__display_1_1test__tractography__displayTest.html" title=" " alt="" coords="196,263,415,303"/>
+<area shape="poly" id="edge71_Node000000_Node000005" title=" " alt="" coords="99,182,139,216,189,248,217,260,215,265,187,253,136,220,95,186"/>
 </map>

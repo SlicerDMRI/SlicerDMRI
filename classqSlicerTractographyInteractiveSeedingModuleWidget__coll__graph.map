@@ -1,6 +1,9 @@
 <map id="qSlicerTractographyInteractiveSeedingModuleWidget" name="qSlicerTractographyInteractiveSeedingModuleWidget">
-<area shape="rect" id="node1" title=" " alt="" coords="76,185,296,227"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,89,220,115"/>
-<area shape="rect" id="node3" href="$classvtkMRMLTractographyInteractiveSeedingNode.html" title=" " alt="" coords="244,81,480,123"/>
-<area shape="rect" id="node4" title=" " alt="" coords="303,5,421,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="76,183,296,223"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,87,220,113"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,122,174,181,170,184,127,125"/>
+<area shape="rect" id="Node000003" href="$classvtkMRMLTractographyInteractiveSeedingNode.html" title=" " alt="" coords="244,80,480,120"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="319,129,220,185,218,180,316,124"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="303,5,421,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="365,44,365,80,359,80,359,44"/>
 </map>

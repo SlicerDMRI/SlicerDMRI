@@ -1,6 +1,9 @@
 <map id="vtkHyperStreamlineDTMRI" name="vtkHyperStreamlineDTMRI">
-<area shape="rect" id="node1" title="for VTK_TENS_FRACTIONAL_ANISOTROPY" alt="" coords="5,184,201,211"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,95,159,121"/>
-<area shape="rect" id="node3" href="$classvtkTractographyArray.html" title=" " alt="" coords="183,95,346,121"/>
-<area shape="rect" id="node4" href="$classvtkTractographyPoint.html" title="Special classes for manipulating data." alt="" coords="185,5,345,32"/>
+<area shape="rect" id="Node000001" title="for VTK_TENS_FRACTIONAL_ANISOTROPY" alt="" coords="5,181,201,207"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,93,159,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,131,103,180,98,181,86,133"/>
+<area shape="rect" id="Node000003" href="$classvtkTractographyArray.html" title=" " alt="" coords="183,93,346,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="232,128,127,183,124,179,229,123"/>
+<area shape="rect" id="Node000004" href="$classvtkTractographyPoint.html" title="Special classes for manipulating data." alt="" coords="185,5,345,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="267,45,267,93,262,93,262,45"/>
 </map>

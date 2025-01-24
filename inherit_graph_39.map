@@ -1,4 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" title=" " alt="" coords="5,13,124,39"/>
-<area shape="rect" id="node2" href="$classvtkTensorImplicitFunctionToFunctionSet.html" title="Wrapper class around itk::BSplineInterpolateImageFunction." alt="" coords="172,5,361,47"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,35,167,60"/>
+<area shape="rect" id="Node000001" href="$classvtkSlicerFiberBundleLogic.html" title=" " alt="" coords="236,5,427,31"/>
+<area shape="poly" id="edge91_Node000000_Node000001" title=" " alt="" coords="180,33,235,27,236,32,181,39"/>
+<area shape="rect" id="Node000002" href="$classvtkSlicerTractographyInteractiveSeedingLogic.html" title=" " alt="" coords="215,55,448,95"/>
+<area shape="poly" id="edge92_Node000000_Node000002" title=" " alt="" coords="181,55,215,59,214,65,180,61"/>
 </map>

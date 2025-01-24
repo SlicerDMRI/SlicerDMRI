@@ -1,7 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" title=" " alt="" coords="5,101,233,127"/>
-<area shape="rect" id="node2" href="$classDTINotReproducibleIssue3977_1_1DTINotReproducibleIssue3977Widget.html" title=" " alt="" coords="289,5,553,47"/>
-<area shape="rect" id="node3" href="$classTemplateKey_1_1TemplateKeyWidget.html" title=" " alt="" coords="301,71,540,98"/>
-<area shape="rect" id="node4" href="$classTractographyDownsample_1_1TractographyDownsampleWidget.html" title=" " alt="" coords="281,123,560,164"/>
-<area shape="rect" id="node5" href="$classTractographyExportPLY_1_1TractographyExportPLYWidget.html" title=" " alt="" coords="293,188,548,229"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,13,133,38"/>
+<area shape="rect" id="Node000001" href="$classqMRMLTractographyDisplayTreeView.html" title=" " alt="" coords="181,5,384,45"/>
+<area shape="poly" id="edge32_Node000000_Node000001" title=" " alt="" coords="147,23,181,23,181,28,147,28"/>
 </map>

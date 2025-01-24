@@ -1,5 +1,7 @@
 <map id="vtkMRMLFiberBundleTubeDisplayNode" name="vtkMRMLFiberBundleTubeDisplayNode">
-<area shape="rect" id="node1" title=" " alt="" coords="5,155,279,181"/>
-<area shape="rect" id="node2" href="$classvtkMRMLFiberBundleDisplayNode.html" title=" " alt="" coords="21,80,263,107"/>
-<area shape="rect" id="node3" title=" " alt="" coords="39,5,245,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,152,279,177"/>
+<area shape="rect" id="Node000002" href="$classvtkMRMLFiberBundleDisplayNode.html" title=" " alt="" coords="21,79,263,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,118,145,152,139,152,139,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="39,5,245,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="145,44,145,79,139,79,139,44"/>
 </map>

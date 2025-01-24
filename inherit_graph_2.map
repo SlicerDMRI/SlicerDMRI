@@ -1,5 +1,55 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" title=" " alt="" coords="5,46,112,73"/>
-<area shape="rect" id="node2" href="$classDICOMDiffusionVolumePlugin_1_1DICOMDiffusionVolumePluginClass.html" title=" " alt="" coords="160,5,409,47"/>
-<area shape="rect" id="node3" href="$classDICOMTractographyPlugin_1_1DICOMTractographyPluginClass.html" title=" " alt="" coords="171,71,398,112"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,783,68,809"/>
+<area shape="rect" id="Node000001" href="$classDICOM2FullBrainTractography_1_1DICOM2FullBrainTractography.html" title=" " alt="" coords="138,5,357,45"/>
+<area shape="poly" id="edge4_Node000000_Node000001" title=" " alt="" coords="36,769,44,613,59,387,82,174,97,98,105,72,114,56,136,38,139,42,118,59,110,74,102,99,87,174,64,387,49,613,42,770"/>
+<area shape="rect" id="Node000002" href="$classDICOM2FullBrainTractography_1_1DICOM2FullBrainTractographyWidget.html" title=" " alt="" coords="116,69,379,109"/>
+<area shape="poly" id="edge5_Node000000_Node000002" title=" " alt="" coords="37,769,45,625,61,419,84,226,98,158,114,120,128,107,131,111,118,123,103,159,89,227,66,420,50,625,42,770"/>
+<area shape="rect" id="Node000003" href="$classDICOM2FullBrainTractographyLib_1_1full__tractography__workflow_1_1Slicelet.html" title=" " alt="" coords="135,134,360,189"/>
+<area shape="poly" id="edge6_Node000000_Node000003" title=" " alt="" coords="35,769,37,649,46,478,56,391,70,311,89,244,101,218,114,198,133,182,136,186,118,202,105,221,94,246,75,312,61,392,51,479,42,649,40,769"/>
+<area shape="rect" id="Node000005" href="$classDICOM2FullBrainTractographyLib_1_1full__tractography__workflow_1_1WorkflowConfiguration.html" title=" " alt="" coords="135,213,360,267"/>
+<area shape="poly" id="edge8_Node000000_Node000005" title=" " alt="" coords="36,769,40,663,51,517,61,442,74,374,92,318,114,278,132,262,136,266,118,282,97,320,80,375,66,443,56,517,45,664,41,770"/>
+<area shape="rect" id="Node000006" href="$classDICOM2FullBrainTractographyLib_1_1workflow__support_1_1Workflow.html" title=" " alt="" coords="135,292,359,332"/>
+<area shape="poly" id="edge9_Node000000_Node000006" title=" " alt="" coords="36,769,42,675,54,547,64,482,77,424,94,376,114,342,133,327,137,331,118,346,99,378,82,425,70,483,60,548,47,675,42,769"/>
+<area shape="rect" id="Node000007" href="$classDICOMDiffusionVolumePlugin_1_1DICOMDiffusionVolumePlugin.html" title=" " alt="" coords="138,356,357,396"/>
+<area shape="poly" id="edge10_Node000000_Node000007" title=" " alt="" coords="37,769,44,687,58,578,81,475,96,434,114,406,136,390,139,394,118,410,101,437,86,476,64,579,50,688,42,770"/>
+<area shape="rect" id="Node000008" href="$classDICOMTractographyPlugin_1_1DICOMTractographyPlugin.html" title=" " alt="" coords="150,420,345,460"/>
+<area shape="poly" id="edge11_Node000000_Node000008" title=" " alt="" coords="38,770,47,700,63,610,85,526,99,493,114,470,130,458,148,449,151,453,133,462,118,474,103,495,90,528,68,611,53,700,43,770"/>
+<area shape="rect" id="Node000009" href="$classFiberBundleToLabelMap_1_1FiberBundleToLabelMap.html" title=" " alt="" coords="141,484,353,524"/>
+<area shape="poly" id="edge12_Node000000_Node000009" title=" " alt="" coords="35,769,39,719,50,656,60,623,74,591,91,560,114,534,139,517,142,522,118,538,96,564,78,593,65,625,55,657,44,720,40,770"/>
+<area shape="rect" id="Node000010" href="$classFiberBundleToLabelMap_1_1FiberBundleToLabelMapLogic.html" title=" " alt="" coords="141,548,353,588"/>
+<area shape="poly" id="edge13_Node000000_Node000010" title=" " alt="" coords="38,769,45,731,59,685,81,638,96,617,114,598,139,582,142,587,118,602,100,620,86,641,64,687,51,732,43,770"/>
+<area shape="rect" id="Node000011" href="$classFiberBundleToLabelMap_1_1FiberBundleToLabelMapWidget.html" title=" " alt="" coords="141,612,353,652"/>
+<area shape="poly" id="edge14_Node000000_Node000011" title=" " alt="" coords="44,769,69,715,89,686,114,662,140,647,142,652,118,666,93,690,74,717,49,772"/>
+<area shape="rect" id="Node000012" href="$classNIfTIFile_1_1NIfTIFileFileReader.html" title=" " alt="" coords="146,677,349,702"/>
+<area shape="poly" id="edge15_Node000000_Node000012" title=" " alt="" coords="52,770,79,739,115,711,145,699,147,704,117,716,83,743,56,773"/>
+<area shape="rect" id="Node000013" href="$classNIfTIFile_1_1NIfTIFileFileWriter.html" title=" " alt="" coords="149,726,346,751"/>
+<area shape="poly" id="edge16_Node000000_Node000013" title=" " alt="" coords="77,775,115,761,167,749,168,754,117,767,79,780"/>
+<area shape="rect" id="Node000014" href="$classNsgPlanTracto_1_1NeurosurgicalPlanningTutorialTractographySelfTest.html" title=" " alt="" coords="117,776,378,816"/>
+<area shape="poly" id="edge17_Node000000_Node000014" title=" " alt="" coords="82,793,116,793,116,799,82,799"/>
+<area shape="rect" id="Node000015" href="$classNsgPlanTracto_1_1NeurosurgicalPlanningTutorialTractographySelfTestLogic.html" title=" " alt="" coords="130,841,365,895"/>
+<area shape="poly" id="edge18_Node000000_Node000015" title=" " alt="" coords="81,812,117,825,154,838,152,843,115,831,79,817"/>
+<area shape="rect" id="Node000016" href="$classNsgPlanTracto_1_1NeurosurgicalPlanningTutorialTractographySelfTestWidget.html" title=" " alt="" coords="130,919,365,974"/>
+<area shape="poly" id="edge19_Node000000_Node000016" title=" " alt="" coords="52,819,78,863,96,886,118,905,138,917,136,922,114,909,92,889,74,866,47,822"/>
+<area shape="rect" id="Node000017" href="$classRegisterDMRIModuleTemplates_1_1RegisterDMRIModuleTemplates.html" title=" " alt="" coords="132,999,363,1039"/>
+<area shape="poly" id="edge20_Node000000_Node000017" title=" " alt="" coords="44,822,51,858,65,902,87,946,118,983,137,996,134,1001,114,987,82,949,60,904,46,860,39,823"/>
+<area shape="rect" id="Node000018" href="$classSlicerMRBTest_1_1SlicerMRBTest.html" title=" " alt="" coords="142,1063,353,1089"/>
+<area shape="poly" id="edge21_Node000000_Node000018" title=" " alt="" coords="40,822,44,871,55,933,65,965,78,996,96,1024,118,1049,143,1064,140,1069,114,1053,91,1027,73,998,60,967,50,934,38,872,35,823"/>
+<area shape="rect" id="Node000019" href="$classSlicerMRBTest_1_1SlicerMRBTestWidget.html" title=" " alt="" coords="142,1113,353,1153"/>
+<area shape="poly" id="edge22_Node000000_Node000019" title=" " alt="" coords="44,822,54,888,70,971,91,1048,104,1078,118,1098,143,1116,140,1120,114,1102,99,1081,86,1050,65,972,48,888,39,823"/>
+<area shape="rect" id="Node000020" href="$classTractographyExportPLY_1_1It.html" title=" " alt="" coords="157,1178,337,1203"/>
+<area shape="poly" id="edge23_Node000000_Node000020" title=" " alt="" coords="43,823,50,902,64,1004,87,1101,101,1139,118,1163,136,1177,158,1185,156,1190,134,1181,114,1167,97,1141,82,1103,59,1005,45,902,37,823"/>
+<area shape="rect" id="Node000021" href="$classfiber__visibility__crash2438_1_1fiber__visibility__crash2438.html" title=" " alt="" coords="137,1228,358,1268"/>
+<area shape="poly" id="edge24_Node000000_Node000021" title=" " alt="" coords="42,822,48,910,62,1027,85,1140,100,1184,118,1213,138,1228,135,1232,114,1216,95,1186,79,1141,57,1028,43,911,37,823"/>
+<area shape="rect" id="Node000022" href="$classfiber__visibility__crash2438_1_1fiber__visibility__crash2438Logic.html" title=" " alt="" coords="137,1292,358,1332"/>
+<area shape="poly" id="edge25_Node000000_Node000022" title=" " alt="" coords="41,823,46,923,57,1060,67,1129,81,1192,97,1244,118,1278,138,1294,135,1298,114,1282,92,1246,75,1194,62,1130,52,1061,40,924,36,823"/>
+<area shape="rect" id="Node000023" href="$classfiber__visibility__crash2438_1_1fiber__visibility__crash2438Widget.html" title=" " alt="" coords="137,1356,358,1396"/>
+<area shape="poly" id="edge26_Node000000_Node000023" title=" " alt="" coords="41,822,43,934,53,1091,63,1170,77,1243,95,1302,106,1325,118,1342,138,1358,135,1362,114,1346,101,1328,90,1304,72,1244,58,1171,48,1091,38,935,35,822"/>
+<area shape="rect" id="Node000024" href="$classtest__tractography__display_1_1TestTractographyDisplayLogic.html" title=" " alt="" coords="140,1420,355,1460"/>
+<area shape="poly" id="edge27_Node000000_Node000024" title=" " alt="" coords="40,822,41,946,49,1121,59,1211,73,1293,92,1361,104,1387,118,1406,141,1424,138,1428,114,1410,100,1389,87,1363,68,1295,54,1212,44,1122,36,946,35,822"/>
+<area shape="rect" id="Node000025" href="$classtest__tractography__display_1_1test__tractography__display.html" title=" " alt="" coords="138,1484,357,1524"/>
+<area shape="poly" id="edge28_Node000000_Node000025" title=" " alt="" coords="42,822,50,967,66,1173,89,1366,103,1434,118,1470,139,1487,136,1491,114,1474,98,1435,84,1367,61,1173,45,967,37,823"/>
+<area shape="rect" id="Node000026" href="$classtest__tractography__display_1_1test__tractography__displayWidget.html" title=" " alt="" coords="138,1548,357,1588"/>
+<area shape="poly" id="edge29_Node000000_Node000026" title=" " alt="" coords="42,822,49,979,64,1206,87,1419,102,1494,110,1519,118,1534,139,1551,136,1555,114,1538,105,1521,97,1495,82,1419,59,1206,44,980,36,823"/>
+<area shape="rect" id="Node000004" href="$classDICOM2FullBrainTractographyLib_1_1full__tractography__workflow_1_1full__tractography__workflow__slicelet.html" title=" " alt="" coords="427,134,673,189"/>
+<area shape="poly" id="edge7_Node000003_Node000004" title=" " alt="" coords="374,159,426,159,426,164,374,164"/>
 </map>

@@ -1,4 +1,13 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,140,32"/>
-<area shape="rect" id="node2" href="$classqSlicerFiberBundleReader.html" title=" " alt="" coords="188,5,377,32"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,119,188,145"/>
+<area shape="rect" id="Node000001" href="$classDTINotReproducibleIssue3977_1_1DTINotReproducibleIssue3977.html" title=" " alt="" coords="264,5,487,45"/>
+<area shape="poly" id="edge42_Node000000_Node000001" title=" " alt="" coords="128,110,177,81,235,55,272,43,274,48,237,60,180,86,131,114"/>
+<area shape="rect" id="Node000002" href="$classNIfTIFile_1_1NIfTIFile.html" title=" " alt="" coords="308,70,443,95"/>
+<area shape="poly" id="edge43_Node000000_Node000002" title=" " alt="" coords="179,114,236,104,308,91,308,97,236,109,180,119"/>
+<area shape="rect" id="Node000003" href="$classTemplateKey_1_1TemplateKey.html" title=" " alt="" coords="279,119,471,145"/>
+<area shape="poly" id="edge44_Node000000_Node000003" title=" " alt="" coords="202,129,279,129,279,135,202,135"/>
+<area shape="rect" id="Node000004" href="$classTractographyDownsample_1_1TractographyDownsample.html" title=" " alt="" coords="236,169,515,209"/>
+<area shape="poly" id="edge45_Node000000_Node000004" title=" " alt="" coords="173,145,278,167,277,172,172,150"/>
+<area shape="rect" id="Node000005" href="$classTractographyExportPLY_1_1TractographyExportPLY.html" title=" " alt="" coords="248,233,503,273"/>
+<area shape="poly" id="edge46_Node000000_Node000005" title=" " alt="" coords="126,151,176,186,237,219,271,231,269,236,235,224,173,190,123,155"/>
 </map>

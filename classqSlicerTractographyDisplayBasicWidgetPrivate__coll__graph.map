@@ -1,10 +1,17 @@
 <map id="qSlicerTractographyDisplayBasicWidgetPrivate" name="qSlicerTractographyDisplayBasicWidgetPrivate">
-<area shape="rect" id="node1" title=" " alt="" coords="668,101,867,143"/>
-<area shape="rect" id="node2" title=" " alt="" coords="273,5,493,47"/>
-<area shape="rect" id="node3" href="$classqSlicerTractographyDisplayBasicWidget.html" title=" " alt="" coords="283,71,482,112"/>
-<area shape="rect" id="node4" title=" " alt="" coords="53,78,165,105"/>
-<area shape="rect" id="node5" href="$classvtkMRMLFiberBundleDisplayNode.html" title=" " alt="" coords="261,143,504,170"/>
-<area shape="rect" id="node6" title=" " alt="" coords="5,143,212,170"/>
-<area shape="rect" id="node7" href="$classvtkMRMLFiberBundleNode.html" title=" " alt="" coords="285,194,480,221"/>
-<area shape="rect" id="node8" title=" " alt="" coords="30,194,187,221"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="668,92,867,132"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="273,5,493,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="503,45,645,76,696,89,695,94,643,81,502,51"/>
+<area shape="rect" id="Node000003" href="$classqSlicerTractographyDisplayBasicWidget.html" title=" " alt="" coords="283,69,482,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="496,93,668,104,668,109,496,99"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="53,77,165,102"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="179,87,283,87,283,92,179,92"/>
+<area shape="rect" id="Node000005" href="$classvtkMRMLFiberBundleNode.html" title=" " alt="" coords="285,134,480,159"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="494,136,644,123,667,120,668,126,644,128,494,141"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="30,134,187,159"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="201,144,285,144,285,149,201,149"/>
+<area shape="rect" id="Node000007" href="$classvtkMRMLFiberBundleDisplayNode.html" title=" " alt="" coords="261,197,504,222"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="518,206,581,198,643,183,696,158,739,130,742,134,698,163,645,188,582,203,518,211"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="5,197,212,222"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="226,207,261,207,261,212,226,212"/>
 </map>

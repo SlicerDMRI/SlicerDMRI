@@ -1,8 +1,13 @@
 <map id="qSlicerTractographyDisplayModuleWidgetPrivate" name="qSlicerTractographyDisplayModuleWidgetPrivate">
-<area shape="rect" id="node1" title=" " alt="" coords="651,71,849,112"/>
-<area shape="rect" id="node2" title=" " alt="" coords="269,5,489,47"/>
-<area shape="rect" id="node3" href="$classqSlicerTractographyDisplayModuleWidget.html" title=" " alt="" coords="280,71,479,112"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,78,220,105"/>
-<area shape="rect" id="node5" href="$classvtkMRMLFiberBundleNode.html" title=" " alt="" coords="282,137,477,163"/>
-<area shape="rect" id="node6" title=" " alt="" coords="34,137,191,163"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="651,69,849,109"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="269,5,489,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="503,44,651,70,650,75,502,49"/>
+<area shape="rect" id="Node000003" href="$classqSlicerTractographyDisplayModuleWidget.html" title=" " alt="" coords="280,69,479,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="493,87,650,87,650,92,493,92"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,77,220,102"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="234,87,280,87,280,92,234,92"/>
+<area shape="rect" id="Node000005" href="$classvtkMRMLFiberBundleNode.html" title=" " alt="" coords="282,134,477,159"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="479,129,626,107,650,103,651,108,627,112,480,135"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="34,134,191,159"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="205,144,282,144,282,149,205,149"/>
 </map>

@@ -1,0 +1,11 @@
+<map id="Modules/CLI" name="Modules/CLI">
+<area shape="rect" id="node2" href="dir_8ae1f8a91379aa25cd3dcc455fa067db.html" title="DiffusionTensorScalarMeasurements" alt="" coords="1296,63,1555,88"/>
+<area shape="rect" id="node3" href="dir_b90282265b67d84193eee34c4b9fd322.html" title="DiffusionWeightedVolumeMasking" alt="" coords="1027,63,1272,88"/>
+<area shape="rect" id="node4" href="dir_81634ab082cd47a8f145ab26f48542f0.html" title="DWIToDTIEstimation" alt="" coords="848,63,1003,88"/>
+<area shape="rect" id="node5" href="dir_a6bf78673c9841c100f2c8758bdb1dee.html" title="ExtractDWIShells" alt="" coords="689,63,823,88"/>
+<area shape="rect" id="node6" href="dir_45a52bca4527f6c382660286099f6946.html" title="FiberBundleLabelSelect" alt="" coords="490,63,665,88"/>
+<area shape="rect" id="node7" href="dir_8e512cd51262a48228b38278ac5586fc.html" title="FiberTractMeasurements" alt="" coords="283,63,466,88"/>
+<area shape="rect" id="node8" href="dir_0f93b2e995ba1afd0df1afdfe19979dc.html" title="TractographyLabelMapSeeding" alt="" coords="37,63,259,88"/>
+<area shape="rect" id="clust2" href="dir_c1add5cedffb2f08a25333ea4cbda1cb.html" alt="" coords="27,52,1632,99"/>
+<area shape="rect" id="clust1" href="dir_f2541a3b18981391fa76fac5599e978a.html" title="Modules" alt="" coords="16,16,1643,109"/>
+</map>

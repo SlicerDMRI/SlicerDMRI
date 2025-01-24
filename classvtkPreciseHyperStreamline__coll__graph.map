@@ -1,6 +1,9 @@
 <map id="vtkPreciseHyperStreamline" name="vtkPreciseHyperStreamline">
-<area shape="rect" id="node1" title="Generate hyperstreamline in arbitrary dataset." alt="" coords="46,184,246,211"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,95,172,121"/>
-<area shape="rect" id="node3" href="$classvtkPreciseHyperArray.html" title=" " alt="" coords="196,95,360,121"/>
-<area shape="rect" id="node4" href="$classvtkPreciseHyperPoint.html" title=" " alt="" coords="197,5,359,32"/>
+<area shape="rect" id="Node000001" title="Generate hyperstreamline in arbitrary dataset." alt="" coords="46,181,246,207"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,93,172,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,129,140,179,136,182,102,132"/>
+<area shape="rect" id="Node000003" href="$classvtkPreciseHyperArray.html" title=" " alt="" coords="196,93,360,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="250,128,165,183,162,179,247,124"/>
+<area shape="rect" id="Node000004" href="$classvtkPreciseHyperPoint.html" title=" " alt="" coords="197,5,359,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="281,45,281,93,275,93,275,45"/>
 </map>

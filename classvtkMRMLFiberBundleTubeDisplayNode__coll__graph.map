@@ -1,8 +1,14 @@
 <map id="vtkMRMLFiberBundleTubeDisplayNode" name="vtkMRMLFiberBundleTubeDisplayNode">
-<area shape="rect" id="node1" title=" " alt="" coords="732,56,1005,83"/>
-<area shape="rect" id="node2" href="$classvtkMRMLFiberBundleDisplayNode.html" title=" " alt="" coords="270,5,513,32"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,5,212,32"/>
-<area shape="rect" id="node4" href="$classvtkPolyDataColorLinesByOrientation.html" title="Colors the lines in the polydata by their mean orientation." alt="" coords="261,56,521,83"/>
-<area shape="rect" id="node5" title=" " alt="" coords="25,72,192,99"/>
-<area shape="rect" id="node6" href="$classvtkPolyDataTensorToColor.html" title="Calculates scalar values from vtkPolyData tensors." alt="" coords="295,107,487,133"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="732,55,1005,80"/>
+<area shape="rect" id="Node000002" href="$classvtkMRMLFiberBundleDisplayNode.html" title=" " alt="" coords="270,5,513,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="526,27,708,45,770,52,770,57,708,50,526,32"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,212,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="226,15,270,15,270,21,226,21"/>
+<area shape="rect" id="Node000004" href="$classvtkPolyDataTensorToColor.html" title="Calculates scalar values from vtkPolyData tensors." alt="" coords="295,55,487,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="501,65,732,65,732,70,501,70"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="25,71,192,96"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="205,75,295,70,295,75,206,81"/>
+<area shape="rect" id="Node000006" href="$classvtkPolyDataColorLinesByOrientation.html" title="Colors the lines in the polydata by their mean orientation." alt="" coords="261,104,521,129"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="206,92,284,101,283,107,205,97"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="535,102,708,85,770,77,770,83,708,90,535,107"/>
 </map>
