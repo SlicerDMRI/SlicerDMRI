@@ -11,7 +11,7 @@ set(EXTENSION_CONTRIBUTORS "Lauren O'Donnell (Brigham & Women's Hospital), Isaia
 set(EXTENSION_DESCRIPTION "SlicerDMRI provides tools to load diffusion MRI image data, perform tractography, and quantify results.")
 set(EXTENSION_ICONURL "https://raw.githubusercontent.com/SlicerDMRI/slicerdmri.github.io/master/images/DMRI_3D_SLICER-icon.png")
 set(EXTENSION_SCREENSHOTURLS "https://raw.githubusercontent.com/SlicerDMRI/slicerdmri.github.io/master/images/DMRI_3D_SLICER.jpg")
-set(EXTENSION_DEPENDS "UKFTractography", "SlicerDcm2nii") # Specified as a space separated list or 'NA' if any
+set(EXTENSION_DEPENDS "UKFTractography" "SlicerDcm2nii") # Specified as a space separated list or 'NA' if any
 set(EXTENSION_BUILD_SUBDIRECTORY inner-build)
 
 set(SUPERBUILD_TOPLEVEL_PROJECT inner)
