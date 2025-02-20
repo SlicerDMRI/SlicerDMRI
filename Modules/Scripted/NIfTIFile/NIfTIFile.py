@@ -27,7 +27,7 @@ def _NIfTIFileInstallPackage():
   try:
     import conversion
   except ModuleNotFoundError:
-    slicer.util.pip_install("git+https://github.com/pnlbwh/conversion.git@v2.3")
+    slicer.util.pip_install("https://github.com/pnlbwh/conversion/archive/refs/tags/v2.4.zip")
 
 
 class NIfTIFileWidget(ScriptedLoadableModuleWidget):
