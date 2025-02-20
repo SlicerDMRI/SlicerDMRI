@@ -122,6 +122,8 @@ class NIfTIFileFileReader(object):
 
       diffusionNode.CreateDefaultDisplayNodes()
 
+      slicer.util.setSliceViewerLayers(background=diffusionNode, fit=True)
+
     except Exception as e:
       logging.error('Failed to load file: '+str(e))
       import traceback
