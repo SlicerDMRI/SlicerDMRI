@@ -62,6 +62,16 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="addDirectory" native="true">
+     <property name="text">
+      <string>Add fibers from directory...</string>
+     </property>
+     <property name="toolTip">
+      <string>Select a directory containing .vtp files to load in parallel</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QWidget" name="percentageWidget" native="true">
      <layout class="QFormLayout" name="formLayout">
       <property name="fieldGrowthPolicy">
