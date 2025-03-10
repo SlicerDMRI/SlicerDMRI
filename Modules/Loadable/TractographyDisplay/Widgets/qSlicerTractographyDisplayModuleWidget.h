@@ -48,11 +48,14 @@ public:
   virtual bool setEditedNode(vtkMRMLNode* node, QString role = QString(), QString context = QString()) override;
   virtual double nodeEditable(vtkMRMLNode* node) override;
 
+  Q_INVOKABLE virtual bool loadThreaded(QString directoryPath);
+
 public slots:
   void setFiberBundleNode(vtkMRMLNode*);
   void setFiberBundleNode(vtkMRMLFiberBundleNode*);
   void setPercentageOfFibersShown(double);
   void setSolidTubeColor(bool);
+  void onAddDirectory();
 
 signals:
   void percentageOfFibersShownChanged(double);
