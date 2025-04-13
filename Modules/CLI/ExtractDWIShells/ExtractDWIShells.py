@@ -1,4 +1,4 @@
-#!/usr/bin/env python-real
+#!/usr/bin/env python
 
 import sys
 import argparse
