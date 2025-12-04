@@ -28,15 +28,16 @@
 // Tractography includes
 #include "vtkSlicerTractographyDisplayModuleMRMLExport.h"
 
-class vtkMRMLFiberBundleDisplayNode;
-class vtkExtractSelection;
-class vtkMRMLMarkupsNode;
-class vtkIdTypeArray;
-class vtkExtractPolyDataGeometry;
-class vtkPlanes;
 class vtMRMLModelDisplayNode;
-class vtkPassThrough;
+class vtkExtractPolyDataGeometry;
+class vtkExtractSelection;
 class vtkGeometryFilter;
+class vtkIdTypeArray;
+class vtkLineSource;
+class vtkMRMLFiberBundleDisplayNode;
+class vtkMRMLMarkupsNode;
+class vtkPassThrough;
+class vtkPlanes;
 
 class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleNode : public vtkMRMLModelNode
 {
@@ -204,15 +205,13 @@ protected:
 
   float SubsamplingRatio;
 
-
-  /// ALL MRML nodes
   bool EnableShuffleIDs;
   bool SelectWithMarkups;
   SelectionModeEnum MarkupsSelectionMode;
 
+  /// ALL MRML nodes
   vtkMRMLMarkupsNode *MarkupsNode;
   char *MarkupsNodeID;
-
   virtual void SetMarkupsNodeID(const char* id);
 
   // Pipeline filter objects
@@ -220,17 +219,15 @@ protected:
 
 private:
   // Pipeline filter objects
-  vtkExtractSelection* ExtractSubsampleUG;
-  vtkGeometryFilter* ExtractSubsample;
+  vtkLineSource* DefaultSource;
+  vtkExtractSelection* ExtractSelection;
+  vtkGeometryFilter* GeometryFilter;
   vtkPlanes *Planes;
   vtkPassThrough* LocalPassThrough;
 
   // Internal methods
   void UpdateSubsampling();
   void UpdateROISelection();
-
-  void PrepareROISelection();
-  void PrepareSubsampling();
 };
 
 #endif
