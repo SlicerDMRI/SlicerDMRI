@@ -38,6 +38,8 @@ class vtkMRMLFiberBundleDisplayNode;
 class vtkMRMLMarkupsNode;
 class vtkPassThrough;
 class vtkPlanes;
+class vtkSelection;
+class vtkSelectionNode;
 
 class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleNode : public vtkMRMLModelNode
 {
@@ -224,6 +226,11 @@ private:
   vtkGeometryFilter* GeometryFilter;
   vtkPlanes *Planes;
   vtkPassThrough* LocalPassThrough;
+
+  // for subsampling
+  vtkSelection* Selection;
+  vtkSelectionNode* SelectionNode;
+  vtkIdTypeArray* IdsOfCellsToKeep;
 
   // Internal methods
   void UpdateSubsampling();
