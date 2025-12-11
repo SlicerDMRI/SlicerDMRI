@@ -85,6 +85,9 @@ vtkMRMLFiberBundleNode::~vtkMRMLFiberBundleNode()
   this->Planes->Delete();
   this->ShuffledIds->Delete();
   this->LocalPassThrough->Delete();
+  this->Selection->Delete();
+  this->SelectionNode->Delete();
+  this->IdsOfCellsToKeep->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -111,7 +114,10 @@ vtkMRMLFiberBundleNode::vtkMRMLFiberBundleNode() :
   ExtractSelection(vtkExtractSelection::New()),
   GeometryFilter(vtkGeometryFilter::New()),
   Planes(vtkPlanes::New()),
-  LocalPassThrough(vtkPassThrough::New())
+  LocalPassThrough(vtkPassThrough::New()),
+  Selection(vtkSelection::New()),
+  SelectionNode(vtkSelectionNode::New()),
+  IdsOfCellsToKeep(vtkIdTypeArray::New())
 {
   this->SubsamplingRatio = 1.0;
   this->SelectWithMarkups = false;
@@ -124,16 +130,12 @@ vtkMRMLFiberBundleNode::vtkMRMLFiberBundleNode() :
     this->ExtractFromROI->ExtractBoundaryCellsOn();
 
   // set up ExtractSelection
-  vtkNew<vtkSelection> selection;
-  vtkNew<vtkIdTypeArray> idsOfCellsToKeep;
+  this->SelectionNode->SetContentType(vtkSelectionNode::INDICES);
+  this->SelectionNode->SetFieldType(vtkSelectionNode::CELL);
+  this->SelectionNode->SetSelectionList(this->IdsOfCellsToKeep);
 
-  vtkNew<vtkSelectionNode> selectionNode;
-    selectionNode->SetContentType(vtkSelectionNode::INDICES);
-    selectionNode->SetFieldType(vtkSelectionNode::CELL);
-    selectionNode->SetSelectionList(idsOfCellsToKeep.GetPointer());
-
-  selection->AddNode(selectionNode.GetPointer());
-  this->ExtractSelection->SetInputData(1, selection.GetPointer());
+  this->Selection->AddNode(this->SelectionNode);
+  this->ExtractSelection->SetInputData(1, this->Selection);
 
   // set up pipeline - ExtractSelection is that entry point for the mesh
   // - Default source for when there's no mesh input yet
@@ -535,20 +537,17 @@ void vtkMRMLFiberBundleNode::SetAndObserveMarkupsNodeID(const char *id)
 void vtkMRMLFiberBundleNode::UpdateSubsampling()
 {
   vtkDebugMacro(<< this->GetClassName() << "Updating the subsampling");
-  vtkSelection* selection = vtkSelection::SafeDownCast(this->ExtractSelection->GetInput(1));
 
   vtkPolyData* polyData = getAlgorithmPolyData(this->Superclass::GetMeshConnection());
 
-  if (!(selection && polyData))
+  if (!(this->Selection && polyData))
     {
     return;
     }
 
-  vtkSelectionNode* selectionNode = selection->GetNode(0);
-  vtkIdTypeArray* idsOfCellsToKeep = vtkIdTypeArray::SafeDownCast(selectionNode->GetSelectionList());
   vtkIdType numberOfCellsToKeep = vtkIdType(floor(polyData->GetNumberOfLines() * this->SubsamplingRatio));
 
-  if (numberOfCellsToKeep == idsOfCellsToKeep->GetNumberOfTuples())
+  if (numberOfCellsToKeep == this->IdsOfCellsToKeep->GetNumberOfTuples())
     {
     // no change, no-op
     return;
@@ -576,14 +575,14 @@ void vtkMRMLFiberBundleNode::UpdateSubsampling()
     std::copy(idVector.begin(), idVector.end(), ids);
     }
 
-  idsOfCellsToKeep->Initialize();
-  idsOfCellsToKeep->SetNumberOfTuples(numberOfCellsToKeep);
+  this->IdsOfCellsToKeep->Initialize();
+  this->IdsOfCellsToKeep->SetNumberOfTuples(numberOfCellsToKeep);
   for (vtkIdType i=0; i < numberOfCellsToKeep; i++)
     {
-    idsOfCellsToKeep->SetValue(i, this->ShuffledIds->GetValue(i));
+    this->IdsOfCellsToKeep->SetValue(i, this->ShuffledIds->GetValue(i));
     }
 
-  idsOfCellsToKeep->Modified();
+  this->IdsOfCellsToKeep->Modified();
 
   // tell the displaynode to render
   this->InvokeCustomModifiedEvent( vtkMRMLModelNode::MeshModifiedEvent, this);
