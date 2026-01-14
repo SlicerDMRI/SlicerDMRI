@@ -596,6 +596,8 @@ logic.runBatchOnPaths(sourceFiberPaths, sourceDirectory, destinationDirectory, p
       self.run(node, node, parameters, advanced=1)
     logging.info('ADVANCED Processing completed')
 
+    nodeCollection.UnRegister(None)
+
     return True
 
 class TractographyDownsampleTest(ScriptedLoadableModuleTest):

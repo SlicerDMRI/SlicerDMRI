@@ -21,6 +21,7 @@
 #include "ui_qSlicerTractographyInteractiveSeedingModuleWidget.h"
 
 // VTK includes
+#include <vtkCollection.h>
 #include <vtkNew.h>
 
 //-----------------------------------------------------------------------------
@@ -96,11 +97,11 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::onEnter()
     }
 
   // if we have one dti volume node select it
-  std::vector<vtkMRMLNode*> nodes;
-  this->mrmlScene()->GetNodesByClass("vtkMRMLDiffusionTensorVolumeNode", nodes);
-  if (nodes.size() == 1 && d->DTINodeSelector->currentNode() == 0)
+  vtkSmartPointer<vtkCollection> nodes = vtkSmartPointer<vtkCollection>::Take(
+    this->mrmlScene()->GetNodesByClass("vtkMRMLDiffusionTensorVolumeNode"));
+  if (nodes->GetNumberOfItems() == 1 && d->DTINodeSelector->currentNode() == 0)
     {
-    this->setDiffusionTensorVolumeNode(nodes[0]);
+    this->setDiffusionTensorVolumeNode(vtkMRMLDiffusionTensorVolumeNode::SafeDownCast(nodes->GetItemAsObject(0)));
     }
 
   // if we have one Fiducial List node select it
@@ -108,24 +109,26 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::onEnter()
     {
     int numAnnotationLists = this->mrmlScene()->GetNumberOfNodesByClass("vtkMRMLAnnotationHierarchyNode");
     int numMarkups = this->mrmlScene()->GetNumberOfNodesByClass("vtkMRMLMarkupsFiducialNode");
-    nodes.clear();
+    nodes->RemoveAllItems();
     if (numMarkups > 0)
       {
-      this->mrmlScene()->GetNodesByClass("vtkMRMLMarkupsFiducialNode", nodes);
-      this->setSeedingNode(nodes[0]);
+      vtkSmartPointer<vtkCollection> nodes = vtkSmartPointer<vtkCollection>::Take(
+        this->mrmlScene()->GetNodesByClass("vtkMRMLMarkupsFiducialNode"));
+      this->setSeedingNode(vtkMRMLMarkupsFiducialNode::SafeDownCast(nodes->GetItemAsObject(0)));
       }
     else if (numAnnotationLists > 1)
       {
-      this->mrmlScene()->GetNodesByClass("vtkMRMLAnnotationHierarchyNode", nodes);
-      for (unsigned int i=0; i<nodes.size(); i++)
+      vtkSmartPointer<vtkCollection> nodes = vtkSmartPointer<vtkCollection>::Take(
+        this->mrmlScene()->GetNodesByClass("vtkMRMLAnnotationHierarchyNode"));
+      for (int i=0; i<nodes->GetNumberOfItems(); i++)
         {
-        vtkMRMLAnnotationHierarchyNode *hnode = vtkMRMLAnnotationHierarchyNode::SafeDownCast(nodes[i]);
+        vtkMRMLAnnotationHierarchyNode *hnode = vtkMRMLAnnotationHierarchyNode::SafeDownCast(nodes->GetItemAsObject(i));
         vtkCollection *cnodes = vtkCollection::New();
         hnode->GetDirectChildren(cnodes);
         if (cnodes->GetNumberOfItems() > 0 && cnodes->GetNumberOfItems() < 5 &&
             vtkMRMLAnnotationFiducialNode::SafeDownCast(cnodes->GetItemAsObject(0)) != NULL)
           {
-          this->setSeedingNode(nodes[i]);
+          this->setSeedingNode(vtkMRMLAnnotationFiducialNode::SafeDownCast(nodes->GetItemAsObject(i)));
           cnodes->RemoveAllItems();
           cnodes->Delete();
           break;
@@ -137,9 +140,10 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::onEnter()
     }
 
   // if we don't have FiberBundleNode create it
-  nodes.clear();
-  this->mrmlScene()->GetNodesByClass("vtkMRMLFiberBundleNode", nodes);
-  if (nodes.size() == 0 && d->FiberNodeSelector->currentNode() == 0)
+  nodes->RemoveAllItems();
+  nodes = vtkSmartPointer<vtkCollection>::Take(
+    this->mrmlScene()->GetNodesByClass("vtkMRMLFiberBundleNode"));
+  if (nodes->GetNumberOfItems() == 0 && d->FiberNodeSelector->currentNode() == 0)
     {
     vtkMRMLFiberBundleNode *fiberNode = vtkMRMLFiberBundleNode::New();
     fiberNode->SetScene(this->mrmlScene());
