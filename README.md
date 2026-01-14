@@ -1,6 +1,7 @@
 # SlicerDMRI
 
 [![GitHub release](https://img.shields.io/github/release/SlicerDMRI/SlicerDMRI.svg)](https://github.com/SlicerDMRI/SlicerDMRI/releases/latest)
+[![License](https://img.shields.io/badge/License-BSD-green.svg)](https://github.com/SlicerDMRI/SlicerDMRI/blob/master/License.txt)
 [![Build, test](https://github.com/SlicerDMRI/SlicerDMRI/actions/workflows/build-test.yml/badge.svg?branch=master)](https://github.com/SlicerDMRI/SlicerDMRI/actions/workflows/build-test.yml?query=branch%3Amaster)
 [![GitHub release](https://github.com/SlicerDMRI/SlicerDMRI/actions/workflows/pages/pages-build-deployment/badge.svg)](https://dmri.slicer.org/SlicerDMRI/)
 
