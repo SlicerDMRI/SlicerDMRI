@@ -27,7 +27,7 @@
 class vtkDMRI_EXPORT vtkTractographyPoint { //;prevent man page generation
 public:
     vtkTractographyPoint(); /// method sets up storage
-    vtkTractographyPoint(const vtkTractographyPoint &) = default;
+	vtkTractographyPoint(const vtkTractographyPoint &) = default;
     vtkTractographyPoint &operator=(const vtkTractographyPoint& hp); //for resizing
 
     double   X[3];    /// position
@@ -45,6 +45,7 @@ public:
     double   T0[3];   /// storage for tensor
     double   T1[3];
     double   T2[3];
+    int      IndexInArray{ -1 };
 };
 
 class vtkDMRI_EXPORT vtkTractographyArray { //;prevent man page generation
@@ -61,11 +62,14 @@ public:
   vtkTractographyPoint *GetTractographyPoint(vtkIdType i) {return this->Array + i;};
   vtkTractographyPoint *InsertNextTractographyPoint()
     {
+      vtkTractographyPoint* res = nullptr;
     if ( ++this->MaxId >= this->Size )
       {
       this->Resize(this->MaxId);
       }
-    return this->Array + this->MaxId;
+    res = this->Array + this->MaxId;
+    res->IndexInArray = MaxId;
+    return res;
     }
   vtkTractographyPoint *Resize(vtkIdType sz); //reallocates data
   void Reset() {this->MaxId = -1;};
