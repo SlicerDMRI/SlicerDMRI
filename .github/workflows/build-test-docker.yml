@@ -1,0 +1,70 @@
+name: Build, test using docker
+
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: ubuntu-22.04
+
+    env:
+      BUILD_TYPE: Release
+
+    steps:
+
+    - name: Checkout out SlicerDMRI
+      uses: actions/checkout@v3
+      with:
+        path: ${{ github.workspace }}/SlicerDMRI
+
+    - name: Get specific version of CMake, Ninja
+      uses: lukka/get-cmake@v3.24.2
+
+    - name: Pull Slicer from Docker
+      run:
+        docker pull slicer/slicer-base:latest
+
+    - name: Build SlicerDMRI
+      run: |
+        Slicer_DIR=/usr/src/Slicer-build/Slicer-build
+
+        EXTENSION_NAME=SlicerDMRI
+        EXTENSION_SOURCE_DIR=${{ github.workspace }}/$EXTENSION_NAME
+        EXTENSION_BUILD_DIR=${{ github.workspace }}/$EXTENSION_NAME-build
+
+        docker run \
+          --rm \
+          -v $EXTENSION_SOURCE_DIR:/usr/src/slicerdmri \
+          -v $EXTENSION_BUILD_DIR:/usr/src/slicerdmri-build \
+          -v $EXTENSION_BUILD_DIR:/usr/src/slicerdmri-build \
+          slicer/slicer-base \
+          cmake \
+            -GNinja \
+            -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
+            -DSlicer_DIR:PATH=$Slicer_DIR \
+            -S /usr/src/slicerdmri \
+            -B /usr/src/slicerdmri-build
+
+        docker run \
+          --rm \
+          -v $EXTENSION_BUILD_DIR:/usr/src/slicerdmri-build \
+          slicer/slicer-base \
+          cmake \
+            --build /usr/src/slicerdmri-build \
+            --config $BUILD_TYPE \
+
+    - name: Test SlicerDMRI
+      run: |
+        docker run \
+          --rm \
+          slicer/slicer-base \
+          ctest -V /usr/src/slicerdmri-build
