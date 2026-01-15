@@ -14,6 +14,16 @@
 ==============================================================================*/
 
 // Qt includes
+#include <QtConcurrent/QtConcurrent>
+#include <QDir>
+#include <QFileDialog>
+#include <QFuture>
+#include <QFutureSynchronizer>
+#include <QFutureWatcher>
+
+// VTK includes
+#include <vtkPolyData.h>
+#include <vtkXMLPolyDataReader.h>
 
 // CTK includes
 //#include <ctkModelTester.h>
@@ -23,11 +33,13 @@
 #include "qMRMLSceneTractographyDisplayModel.h"
 // MRML includes
 
+#include <vtkMRMLDiffusionTensorDisplayPropertiesNode.h>
 #include "vtkMRMLNode.h"
 #include "vtkMRMLFiberBundleNode.h"
 #include "vtkMRMLFiberBundleDisplayNode.h"
 #include "vtkMRMLFiberBundleStorageNode.h"
 #include "vtkMRMLFiberBundleTubeDisplayNode.h"
+#include "vtkMRMLFiberBundleLineDisplayNode.h"
 #include "vtkMRMLInteractionNode.h"
 #include "vtkMRMLScene.h"
 
@@ -65,6 +77,8 @@ void qSlicerTractographyDisplayModuleWidgetPrivate::init()
 
   this->percentageOfFibersShown->setTracking(false);
 
+  QObject::connect(this->addDirectory, SIGNAL(clicked()),
+                   q, SLOT(onAddDirectory()));
   QObject::connect(this->percentageOfFibersShown, SIGNAL(valueChanged(double)),
                    q, SLOT(setPercentageOfFibersShown(double)));
   QObject::connect(q, SIGNAL(percentageOfFibersShownChanged(double)),
@@ -192,6 +206,8 @@ void qSlicerTractographyDisplayModuleWidget::setPercentageOfFibersShown(double p
     emit percentageOfFibersShownChanged(d->PercentageOfFibersShown);
     }
 }
+
+//-----------------------------------------------------------
 void qSlicerTractographyDisplayModuleWidget::setSolidTubeColor(bool solid)
 {
   std::vector<vtkMRMLNode *> nodes;
@@ -210,4 +226,119 @@ void qSlicerTractographyDisplayModuleWidget::setSolidTubeColor(bool solid)
       node->SetColorMode(vtkMRMLFiberBundleDisplayNode::colorModeScalar);
       }
     }
+}
+
+//-----------------------------------------------------------
+void qSlicerTractographyDisplayModuleWidget::onAddDirectory()
+{
+  QString directoryPath = QFileDialog::getExistingDirectory(this, "Directory to add");
+  if (directoryPath != "")
+    {
+    this->loadThreaded(directoryPath);
+    }
+}
+
+
+//-----------------------------------------------------------
+
+typedef void ReaderType;
+
+class FiberReader : public QObject
+{
+
+public:
+
+  QFuture<ReaderType> read(vtkMRMLScene * miniScene, const QString& filePath)
+    {
+    auto fiberReaderWorker = [](vtkMRMLScene *miniScene, const QString& filePath)
+      {
+      qDebug() << "inside worker with " << filePath;
+
+      vtkNew<vtkXMLPolyDataReader> reader;
+      reader->SetFileName(filePath.toStdString().c_str());
+      reader->Update();
+      vtkPolyData *polyData = reader->GetOutput();
+
+      vtkNew<vtkMRMLFiberBundleNode> fiberBundleNode;
+      QString nodeName = QFileInfo(filePath).baseName();
+      fiberBundleNode->SetName(nodeName.toStdString().c_str());
+
+      fiberBundleNode->SetAndObservePolyData(polyData);
+      miniScene->AddNode(fiberBundleNode);
+      fiberBundleNode->CreateDefaultDisplayNodes();
+
+      };
+    return QtConcurrent::run(fiberReaderWorker, miniScene, filePath);
+    }
+};
+
+
+//-----------------------------------------------------------
+bool qSlicerTractographyDisplayModuleWidget::loadThreaded(QString directoryPath)
+{
+  this->mrmlScene()->StartState(vtkMRMLScene::ImportState);
+
+  QFutureSynchronizer<void> futureSynchrnonizer;
+
+  QDir dir(directoryPath);
+  QStringList nameFilter;
+  nameFilter << "*.vtp";
+  foreach(QString fileName, dir.entryList(nameFilter)) {
+
+    vtkMRMLScene *miniScene = vtkMRMLScene::New();
+    miniScene->CopyRegisteredNodesToScene(this->mrmlScene());
+
+    FiberReader reader;
+
+    QFuture<ReaderType> future = reader.read(miniScene, directoryPath+"/"+fileName);
+    futureSynchrnonizer.addFuture(future);
+
+    QFutureWatcher<ReaderType> *watcher = new QFutureWatcher<ReaderType>();
+
+    connect(watcher, &QFutureWatcher<ReaderType>::finished,
+      [=]() {
+        qDebug() << "Got back scene with " << miniScene->GetNumberOfNodes();
+
+        vtkMRMLNode *node = miniScene->GetNthNodeByClass(0, "vtkMRMLFiberBundleNode");
+        vtkMRMLFiberBundleNode *fiberBundleNode = vtkMRMLFiberBundleNode::SafeDownCast(node);
+        std::vector<vtkMRMLFiberBundleDisplayNode *> fiberDisplayNodes;
+        int displayNodeCount = fiberBundleNode->GetNumberOfDisplayNodes();
+        for (int displayNodeIndex = 0; displayNodeIndex < displayNodeCount; displayNodeIndex++)
+          {
+          vtkMRMLDisplayNode *displayNode = fiberBundleNode->GetNthDisplayNode(displayNodeIndex);
+          vtkMRMLFiberBundleDisplayNode *fiberDisplayNode = vtkMRMLFiberBundleDisplayNode::SafeDownCast(displayNode);
+          fiberDisplayNodes.push_back(fiberDisplayNode);
+          }
+        fiberBundleNode->RemoveAllDisplayNodeIDs();
+        fiberBundleNode->Register(fiberBundleNode);
+        miniScene->RemoveNode(fiberBundleNode);
+        for(auto fiberDisplayNode : fiberDisplayNodes)
+          {
+          vtkMRMLDiffusionTensorDisplayPropertiesNode *propertiesNode;
+          propertiesNode = fiberDisplayNode->GetDiffusionTensorDisplayPropertiesNode();
+          propertiesNode->Register(fiberBundleNode);
+          miniScene->RemoveNode(propertiesNode);
+          this->mrmlScene()->AddNode(propertiesNode);
+          propertiesNode->Delete();
+          fiberDisplayNode->Register(fiberBundleNode);
+          miniScene->RemoveNode(fiberDisplayNode);
+          this->mrmlScene()->AddNode(fiberDisplayNode);
+          fiberDisplayNode->Delete();
+          fiberDisplayNode->SetAndObserveDiffusionTensorDisplayPropertiesNodeID(propertiesNode->GetID());
+          fiberDisplayNode->SetAndObserveColorNodeID("vtkMRMLColorTableNodeRainbow");
+          fiberBundleNode->AddAndObserveDisplayNodeID(fiberDisplayNode->GetID());
+          }
+        this->mrmlScene()->AddNode(fiberBundleNode);
+        fiberBundleNode->Delete();
+        miniScene->Delete();
+      }
+    );
+    watcher->setFuture(future);
+  }
+
+  futureSynchrnonizer.waitForFinished();
+
+  this->mrmlScene()->EndState(vtkMRMLScene::ImportState);
+
+  return true;
 }
