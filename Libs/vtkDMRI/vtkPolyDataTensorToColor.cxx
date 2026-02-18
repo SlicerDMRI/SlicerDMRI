@@ -15,6 +15,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPolyDataTensorToColor.h"
 
 #include "vtkCellArray.h"
+#include "vtkCellData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
@@ -419,6 +420,9 @@ int vtkPolyDataTensorToColor::RequestData(
 
   //output->SetVerts(verts);
   //verts->Delete();
+
+  // Pass cell data through (preserves ghost array for rendering visibility control)
+  output->GetCellData()->PassData(input->GetCellData());
 
   output->Squeeze();
   delete [] pts;

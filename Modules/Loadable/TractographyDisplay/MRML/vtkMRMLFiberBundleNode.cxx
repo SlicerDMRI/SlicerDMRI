@@ -26,6 +26,7 @@ Version:   $Revision: 1.3 $
 
 // VTK includes
 #include <vtkAlgorithmOutput.h>
+#include <vtkCellData.h>
 #include <vtkCommand.h>
 #include <vtkDataSetAttributes.h>
 #include <vtkExtractPolyDataGeometry.h>
@@ -579,7 +580,6 @@ void vtkMRMLFiberBundleNode::UpdateSubsampling()
     }
 
   ghosts->Modified();
-  polyData->GetCellData()->Modified();
 
   this->LastNumberOfCellsKept = numberOfCellsToKeep;
 
