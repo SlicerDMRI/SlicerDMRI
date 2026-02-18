@@ -26,10 +26,10 @@ Version:   $Revision: 1.3 $
 
 // VTK includes
 #include <vtkAlgorithmOutput.h>
-#include <vtkCellData.h>
+#include <vtkCellArray.h>
 #include <vtkCommand.h>
-#include <vtkDataSetAttributes.h>
 #include <vtkExtractPolyDataGeometry.h>
+#include <vtkIdList.h>
 #include <vtkIdTypeArray.h>
 #include <vtkInformation.h>
 #include <vtkLineSource.h>
@@ -38,7 +38,7 @@ Version:   $Revision: 1.3 $
 #include <vtkPointData.h>
 #include <vtkPlanes.h>
 #include <vtkPassThrough.h>
-#include <vtkUnsignedCharArray.h>
+#include <vtkPolyData.h>
 #include <vtkVersion.h>
 
 // STD includes
@@ -81,24 +81,23 @@ vtkMRMLFiberBundleNode::~vtkMRMLFiberBundleNode()
   this->Planes->Delete();
   this->ShuffledIds->Delete();
   this->LocalPassThrough->Delete();
+  this->SubsampledPolyData->Delete();
 }
 
 //-----------------------------------------------------------------------------
 /* Pipeline:
   *
-  * Basic pipeline is:
-  *  MeshConnection -> ExtractFromROI
-  *
-  * Subsampling is applied by writing a vtkGhostType cell array directly onto
-  * the input polydata. The standard vtkPolyDataMapper skips HIDDENCELL-flagged
-  * cells, so no extract/geometry filter is needed in the pipeline.
+  * Subsampling produces SubsampledPolyData, which shares its points and point-data
+  * arrays by reference with the original input polydata. Only the cell array is rebuilt
+  * each time the ratio changes. This means scalar array names/active-attributes are
+  * stable across subsample updates (the Qt scalar combo box never sees them change).
   *
   * Output:
   *
   *   if SelectWithMarkups
-  *     ExtractFromROI -> LocalPassThrough -> GetFilteredMeshConnection
+  *     MeshConnection -> ExtractFromROI -> LocalPassThrough -> GetFilteredMeshConnection
   *   else
-  *     MeshConnection -> LocalPassThrough -> GetFilteredMeshConnection
+  *     SubsampledPolyData -> LocalPassThrough -> GetFilteredMeshConnection
 */
 
 //-----------------------------------------------------------------------------
@@ -110,7 +109,8 @@ vtkMRMLFiberBundleNode::vtkMRMLFiberBundleNode() :
   DefaultSource(vtkLineSource::New()),
   Planes(vtkPlanes::New()),
   LocalPassThrough(vtkPassThrough::New()),
-  LastNumberOfCellsKept(-1)
+  LastNumberOfCellsKept(-1),
+  SubsampledPolyData(vtkPolyData::New())
 {
   this->SubsamplingRatio = 1.0;
   this->SelectWithMarkups = false;
@@ -122,11 +122,11 @@ vtkMRMLFiberBundleNode::vtkMRMLFiberBundleNode() :
   this->ExtractFromROI->ExtractInsideOn();
   this->ExtractFromROI->ExtractBoundaryCellsOn();
 
-  // set up pipeline - DefaultSource is the entry point when there's no mesh input yet
+  // set up pipeline - DefaultSource is the entry point for ExtractFromROI when there's no mesh input yet
   this->ExtractFromROI->SetInputConnection(this->DefaultSource->GetOutputPort());
 
-  // default mode: produce sub-sampled output - this input is changed when ROI is active
-  this->LocalPassThrough->SetInputConnection(this->DefaultSource->GetOutputPort());
+  // default mode: LocalPassThrough serves SubsampledPolyData (populated by UpdateSubsampling)
+  this->LocalPassThrough->SetInputData(this->SubsampledPolyData);
 }
 
 //----------------------------------------------------------------------------
@@ -380,8 +380,7 @@ void vtkMRMLFiberBundleNode::SetMeshConnection(vtkAlgorithmOutput *inputPort)
 {
   this->Superclass::SetMeshConnection(inputPort);
   this->ExtractFromROI->SetInputConnection(0, inputPort);
-  if (!this->SelectWithMarkups)
-    this->LocalPassThrough->SetInputConnection(inputPort);
+  // LocalPassThrough serves SubsampledPolyData; UpdateSubsampling() (called below) will populate it
 
   fixupPolyDataTensors(inputPort);
 
@@ -440,7 +439,7 @@ void vtkMRMLFiberBundleNode::SetSelectWithMarkups(bool state)
     if (state == true)
       this->LocalPassThrough->SetInputConnection(this->ExtractFromROI->GetOutputPort());
     else
-      this->LocalPassThrough->SetInputConnection(this->Superclass::GetMeshConnection());
+      this->LocalPassThrough->SetInputData(this->SubsampledPolyData);
     }
   this->EndModify(wasModifying);
 
@@ -467,7 +466,7 @@ void vtkMRMLFiberBundleNode::SetMarkupsSelectionMode(SelectionModeEnum mode)
     }
   else
     {
-    this->LocalPassThrough->SetInputConnection(this->Superclass::GetMeshConnection());
+    this->LocalPassThrough->SetInputData(this->SubsampledPolyData);
     }
 
   this->UpdateROISelection();
@@ -558,28 +557,22 @@ void vtkMRMLFiberBundleNode::UpdateSubsampling()
     return;
     }
 
-  // Get or create the ghost array on the input polydata
-  const char* ghostName = vtkDataSetAttributes::GhostArrayName();
-  vtkUnsignedCharArray* ghosts = vtkUnsignedCharArray::SafeDownCast(
-      polyData->GetCellData()->GetArray(ghostName));
-  if (!ghosts || ghosts->GetNumberOfTuples() != numberOfFibers)
-    {
-    vtkNew<vtkUnsignedCharArray> newGhosts;
-    newGhosts->SetName(ghostName);
-    newGhosts->SetNumberOfTuples(numberOfFibers);
-    newGhosts->FillValue(0);
-    polyData->GetCellData()->AddArray(newGhosts);
-    ghosts = newGhosts;
-    }
+  // Build SubsampledPolyData with only the visible cells.
+  // Points and point-data arrays are shared by reference from the original polydata,
+  // so the scalar combo box sees the same array names and never resets to "None".
+  this->SubsampledPolyData->Initialize();
+  this->SubsampledPolyData->SetPoints(polyData->GetPoints());
+  this->SubsampledPolyData->GetPointData()->ShallowCopy(polyData->GetPointData());
 
-  // First numberOfCellsToKeep entries in ShuffledIds are visible; the rest are hidden
-  ghosts->FillValue(0);
-  for (vtkIdType i = numberOfCellsToKeep; i < numberOfFibers; i++)
+  vtkNew<vtkCellArray> visibleLines;
+  vtkNew<vtkIdList> ptIds;
+  for (vtkIdType i = 0; i < numberOfCellsToKeep; i++)
     {
-    ghosts->SetValue(this->ShuffledIds->GetValue(i), vtkDataSetAttributes::HIDDENCELL);
+    polyData->GetCellPoints(this->ShuffledIds->GetValue(i), ptIds);
+    visibleLines->InsertNextCell(ptIds);
     }
-
-  ghosts->Modified();
+  this->SubsampledPolyData->SetLines(visibleLines);
+  this->SubsampledPolyData->Modified();
 
   this->LastNumberOfCellsKept = numberOfCellsToKeep;
 

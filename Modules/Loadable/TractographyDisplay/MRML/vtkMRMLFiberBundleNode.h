@@ -36,7 +36,7 @@ class vtkMRMLFiberBundleDisplayNode;
 class vtkMRMLMarkupsNode;
 class vtkPassThrough;
 class vtkPlanes;
-class vtkUnsignedCharArray;
+class vtkPolyData;
 
 class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleNode : public vtkMRMLModelNode
 {
@@ -224,6 +224,7 @@ private:
 
   // for subsampling
   vtkIdType LastNumberOfCellsKept;
+  vtkPolyData* SubsampledPolyData;
 
   // Internal methods
   void UpdateSubsampling();
