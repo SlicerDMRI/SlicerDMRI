@@ -30,16 +30,13 @@
 
 class vtMRMLModelDisplayNode;
 class vtkExtractPolyDataGeometry;
-class vtkExtractSelection;
-class vtkGeometryFilter;
 class vtkIdTypeArray;
 class vtkLineSource;
 class vtkMRMLFiberBundleDisplayNode;
 class vtkMRMLMarkupsNode;
 class vtkPassThrough;
 class vtkPlanes;
-class vtkSelection;
-class vtkSelectionNode;
+class vtkUnsignedCharArray;
 
 class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleNode : public vtkMRMLModelNode
 {
@@ -222,15 +219,11 @@ protected:
 private:
   // Pipeline filter objects
   vtkLineSource* DefaultSource;
-  vtkExtractSelection* ExtractSelection;
-  vtkGeometryFilter* GeometryFilter;
   vtkPlanes *Planes;
   vtkPassThrough* LocalPassThrough;
 
   // for subsampling
-  vtkSelection* Selection;
-  vtkSelectionNode* SelectionNode;
-  vtkIdTypeArray* IdsOfCellsToKeep;
+  vtkIdType LastNumberOfCellsKept;
 
   // Internal methods
   void UpdateSubsampling();
