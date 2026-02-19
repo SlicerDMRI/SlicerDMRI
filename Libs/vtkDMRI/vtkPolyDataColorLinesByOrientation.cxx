@@ -267,6 +267,9 @@ int vtkPolyDataColorLinesByOrientation::RequestData(
   }
   cellColor->Delete();
 
+  // Pass cell data through (preserves ghost array for rendering visibility control)
+  output->GetCellData()->PassData(input->GetCellData());
+
   output->Squeeze();
   delete [] pts;
 
