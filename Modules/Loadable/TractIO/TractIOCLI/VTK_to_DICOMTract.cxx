@@ -53,13 +53,29 @@ using std::string;
 
 // Mapping from text keys to Supplement 181 family codes in DCMTK dictionary
 std::map<string, DSRBasicCodedEntry> algorithmFamily_keys = {
+#ifdef CODE_DCM_Deterministic
   { "Deterministic", CODE_DCM_Deterministic },
   { "Probabilistic", CODE_DCM_Probabilistic },
   { "Global", CODE_DCM_Global },
+#else
+#ifndef CODE_DCM_DeterministicTrackingAlgorithm
+#error "DCMTK version too old, need at least version with TrackingAlgorithm codes"
+#endif
+  { "Deterministic", CODE_DCM_DeterministicTrackingAlgorithm },
+  { "Probabilistic", CODE_DCM_ProbabilisticTrackingAlgorithm },
+  { "Global", CODE_DCM_GlobalTrackingAlgorithm },
+#endif
   { "FACT", CODE_DCM_FACT },
   { "Streamline", CODE_DCM_Streamline },
   { "TEND", CODE_DCM_TEND },
+#ifdef CODE_DCM_Bootstrap
   { "Bootstrap", CODE_DCM_Bootstrap },
+#else
+#ifndef CODE_DCM_BootstrapTrackingAlgorithm
+#error "DCMTK version too old, need at least version with TrackingAlgorithm codes"
+#endif
+  { "Bootstrap", CODE_DCM_BootstrapTrackingAlgorithm },
+#endif
   { "Euler", CODE_DCM_Euler },
   { "RungeKutta", CODE_DCM_RungeKutta }
 };
