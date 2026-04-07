@@ -89,6 +89,7 @@ endif()
 add_subdirectory("Modules/Scripted/TractographyExportPLY")
 add_subdirectory("Modules/Scripted/TractographyDownsample")
 add_subdirectory("Modules/Scripted/NIfTIFile")
+add_subdirectory("Modules/Scripted/TRXFile")
 
 if (${SlicerDMRI_ENABLE_TRACTIO})
   add_subdirectory("Modules/Loadable/TractIO")
