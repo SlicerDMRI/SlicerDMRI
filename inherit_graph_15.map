@@ -1,13 +1,15 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,119,233,145"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,145,233,170"/>
 <area shape="rect" id="Node000001" href="$classDTINotReproducibleIssue3977_1_1DTINotReproducibleIssue3977Widget.html" title=" " alt="" coords="289,5,553,45"/>
-<area shape="poly" id="edge56_Node000000_Node000001" title=" " alt="" coords="155,110,213,82,280,55,321,43,322,48,282,60,215,87,157,115"/>
+<area shape="poly" id="edge58_Node000000_Node000001" title=" " alt="" coords="147,134,206,94,280,55,315,43,317,48,282,60,209,98,150,139"/>
 <area shape="rect" id="Node000002" href="$classNIfTIFile_1_1NIfTIFileWidget.html" title=" " alt="" coords="331,70,511,95"/>
-<area shape="poly" id="edge57_Node000000_Node000002" title=" " alt="" coords="210,114,342,93,343,98,211,120"/>
-<area shape="rect" id="Node000003" href="$classTemplateKey_1_1TemplateKeyWidget.html" title=" " alt="" coords="301,119,540,145"/>
-<area shape="poly" id="edge58_Node000000_Node000003" title=" " alt="" coords="247,129,301,129,301,135,247,135"/>
-<area shape="rect" id="Node000004" href="$classTractographyDownsample_1_1TractographyDownsampleWidget.html" title=" " alt="" coords="281,169,560,209"/>
-<area shape="poly" id="edge59_Node000000_Node000004" title=" " alt="" coords="201,145,316,167,315,172,200,150"/>
-<area shape="rect" id="Node000005" href="$classTractographyExportPLY_1_1TractographyExportPLYWidget.html" title=" " alt="" coords="293,233,548,273"/>
-<area shape="poly" id="edge60_Node000000_Node000005" title=" " alt="" coords="152,150,211,185,282,219,319,231,317,236,280,224,209,190,150,155"/>
+<area shape="poly" id="edge59_Node000000_Node000002" title=" " alt="" coords="169,138,281,104,335,93,336,98,282,109,170,143"/>
+<area shape="rect" id="Node000003" href="$classTRXFile_1_1TRXFileWidget.html" title=" " alt="" coords="335,119,506,145"/>
+<area shape="poly" id="edge60_Node000000_Node000003" title=" " alt="" coords="247,144,335,136,335,142,247,149"/>
+<area shape="rect" id="Node000004" href="$classTemplateKey_1_1TemplateKeyWidget.html" title=" " alt="" coords="301,169,540,194"/>
+<area shape="poly" id="edge61_Node000000_Node000004" title=" " alt="" coords="247,165,301,169,301,175,247,170"/>
+<area shape="rect" id="Node000005" href="$classTractographyDownsample_1_1TractographyDownsampleWidget.html" title=" " alt="" coords="281,219,560,259"/>
+<area shape="poly" id="edge62_Node000000_Node000005" title=" " alt="" coords="175,172,282,203,334,216,333,221,281,208,173,177"/>
+<area shape="rect" id="Node000006" href="$classTractographyExportPLY_1_1TractographyExportPLYWidget.html" title=" " alt="" coords="293,283,548,323"/>
+<area shape="poly" id="edge63_Node000000_Node000006" title=" " alt="" coords="146,177,206,223,243,248,282,268,315,280,313,285,280,273,240,252,203,228,143,181"/>
 </map>

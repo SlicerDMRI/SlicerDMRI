@@ -16,5 +16,10 @@ var searchData=
   ['tractographyexportply_13',['TractographyExportPLY',['../classTractographyExportPLY_1_1TractographyExportPLY.html',1,'TractographyExportPLY']]],
   ['tractographyexportplylogic_14',['TractographyExportPLYLogic',['../classTractographyExportPLY_1_1TractographyExportPLYLogic.html',1,'TractographyExportPLY']]],
   ['tractographyexportplytest_15',['TractographyExportPLYTest',['../classTractographyExportPLY_1_1TractographyExportPLYTest.html',1,'TractographyExportPLY']]],
-  ['tractographyexportplywidget_16',['TractographyExportPLYWidget',['../classTractographyExportPLY_1_1TractographyExportPLYWidget.html',1,'TractographyExportPLY']]]
+  ['tractographyexportplywidget_16',['TractographyExportPLYWidget',['../classTractographyExportPLY_1_1TractographyExportPLYWidget.html',1,'TractographyExportPLY']]],
+  ['trxfile_17',['TRXFile',['../classTRXFile_1_1TRXFile.html',1,'TRXFile']]],
+  ['trxfilefilereader_18',['TRXFileFileReader',['../classTRXFile_1_1TRXFileFileReader.html',1,'TRXFile']]],
+  ['trxfilefilewriter_19',['TRXFileFileWriter',['../classTRXFile_1_1TRXFileFileWriter.html',1,'TRXFile']]],
+  ['trxfiletest_20',['TRXFileTest',['../classTRXFile_1_1TRXFileTest.html',1,'TRXFile']]],
+  ['trxfilewidget_21',['TRXFileWidget',['../classTRXFile_1_1TRXFileWidget.html',1,'TRXFile']]]
 ];
