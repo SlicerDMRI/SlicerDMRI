@@ -6,6 +6,8 @@
 #include "vtkImageData.h"
 #include <vtkVersion.h>
 
+// STD includes
+#include <iostream>
 
 vtkStandardNewMacro(vtkHyperStreamlineTeem);
 
@@ -224,7 +226,7 @@ bool vtkHyperStreamlineTeem::DatasetOrSettingsChanged()
 
 
 
-void vtkHyperStreamlineTeem::PrintSelf(ostream& os, vtkIndent indent)
+void vtkHyperStreamlineTeem::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }

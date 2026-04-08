@@ -19,6 +19,7 @@
 #include "vtkDMRIConfigure.h"
 
 // STD includes
+#include <iosfwd>
 #include <vector>  /// for the buffer
 
 #define VTK_INTEGRATE_MAJOR_EIGENVECTOR  0
@@ -40,7 +41,7 @@ class  vtkDMRI_EXPORT vtkBSplineInterpolateImageFunction : public vtkImplicitFun
  public:
   static vtkBSplineInterpolateImageFunction *New();
   vtkTypeMacro(vtkBSplineInterpolateImageFunction, vtkImplicitFunction );
-  virtual void PrintSelf(ostream& os, vtkIndent indent) override;
+  virtual void PrintSelf(std::ostream& os, vtkIndent indent) override;
 
   using vtkImplicitFunction::EvaluateFunction;
   virtual double EvaluateFunction (double x[ImageDimension]) override;

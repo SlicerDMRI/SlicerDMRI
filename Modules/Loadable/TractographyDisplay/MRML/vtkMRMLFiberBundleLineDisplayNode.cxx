@@ -29,6 +29,9 @@ Version:   $Revision: 1.3 $
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 
+// STD includes
+#include <iostream>
+
 //----------------------------------------------------------------------------
 vtkMRMLNodeNewMacro(vtkMRMLFiberBundleLineDisplayNode);
 
@@ -50,7 +53,7 @@ vtkMRMLFiberBundleLineDisplayNode::~vtkMRMLFiberBundleLineDisplayNode()
 }
 
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleLineDisplayNode::PrintSelf(ostream& os, vtkIndent indent)
+void vtkMRMLFiberBundleLineDisplayNode::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }

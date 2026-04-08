@@ -20,6 +20,9 @@
 #include "vtkMRMLScene.h"
 #include "vtkSmartPointer.h"
 
+// STD includes
+#include <iostream>
+
 int vtkMRMLFiberBundleNodeTest1(int argc, char * argv[] )
 {
   if (argc < 2)

@@ -36,6 +36,9 @@
 #undef HAVE_CONFIG_H
 #endif
 
+// STD includes
+#include <iostream>
+
 #include "DiffusionWeightedVolumeMaskingCLP.h"
 
 int main( int argc, char * argv[] )

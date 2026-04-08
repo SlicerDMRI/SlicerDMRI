@@ -44,6 +44,7 @@ Version:   $Revision: 1.3 $
 // STD includes
 #include <algorithm>
 #include <cassert>
+#include <iostream>
 #include <math.h>
 #include <vector>
 #include <sstream>
@@ -130,7 +131,7 @@ vtkMRMLFiberBundleNode::vtkMRMLFiberBundleNode() :
 }
 
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleNode::WriteXML(ostream& of, int nIndent)
+void vtkMRMLFiberBundleNode::WriteXML(std::ostream& of, int nIndent)
 {
   // Write all attributes not equal to their defaults
 
@@ -213,7 +214,7 @@ void vtkMRMLFiberBundleNode::Copy(vtkMRMLNode *anode)
 }
 
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleNode::PrintSelf(ostream& os, vtkIndent indent)
+void vtkMRMLFiberBundleNode::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   Superclass::PrintSelf(os,indent);
 }

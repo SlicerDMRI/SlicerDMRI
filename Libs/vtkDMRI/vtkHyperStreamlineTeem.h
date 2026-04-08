@@ -16,12 +16,15 @@
 #include "teem/ten.h"
 #include "teem/nrrd.h"
 
+// STD includes
+#include <iosfwd>
+
 class vtkDMRI_EXPORT vtkHyperStreamlineTeem : public vtkHyperStreamlineDTMRI
 {
 
  public:
   vtkTypeMacro(vtkHyperStreamlineTeem,vtkHyperStreamlineDTMRI);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(std::ostream& os, vtkIndent indent) override;
 
   static vtkHyperStreamlineTeem *New();
 

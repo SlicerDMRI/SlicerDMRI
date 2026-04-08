@@ -13,6 +13,9 @@
 ==========================================================================*/
 #include "vtkPluginFilterWatcher.h"
 
+// STD includes
+#include <iostream>
+
 // MRML includes
 #include <vtkMRMLLinearTransformNode.h>
 #include <vtkMRMLScene.h>

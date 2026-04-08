@@ -21,6 +21,9 @@
 #include "vtkInitialValueProblemSolver.h" /// to get the function set
 #include <vtkVersion.h>
 
+// STD includes
+#include <iosfwd>
+
 #define VTK_INTEGRATE_FORWARD 0
 #define VTK_INTEGRATE_BACKWARD 1
 #define VTK_INTEGRATE_BOTH_DIRECTIONS 2
@@ -65,7 +68,7 @@ class vtkDMRI_EXPORT vtkPreciseHyperStreamline : public vtkPolyDataAlgorithm
 {
  public:
   vtkTypeMacro(vtkPreciseHyperStreamline,vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(std::ostream& os, vtkIndent indent) override;
 
   ///
   /// Construct object with initial starting position (0,0,0); integration

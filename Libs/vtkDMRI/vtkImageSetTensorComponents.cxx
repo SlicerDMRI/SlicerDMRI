@@ -23,6 +23,8 @@
 #include <vtkStructuredPointsWriter.h>
 #include <vtkVersion.h>
 
+// STD includes
+#include <iostream>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkImageSetTensorComponents);
@@ -231,11 +233,11 @@ void vtkImageSetTensorComponents::ThreadedExecute(vtkImageData *inData,
     }
 }
 
-void vtkImageSetTensorComponents::PrintSelf(ostream& os, vtkIndent indent)
+void vtkImageSetTensorComponents::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "NumberOfComponents: " << this->NumberOfComponents << endl;
+  os << indent << "NumberOfComponents: " << this->NumberOfComponents << std::endl;
   os << indent << "Components: ( "
      << this->Components[0] << ", "
      << this->Components[1] << ", "

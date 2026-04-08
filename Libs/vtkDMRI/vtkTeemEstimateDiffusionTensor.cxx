@@ -21,6 +21,8 @@
 #include "vtkFloatArray.h"
 #include <vtkVersion.h>
 
+// STD includes
+#include <iostream>
 
 #define VTKEPS 10e-12
 
@@ -92,7 +94,7 @@ vtkTeemEstimateDiffusionTensor::~vtkTeemEstimateDiffusionTensor()
 }
 
 //----------------------------------------------------------------------------
-void vtkTeemEstimateDiffusionTensor::PrintSelf(ostream& os, vtkIndent indent)
+void vtkTeemEstimateDiffusionTensor::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
@@ -355,7 +357,7 @@ static void vtkTeemEstimateDiffusionTensorExecute(vtkTeemEstimateDiffusionTensor
   // Set Ten Context
   tenEstimateContext *tec = tenEstimateContextNew();
   if (self->SetTenContext(tec,ngrad,nbmat)) {
-    cout<<"TenContext cannot be set. Bailing out"<<endl;
+    std::cout<<"TenContext cannot be set. Bailing out"<<std::endl;
     tenEstimateContextNix(tec);
     nrrdNuke(nbmat);
     nrrdNix(ngrad);

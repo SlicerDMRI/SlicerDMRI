@@ -23,6 +23,7 @@ Version:   $Revision: 1.2 $
 #include <vtkObjectFactory.h>
 
 // STD includes
+#include <iostream>
 #include <sstream>
 
 //------------------------------------------------------------------------------
@@ -72,7 +73,7 @@ vtkMRMLTractographyInteractiveSeedingNode::~vtkMRMLTractographyInteractiveSeedin
 }
 
 //----------------------------------------------------------------------------
-void vtkMRMLTractographyInteractiveSeedingNode::WriteXML(ostream& of, int nIndent)
+void vtkMRMLTractographyInteractiveSeedingNode::WriteXML(std::ostream& of, int nIndent)
 {
   Superclass::WriteXML(of, nIndent);
 
@@ -413,7 +414,7 @@ void vtkMRMLTractographyInteractiveSeedingNode::Copy(vtkMRMLNode *anode)
 }
 
 //----------------------------------------------------------------------------
-void vtkMRMLTractographyInteractiveSeedingNode::PrintSelf(ostream& os, vtkIndent indent)
+void vtkMRMLTractographyInteractiveSeedingNode::PrintSelf(std::ostream& os, vtkIndent indent)
 {
 
   vtkMRMLNode::PrintSelf(os,indent);

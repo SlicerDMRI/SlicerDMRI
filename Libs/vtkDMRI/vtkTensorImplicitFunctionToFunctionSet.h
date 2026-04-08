@@ -25,13 +25,16 @@
 #include "vtkFunctionSet.h"
 #include "vtkImageData.h"
 
+// STD includes
+#include <iosfwd>
+
 /// \brief Wrapper class around itk::BSplineInterpolateImageFunction.
 class vtkDMRI_EXPORT vtkTensorImplicitFunctionToFunctionSet : public vtkFunctionSet
 {
 public:
   static vtkTensorImplicitFunctionToFunctionSet *New();
   vtkTypeMacro(vtkTensorImplicitFunctionToFunctionSet, vtkFunctionSet );
-  virtual void PrintSelf(ostream& os, vtkIndent indent) override;
+  virtual void PrintSelf(std::ostream& os, vtkIndent indent) override;
   using vtkFunctionSet::FunctionValues;
   virtual int FunctionValues(double* x, double* f) override;
   int GetTensor(double *x, double * f);

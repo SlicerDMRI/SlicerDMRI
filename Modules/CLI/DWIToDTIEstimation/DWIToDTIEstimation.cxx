@@ -22,6 +22,9 @@
 // ITK includes
 #include <itkFloatingPointExceptions.h>
 
+// STD includes
+#include <iostream>
+
 #define MAT_TOL 1e-6
 bool transformsNotEqual(const vtkMatrix4x4* mat1, const vtkMatrix4x4* mat2);
 

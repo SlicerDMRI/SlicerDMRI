@@ -23,6 +23,9 @@
 #include "vtkImageMask.h"
 #include "vtkThreadedImageAlgorithm.h"
 
+// STD includes
+#include <iosfwd>
+
 /// \brief Combines a mask and an image.
 ///
 /// vtkTensorMask combines a mask with an image.  Non zero mask
@@ -41,7 +44,7 @@ public:
   vtkTypeMacro(vtkTensorMask,vtkImageMask);
 
   static vtkTensorMask *New();
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(std::ostream& os, vtkIndent indent) override;
 
 protected:
   vtkTensorMask();

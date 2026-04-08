@@ -19,6 +19,9 @@
 
 #include "vtkThreadedImageAlgorithm.h"
 
+// STD includes
+#include <iosfwd>
+
 /// \brief Six scalar components from tensor.
 ///
 /// vtkImageGetTensorComponents gets from the tensor the 6 components and
@@ -33,7 +36,7 @@ class vtkDMRI_EXPORT vtkImageGetTensorComponents : public vtkThreadedImageAlgori
 public:
   static vtkImageGetTensorComponents *New();
   vtkTypeMacro(vtkImageGetTensorComponents,vtkThreadedImageAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(std::ostream& os, vtkIndent indent);
 
   ///
   /// Set/Get the components to extract.

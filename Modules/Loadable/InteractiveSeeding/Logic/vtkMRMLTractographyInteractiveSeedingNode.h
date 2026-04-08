@@ -27,6 +27,9 @@
 
 #include "vtkIntxSeedingLogicExport.h"
 
+// STD includes
+#include <iosfwd>
+
 class vtkImageData;
 
 class VTK_SLICER_TRACTOGRAPHYINTERACTIVESEEDING_MODULE_LOGIC_EXPORT vtkMRMLTractographyInteractiveSeedingNode :
@@ -35,7 +38,7 @@ class VTK_SLICER_TRACTOGRAPHYINTERACTIVESEEDING_MODULE_LOGIC_EXPORT vtkMRMLTract
 public:
   static vtkMRMLTractographyInteractiveSeedingNode *New();
   vtkTypeMacro(vtkMRMLTractographyInteractiveSeedingNode,vtkMRMLNode);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(std::ostream& os, vtkIndent indent) override;
 
   // Description:
   // Create instance of a GAD node.
@@ -47,7 +50,7 @@ public:
 
   // Description:
   // Write this node's information to a MRML file in XML format.
-  virtual void WriteXML(ostream& of, int indent) override;
+  virtual void WriteXML(std::ostream& of, int indent) override;
 
   // Description:
   // Copy the node's attributes to this object

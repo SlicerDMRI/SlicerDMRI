@@ -20,6 +20,9 @@
 #include "vtkDiffusionTensorMathematics.h" /// for VTK_TENS_FRACTIONAL_ANISOTROPY
 #include "vtkTractographyPointAndArray.h"
 
+// STD includes
+#include <iosfwd>
+
 /// \brief Generate hyperstreamline in arbitrary dataset.
 ///
 /// vtkHyperStreamlineDTMRI is a filter that integrates through a tensor field to
@@ -47,7 +50,7 @@ class vtkDMRI_EXPORT vtkHyperStreamlineDTMRI : public vtkHyperStreamline
 {
 public:
   vtkTypeMacro(vtkHyperStreamlineDTMRI,vtkHyperStreamline);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(std::ostream& os, vtkIndent indent) override;
 
   ///
   /// Construct object with initial starting position (0,0,0); integration

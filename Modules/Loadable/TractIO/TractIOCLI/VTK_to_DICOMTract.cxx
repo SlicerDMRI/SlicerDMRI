@@ -1,6 +1,7 @@
 // std includes
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 #include <iterator>
 #include <memory>
 #include <sstream>

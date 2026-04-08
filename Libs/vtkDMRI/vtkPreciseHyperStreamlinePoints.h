@@ -22,12 +22,15 @@
 #include "vtkPreciseHyperStreamline.h"
 #include "vtkPoints.h"
 
+// STD includes
+#include <iosfwd>
+
 class vtkDMRI_EXPORT vtkPreciseHyperStreamlinePoints : public vtkPreciseHyperStreamline
 {
 public:
   static vtkPreciseHyperStreamlinePoints *New();
   vtkTypeMacro(vtkPreciseHyperStreamlinePoints,vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(std::ostream& os, vtkIndent indent) override;
 
   vtkGetObjectMacro(PreciseHyperStreamline0,vtkPoints);
   vtkGetObjectMacro(PreciseHyperStreamline1,vtkPoints);

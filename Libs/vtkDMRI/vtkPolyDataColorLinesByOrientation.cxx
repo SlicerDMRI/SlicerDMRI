@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkDiffusionTensorMathematics.h"
 #include <math.h>
 
+// STD includes
+#include <iostream>
 
 
 vtkStandardNewMacro(vtkPolyDataColorLinesByOrientation);
@@ -282,7 +284,7 @@ int vtkPolyDataColorLinesByOrientation::FillInputPortInformation(int, vtkInforma
   return 1;
 }
 
-void vtkPolyDataColorLinesByOrientation::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPolyDataColorLinesByOrientation::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }

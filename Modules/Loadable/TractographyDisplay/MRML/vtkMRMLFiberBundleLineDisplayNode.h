@@ -24,6 +24,9 @@
 
 #include "vtkMRMLFiberBundleDisplayNode.h"
 
+// STD includes
+#include <iosfwd>
+
 class vtkPolyData;
 class vtkPolyDataTensorToColor;
 class vtkPolyDataColorLinesByOrientation;
@@ -35,7 +38,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleLineDi
  public:
   static vtkMRMLFiberBundleLineDisplayNode *New (  );
   vtkTypeMacro ( vtkMRMLFiberBundleLineDisplayNode, vtkMRMLFiberBundleDisplayNode );
-  void PrintSelf ( ostream& os, vtkIndent indent ) override;
+  void PrintSelf ( std::ostream& os, vtkIndent indent ) override;
 
   //--------------------------------------------------------------------------
   /// MRMLNode methods

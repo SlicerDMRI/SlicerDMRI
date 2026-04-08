@@ -26,6 +26,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkDiffusionTensorMathematics.h"
 #include <math.h>
 
+// STD includes
+#include <iostream>
+
 vtkStandardNewMacro(vtkPolyDataTensorToColor);
 
 // Construct with lower threshold=0, upper threshold=1, and threshold
@@ -436,7 +439,7 @@ int vtkPolyDataTensorToColor::FillInputPortInformation(int, vtkInformation *info
   return 1;
 }
 
-void vtkPolyDataTensorToColor::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPolyDataTensorToColor::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }

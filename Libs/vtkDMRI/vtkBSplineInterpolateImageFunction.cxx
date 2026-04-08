@@ -19,6 +19,9 @@
 
 #include <math.h>
 
+// STD includes
+#include <iostream>
+
 vtkStandardNewMacro(vtkBSplineInterpolateImageFunction);
 
 void vtkBSplineInterpolateImageFunction::SetInterpolationWeights(
@@ -306,7 +309,7 @@ void vtkBSplineInterpolateImageFunction::ApplyMirrorBoundaryConditions(
     }
 }
 
-void vtkBSplineInterpolateImageFunction::PrintSelf(ostream& os, vtkIndent indent) {
+void vtkBSplineInterpolateImageFunction::PrintSelf(std::ostream& os, vtkIndent indent) {
   vtkImplicitFunction::PrintSelf( os, indent );
   os << indent << "Spline Order: " << this->SplineOrder << std::endl;
 }

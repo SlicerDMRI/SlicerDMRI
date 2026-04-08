@@ -28,6 +28,9 @@ Version:   $Revision: 1.3 $
 #include <vtkPointData.h>
 #include <vtkVersion.h>
 
+// STD includes
+#include <iostream>
+
 //----------------------------------------------------------------------------
 vtkMRMLNodeNewMacro(vtkMRMLFiberBundleGlyphDisplayNode);
 
@@ -47,7 +50,7 @@ vtkMRMLFiberBundleGlyphDisplayNode::~vtkMRMLFiberBundleGlyphDisplayNode()
 }
 
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleGlyphDisplayNode::WriteXML(ostream& of, int nIndent)
+void vtkMRMLFiberBundleGlyphDisplayNode::WriteXML(std::ostream& of, int nIndent)
 {
   // Write all attributes not equal to their defaults
 
@@ -103,7 +106,7 @@ void vtkMRMLFiberBundleGlyphDisplayNode::Copy(vtkMRMLNode *anode)
 }
 
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleGlyphDisplayNode::PrintSelf(ostream& os, vtkIndent indent)
+void vtkMRMLFiberBundleGlyphDisplayNode::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   Superclass::PrintSelf(os,indent);
   os << indent << "TwoDimensionalVisibility:             " << this->TwoDimensionalVisibility << "\n";

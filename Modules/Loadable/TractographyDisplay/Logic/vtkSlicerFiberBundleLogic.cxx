@@ -38,6 +38,9 @@
 #include <itksys/SystemTools.hxx>
 #include <itksys/Directory.hxx>
 
+// STD includes
+#include <iostream>
+
 vtkStandardNewMacro(vtkSlicerFiberBundleLogic);
 
 //----------------------------------------------------------------------------
@@ -173,7 +176,7 @@ int vtkSlicerFiberBundleLogic::SaveFiberBundle (const char* filename, vtkMRMLFib
 }
 
 //----------------------------------------------------------------------------
-void vtkSlicerFiberBundleLogic::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSlicerFiberBundleLogic::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->vtkObject::PrintSelf(os, indent);
 

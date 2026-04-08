@@ -24,6 +24,7 @@
 #include <vtkVersion.h>
 
 // STD includes
+#include <iostream>
 #include <string>
 
 int main( int argc, char * argv[] )

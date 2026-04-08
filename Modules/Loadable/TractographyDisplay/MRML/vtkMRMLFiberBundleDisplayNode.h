@@ -28,13 +28,16 @@
 // Tractography includes
 #include "vtkSlicerTractographyDisplayModuleMRMLExport.h"
 
+// STD includes
+#include <iosfwd>
+
 class vtkMRMLDiffusionTensorDisplayPropertiesNode;
 
 class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleDisplayNode : public vtkMRMLModelDisplayNode
 {
  public:
   vtkTypeMacro(vtkMRMLFiberBundleDisplayNode, vtkMRMLModelDisplayNode);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(std::ostream& os, vtkIndent indent) override;
 
   //--------------------------------------------------------------------------
   /// MRMLNode methods
@@ -46,7 +49,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleDispla
 
   ///
   /// Write this node's information to a MRML file in XML format.
-  virtual void WriteXML ( ostream& of, int indent ) override;
+  virtual void WriteXML ( std::ostream& of, int indent ) override;
 
   ///
   /// Copy the node's attributes to this object

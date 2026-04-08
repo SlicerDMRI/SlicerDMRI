@@ -22,6 +22,9 @@
 #include <vtkVersion.h>
 #include "teem/nrrd.h"
 
+// STD includes
+#include <iosfwd>
+
 /* avoid name conflicts with symbols from python */
 #undef ECHO
 #undef B0
@@ -136,7 +139,7 @@ class vtkDMRI_EXPORT vtkTeemEstimateDiffusionTensor : public vtkThreadedImageAlg
   ~vtkTeemEstimateDiffusionTensor();
   vtkTeemEstimateDiffusionTensor(const vtkTeemEstimateDiffusionTensor&);
   void operator=(const vtkTeemEstimateDiffusionTensor&);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(std::ostream& os, vtkIndent indent) override;
 
   int NumberOfGradients;
 

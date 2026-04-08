@@ -31,6 +31,7 @@ class vtkMRMLFiberBundleNode;
 #include <vtkMRMLAbstractThreeDViewDisplayableManager.h>
 
 // STD includes
+#include <iosfwd>
 #include <vector>
 
 /// \ingroup Slicer_QtModules_Tractography
@@ -40,7 +41,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRMLDM_EXPORT vtkMRMLTractographyDis
 public:
   static vtkMRMLTractographyDisplayDisplayableManager *New();
   vtkTypeMacro(vtkMRMLTractographyDisplayDisplayableManager, vtkMRMLAbstractThreeDViewDisplayableManager);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(std::ostream& os, vtkIndent indent) override;
 
   vtkGetMacro(EnableFiberEdit, int);
   vtkSetMacro(EnableFiberEdit, int);

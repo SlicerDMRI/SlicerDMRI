@@ -21,6 +21,9 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 
+// STD includes
+#include <iostream>
+
 vtkStandardNewMacro(vtkHyperStreamlineDTMRI);
 
 vtkHyperStreamlineDTMRI::vtkHyperStreamlineDTMRI()
@@ -898,7 +901,7 @@ void vtkHyperStreamlineDTMRI::BuildLinesForSingleTrajectory(vtkDataSet *input, v
 
 }
 
-void vtkHyperStreamlineDTMRI::PrintSelf(ostream& os, vtkIndent indent)
+void vtkHyperStreamlineDTMRI::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 

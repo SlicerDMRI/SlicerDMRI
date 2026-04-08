@@ -30,6 +30,7 @@ Version:   $Revision: 1.3 $
 #include <vtkTubeFilter.h>
 
 // STD includes
+#include <iostream>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -73,7 +74,7 @@ vtkMRMLFiberBundleTubeDisplayNode::~vtkMRMLFiberBundleTubeDisplayNode()
 }
 
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleTubeDisplayNode::WriteXML(ostream& of, int nIndent)
+void vtkMRMLFiberBundleTubeDisplayNode::WriteXML(std::ostream& of, int nIndent)
 {
   // Write all attributes not equal to their defaults
   this->Superclass::WriteXML(of, nIndent);
@@ -132,7 +133,7 @@ void vtkMRMLFiberBundleTubeDisplayNode::Copy(vtkMRMLNode *anode)
 }
 
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleTubeDisplayNode::PrintSelf(ostream& os, vtkIndent indent)
+void vtkMRMLFiberBundleTubeDisplayNode::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "TubeNumberOfSides:             " << this->TubeNumberOfSides << "\n";
