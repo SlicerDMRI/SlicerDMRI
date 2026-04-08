@@ -191,17 +191,17 @@ class TractCloudLogic(ScriptedLoadableModuleLogic):
             self.progressCallback(fraction)
 
     def _ensureDependencies(self):
-        """Install tractcloud package if needed."""
-        try:
-            import tractcloud
-        except ImportError:
+        """Install tractcloud package if needed.
+
+        Uses importlib.util.find_spec to check for packages without
+        importing them, avoiding loading torch/CUDA in the main process.
+        """
+        import importlib.util
+        if importlib.util.find_spec("tractcloud") is None:
             self._status("Installing tractcloud package...")
             slicer.util.pip_install(
                 "git+https://github.com/SlicerDMRI/TractCloud.git@inference-cli")
-        # Verify torch is available
-        try:
-            import torch
-        except ImportError:
+        if importlib.util.find_spec("torch") is None:
             self._status("Installing PyTorch...")
             slicer.util.pip_install("torch torchvision torchaudio")
 
@@ -325,8 +325,6 @@ class TractCloudLogic(ScriptedLoadableModuleLogic):
 
     def _loadResults(self):
         """Load output VTP files into MRML scene with hierarchy and colors."""
-        from tractcloud.tract_mapping import TRACT_FULL_NAMES
-
         shNode = slicer.mrmlScene.GetSubjectHierarchyNode()
         sceneItemID = shNode.GetSceneItemID()
         baseName = self._inputNode.GetName() + "_TractCloud"
