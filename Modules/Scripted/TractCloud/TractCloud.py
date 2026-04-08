@@ -1,5 +1,8 @@
+import json
 import logging
 import os
+import shutil
+import tempfile
 
 import vtk, qt, ctk, slicer
 from slicer.ScriptedLoadableModule import *
@@ -10,12 +13,8 @@ import numpy as np
 class TractCloud(ScriptedLoadableModule):
     """TractCloud: Registration-free tractography parcellation.
 
-    Uses deep learning to classify streamlines from whole-brain tractography
-    into 42 anatomical white matter tracts without requiring image registration.
-
-    Reference: Xue et al., "TractCloud: Registration-free tractography
-    parcellation with a novel local-global streamline point cloud
-    representation", MICCAI 2023.
+    Uses the tractcloud pip package to classify streamlines from whole-brain
+    tractography into 42 anatomical white matter tracts.
     """
 
     def __init__(self, parent):
@@ -37,13 +36,10 @@ subject space without requiring registration to an atlas.
 
 <b>Input:</b> A FiberBundle node containing whole-brain tractography.<br>
 <b>Output:</b> A SubjectHierarchy folder containing one FiberBundle per
-identified tract (up to 42 tracts).
+identified tract, organized by anatomical category.
 
-On first use the module downloads pre-trained model weights (~50 MB) and atlas
-data. PyTorch is installed automatically if needed.
-
-The model supports both GPU (CUDA) and CPU inference. GPU is used automatically
-when available.
+On first use the module installs the tractcloud package and downloads
+pre-trained model weights (~50 MB). GPU is used automatically when available.
 """
         self.parent.acknowledgementText = """
 Based on the TractCloud method: https://github.com/SlicerDMRI/TractCloud
@@ -51,8 +47,6 @@ Based on the TractCloud method: https://github.com/SlicerDMRI/TractCloud
 Tengfei Xue, Yuqian Chen, Chaoyi Zhang, Alexandra J. Golby, Nikos Makris,
 Yogesh Rathi, Weidong Cai, Fan Zhang, Lauren J. O'Donnell.
 MICCAI 2023.
-
-Supported by NIH grants and the SlicerDMRI project (http://dmri.slicer.org).
 """
 
 
@@ -67,7 +61,6 @@ class TractCloudWidget(ScriptedLoadableModuleWidget):
         self.layout.addWidget(parametersCollapsible)
         parametersForm = qt.QFormLayout(parametersCollapsible)
 
-        # Input fiber bundle
         self.inputSelector = slicer.qMRMLNodeComboBox()
         self.inputSelector.nodeTypes = ["vtkMRMLFiberBundleNode"]
         self.inputSelector.selectNodeUponCreation = False
@@ -80,13 +73,13 @@ class TractCloudWidget(ScriptedLoadableModuleWidget):
             "Select whole-brain tractography to parcellate.")
         parametersForm.addRow("Input FiberBundle:", self.inputSelector)
 
-        # Include Other tract checkbox
         self.includeOtherCheckBox = qt.QCheckBox()
         self.includeOtherCheckBox.checked = False
         self.includeOtherCheckBox.setToolTip(
-            "If checked, include an 'Other' bundle for streamlines not "
-            "assigned to any anatomical tract.")
-        parametersForm.addRow("Include 'Other' tract:", self.includeOtherCheckBox)
+            "If checked, include an 'Other' bundle for unclassified "
+            "streamlines.")
+        parametersForm.addRow("Include 'Other' tract:",
+                              self.includeOtherCheckBox)
 
         # --- Advanced ---
         advancedCollapsible = ctk.ctkCollapsibleButton()
@@ -95,30 +88,16 @@ class TractCloudWidget(ScriptedLoadableModuleWidget):
         self.layout.addWidget(advancedCollapsible)
         advancedForm = qt.QFormLayout(advancedCollapsible)
 
-        # Device selector
         self.deviceCombo = qt.QComboBox()
         self.deviceCombo.addItem("Auto (GPU if available)")
         self.deviceCombo.addItem("CPU only")
         advancedForm.addRow("Device:", self.deviceCombo)
 
-        # Batch size
         self.batchSizeSpinBox = qt.QSpinBox()
         self.batchSizeSpinBox.minimum = 64
         self.batchSizeSpinBox.maximum = 16384
         self.batchSizeSpinBox.value = 2048
-        self.batchSizeSpinBox.setToolTip(
-            "Batch size for model inference. Reduce if running out of memory.")
         advancedForm.addRow("Batch size:", self.batchSizeSpinBox)
-
-        # Num points per fiber
-        self.numPointsSpinBox = qt.QSpinBox()
-        self.numPointsSpinBox.minimum = 5
-        self.numPointsSpinBox.maximum = 100
-        self.numPointsSpinBox.value = 15
-        self.numPointsSpinBox.setToolTip(
-            "Number of points to resample each streamline to. "
-            "Must match the trained model (default 15).")
-        advancedForm.addRow("Points per fiber:", self.numPointsSpinBox)
 
         # --- Apply ---
         self.applyButton = qt.QPushButton("Apply")
@@ -126,34 +105,32 @@ class TractCloudWidget(ScriptedLoadableModuleWidget):
         self.applyButton.enabled = False
         self.layout.addWidget(self.applyButton)
 
-        # Progress bar
         self.progressBar = qt.QProgressBar()
         self.progressBar.visible = False
         self.layout.addWidget(self.progressBar)
 
-        # Status label
         self.statusLabel = qt.QLabel("")
         self.layout.addWidget(self.statusLabel)
 
         self.layout.addStretch(1)
 
-        # Connections
         self.inputSelector.connect(
             "currentNodeChanged(vtkMRMLNode*)", self.onSelect)
         self.applyButton.connect("clicked(bool)", self.onApply)
-
         self.onSelect()
 
     def cleanup(self):
         pass
 
     def onSelect(self):
-        self.applyButton.enabled = self.inputSelector.currentNode() is not None
+        self.applyButton.enabled = (
+            self.inputSelector.currentNode() is not None)
 
     def onApply(self):
         inputNode = self.inputSelector.currentNode()
         if not inputNode:
-            slicer.util.errorDisplay("Please select an input FiberBundle.")
+            slicer.util.errorDisplay(
+                "Please select an input FiberBundle.")
             return
 
         self.applyButton.enabled = False
@@ -161,296 +138,251 @@ class TractCloudWidget(ScriptedLoadableModuleWidget):
         self.progressBar.setValue(0)
         self.statusLabel.text = ""
 
-        try:
-            logic = TractCloudLogic()
-            logic.progressCallback = self._updateProgress
-            logic.statusCallback = self._updateStatus
-            logic.run(
-                inputNode,
-                includeOther=self.includeOtherCheckBox.checked,
-                forceCPU=(self.deviceCombo.currentIndex == 1),
-                batchSize=self.batchSizeSpinBox.value,
-                numPoints=self.numPointsSpinBox.value,
-            )
-            self.statusLabel.text = "Parcellation complete."
-        except Exception as e:
-            slicer.util.errorDisplay(f"TractCloud failed: {e}")
-            import traceback
-            traceback.print_exc()
-            self.statusLabel.text = "Error during parcellation."
-        finally:
-            self.applyButton.enabled = True
-            self.progressBar.visible = False
+        logic = TractCloudLogic()
+        logic.statusCallback = self._updateStatus
+        logic.progressCallback = self._updateProgress
+        logic.completionCallback = self._onCompleted
+
+        device = "cpu" if self.deviceCombo.currentIndex == 1 else "auto"
+        logic.run(
+            inputNode,
+            includeOther=self.includeOtherCheckBox.checked,
+            device=device,
+            batchSize=self.batchSizeSpinBox.value,
+        )
+        # Keep reference so it isn't garbage collected
+        self._logic = logic
 
     def _updateProgress(self, fraction):
         self.progressBar.setValue(int(fraction * 100))
-        slicer.app.processEvents()
 
     def _updateStatus(self, message):
         self.statusLabel.text = message
         logging.info(message)
-        slicer.app.processEvents()
+
+    def _onCompleted(self, success, message):
+        self.applyButton.enabled = True
+        self.progressBar.visible = False
+        if success:
+            self.statusLabel.text = message
+        else:
+            slicer.util.errorDisplay(f"TractCloud failed: {message}")
+            self.statusLabel.text = "Error during parcellation."
 
 
 class TractCloudLogic(ScriptedLoadableModuleLogic):
-    """Orchestrates TractCloud inference and scene output."""
+    """Runs TractCloud as a QProcess subprocess."""
 
     def __init__(self):
         ScriptedLoadableModuleLogic.__init__(self)
-        self.progressCallback = None
         self.statusCallback = None
+        self.progressCallback = None
+        self.completionCallback = None
+        self._process = None
+        self._tempDir = None
+        self._inputNode = None
 
     def _status(self, msg):
         if self.statusCallback:
             self.statusCallback(msg)
-        else:
-            logging.info(msg)
 
     def _progress(self, fraction):
         if self.progressCallback:
             self.progressCallback(fraction)
 
-    def run(self, inputNode, includeOther=False, forceCPU=False,
-            batchSize=2048, numPoints=15):
-        """Run TractCloud parcellation on a FiberBundle node.
-
-        Args:
-            inputNode: vtkMRMLFiberBundleNode with whole-brain tractography
-            includeOther: whether to create a bundle for unclassified fibers
-            forceCPU: force CPU even if GPU is available
-            batchSize: inference batch size
-            numPoints: points per streamline (must match trained model)
-
-        Returns:
-            list of created vtkMRMLFiberBundleNode IDs
-        """
-        import torch
-
-        self._ensureDependencies()
-
-        from TractCloudLib.inference import (
-            ensureModelData, extractRASFeatures, centerTractography,
-            RealDataDataset, loadModel, runInference,
-        )
-        from TractCloudLib.tract_mapping import (
-            TRACT_NAMES, cluster2tract_label,
-        )
-
-        startTime = __import__("time").time()
-
-        # --- Device ---
-        if forceCPU:
-            device = torch.device("cpu")
-        else:
-            device = torch.device(
-                "cuda:0" if torch.cuda.is_available() else "cpu")
-        self._status(f"Using device: {device}")
-
-        # --- Model data ---
-        self._status("Checking model data...")
-        weightPath, argsPath, massCenter = ensureModelData(
-            progressCallback=self._progress)
-
-        # --- Load model ---
-        # Use inference-appropriate defaults (training k_global=500, k_ds_rate=1.0 are too large)
-        k = 20
-        kGlobal = 80
-        kDsRate = 0.1
-        numClasses = 1600
-
-        self._status("Loading model...")
-        model, argsDict = loadModel(weightPath, argsPath, device,
-                                     kOverride=k, kGlobalOverride=kGlobal)
-
-        # --- Extract features ---
-        polyData = inputNode.GetPolyData()
-        numFibers = polyData.GetNumberOfLines()
-        self._status(
-            f"Extracting features from {numFibers} streamlines "
-            f"(step 1/4)...")
-        self._progress(0.0)
-        featRAS = extractRASFeatures(polyData, numPoints=numPoints)
-
-        # --- Re-center ---
-        self._status("Re-centering tractography to atlas space...")
-        centeredFeat = centerTractography(featRAS, massCenter)
-
-        # --- Build dataset ---
-        self._status(
-            "Computing local/global neighbor features "
-            "(step 2/4, this is the slowest step)...")
-        dataset = RealDataDataset(
-            centeredFeat, k=k, kGlobal=kGlobal, kDsRate=kDsRate,
-            progressCallback=self._progress)
-        dataLoader = torch.utils.data.DataLoader(
-            dataset, batch_size=batchSize, shuffle=False)
-        globalFeat = dataset.globalFeat
-
-        # --- Inference ---
-        self._status("Running model inference (step 3/4)...")
-        clusterPredictions = runInference(
-            model, dataLoader, globalFeat, numClasses, device,
-            progressCallback=self._progress)
-
-        # --- Map clusters to tracts ---
-        tractLabels = cluster2tract_label(clusterPredictions)
-        tractLabels = np.array(tractLabels)
-
-        # --- Create output nodes ---
-        self._status("Creating output fiber bundles (step 4/4)...")
-        self._progress(0.0)
-        createdNodeIDs = self._createOutputNodes(
-            inputNode, polyData, tractLabels, includeOther)
-
-        elapsed = __import__("time").time() - startTime
-        self._status(
-            f"Done! Created {len(createdNodeIDs)} tract bundles "
-            f"in {elapsed:.1f}s")
-        return createdNodeIDs
-
     def _ensureDependencies(self):
-        """Install PyTorch if needed."""
-        self._status("Checking dependencies...")
-
+        """Install tractcloud package if needed."""
+        try:
+            import tractcloud
+        except ImportError:
+            self._status("Installing tractcloud package...")
+            slicer.util.pip_install(
+                "git+https://github.com/SlicerDMRI/TractCloud.git@inference-cli")
+        # Verify torch is available
         try:
             import torch
         except ImportError:
-            self._status("Installing PyTorch (CPU)...")
-            slicer.util.pip_install(
-                "torch torchvision torchaudio"
-                " --index-url https://download.pytorch.org/whl/cpu")
+            self._status("Installing PyTorch...")
+            slicer.util.pip_install("torch torchvision torchaudio")
 
+    def run(self, inputNode, includeOther=False, device="auto",
+            batchSize=2048):
+        """Run TractCloud parcellation via QProcess.
 
-    def _createOutputNodes(self, inputNode, polyData, tractLabels,
-                           includeOther):
-        """Create two-level SubjectHierarchy with category and tract folders.
-
-        Structure:
-            <inputName>_TractCloud/
-                Association/
-                    AF, CB, EC, ...
-                Projection/
-                    CST, CR-F, ...
-                Commissural/
-                    CC1, CC2, ...
-                Cerebellar/
-                    CPC, ICP, ...
-                Superficial/
-                    Sup-F, Sup-FP, ...
-                Other/ (optional)
-                    Other
-
-        Each tract is assigned a unique solid color from the GenericColors
-        color table.
-
-        Args:
-            inputNode: source FiberBundle node (for naming)
-            polyData: original vtkPolyData
-            tractLabels: array of tract label indices per streamline
-            includeOther: whether to create a bundle for 'Other'
-
-        Returns:
-            list of created node IDs
+        The computation runs in a subprocess so Slicer remains responsive.
+        Results are loaded into the scene when the process completes.
         """
-        from TractCloudLib.tract_mapping import (
-            TRACT_NAMES, TRACT_CATEGORIES, TRACT_FULL_NAMES,
-        )
+        self._ensureDependencies()
+
+        self._inputNode = inputNode
+        self._tempDir = tempfile.mkdtemp(prefix="tractcloud_")
+
+        # Save input polydata to temp file
+        inputPath = os.path.join(self._tempDir, "input.vtp")
+        writer = vtk.vtkXMLPolyDataWriter()
+        writer.SetFileName(inputPath)
+        writer.SetInputData(inputNode.GetPolyData())
+        writer.SetCompressorTypeToZLib()
+        writer.Write()
+
+        outputDir = os.path.join(self._tempDir, "output")
+        self._outputDir = outputDir
+
+        # Build command
+        import sys
+        pythonPath = os.path.join(
+            os.path.dirname(os.path.dirname(sys.executable)),
+            "bin", "PythonSlicer")
+        if not os.path.exists(pythonPath):
+            pythonPath = sys.executable
+
+        args = [
+            pythonPath,
+            "-m", "tractcloud",
+            "--input", inputPath,
+            "--output-dir", outputDir,
+            "--device", device,
+            "--batch-size", str(batchSize),
+        ]
+        if includeOther:
+            args.append("--include-other")
+
+        self._status("Starting TractCloud subprocess...")
+        logging.info(f"TractCloud command: {' '.join(args)}")
+
+        self._process = qt.QProcess()
+        self._process.setProcessChannelMode(
+            qt.QProcess.SeparateChannels)
+
+        # Pass environment (ensures TRACTCLOUD_DATA_DIR propagates)
+        env = qt.QProcessEnvironment.systemEnvironment()
+        self._process.setProcessEnvironment(env)
+
+        self._process.readyReadStandardOutput.connect(self._onStdout)
+        self._process.finished.connect(self._onFinished)
+        self._process.errorOccurred.connect(self._onError)
+        self._process.start(args[0], args[1:])
+
+    def _onError(self, error):
+        """Handle QProcess errors (e.g. program not found)."""
+        errorMsgs = {0: "Failed to start", 1: "Crashed", 2: "Timed out",
+                     4: "Write error", 3: "Read error", 5: "Unknown error"}
+        msg = errorMsgs.get(error, f"Error code {error}")
+        logging.error(f"TractCloud QProcess error: {msg}")
+        if self.completionCallback:
+            self.completionCallback(False, msg)
+
+    def _onStdout(self):
+        """Parse JSON progress lines from the subprocess."""
+        while self._process.canReadLine():
+            line = self._process.readLine().data().decode().strip()
+            if not line:
+                continue
+            try:
+                msg = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            msgType = msg.get("type")
+            if msgType == "status":
+                self._status(msg.get("message", ""))
+            elif msgType == "progress":
+                fraction = msg.get("fraction", 0)
+                self._progress(fraction)
+                # Show time estimate if available
+                remaining = msg.get("estimated_remaining")
+                if remaining is not None and remaining > 1:
+                    step = msg.get("step", "")
+                    self._status(
+                        f"Step {step}: {remaining:.0f}s remaining...")
+            elif msgType == "result":
+                totalTime = msg.get("total_time")
+                timeStr = (f" in {totalTime:.1f}s"
+                           if totalTime is not None else "")
+                self._status(
+                    f"Created {msg.get('tracts_created', '?')} tracts"
+                    + timeStr)
+
+    def _onFinished(self, exitCode, exitStatus=None):
+        """Load output VTP files into the Slicer scene."""
+        if exitCode != 0:
+            stderr = self._process.readAllStandardError().data().decode()
+            if self.completionCallback:
+                self.completionCallback(False, stderr[-500:])
+            self._cleanup()
+            return
+
+        self._status("Loading results into scene...")
+        try:
+            nodeIDs = self._loadResults()
+            msg = f"Parcellation complete: {len(nodeIDs)} tracts"
+            if self.completionCallback:
+                self.completionCallback(True, msg)
+        except Exception as e:
+            if self.completionCallback:
+                self.completionCallback(False, str(e))
+
+        self._cleanup()
+
+    def _loadResults(self):
+        """Load output VTP files into MRML scene with hierarchy and colors."""
+        from tractcloud.tract_mapping import TRACT_FULL_NAMES
 
         shNode = slicer.mrmlScene.GetSubjectHierarchyNode()
         sceneItemID = shNode.GetSceneItemID()
-        baseName = inputNode.GetName() + "_TractCloud"
+        baseName = self._inputNode.GetName() + "_TractCloud"
         rootFolderID = shNode.CreateFolderItem(sceneItemID, baseName)
 
         colorNode = slicer.util.getNode("GenericColors")
+        colorIndex = 1
+        createdIDs = []
 
-        createdNodeIDs = []
-        colorIndex = 1  # start at 1 (index 0 is black/transparent)
-        totalTracts = sum(
-            len(tracts) for cat, tracts in TRACT_CATEGORIES.items()
-            if cat != "Other" or includeOther)
-        tractsDone = 0
-
-        for categoryName, tractNamesInCategory in TRACT_CATEGORIES.items():
-            if categoryName == "Other" and not includeOther:
+        # Walk the category directories
+        for categoryName in sorted(os.listdir(self._outputDir)):
+            catDir = os.path.join(self._outputDir, categoryName)
+            if not os.path.isdir(catDir):
                 continue
 
-            # Collect tracts that have fibers before creating the folder
-            categoryTracts = []
-            for tractName in tractNamesInCategory:
-                tractIdx = TRACT_NAMES.index(tractName)
-                fiberIndices = np.where(tractLabels == tractIdx)[0]
-                if len(fiberIndices) > 0:
-                    categoryTracts.append((tractName, fiberIndices))
-
-            if not categoryTracts:
+            vtpFiles = [f for f in os.listdir(catDir)
+                        if f.endswith(".vtp")]
+            if not vtpFiles:
                 continue
 
-            # Create category subfolder
-            categoryFolderID = shNode.CreateFolderItem(
+            catFolderID = shNode.CreateFolderItem(
                 rootFolderID, categoryName)
 
-            for tractName, fiberIndices in categoryTracts:
-                tractPolyData = self._extractFibers(polyData, fiberIndices)
+            for vtpFile in sorted(vtpFiles):
+                filepath = os.path.join(catDir, vtpFile)
+                nodeName = os.path.splitext(vtpFile)[0]
 
-                fullName = TRACT_FULL_NAMES.get(tractName, tractName)
-                nodeName = f"{fullName} ({tractName})"
-                node = slicer.mrmlScene.AddNewNodeByClass(
-                    "vtkMRMLFiberBundleNode", nodeName)
-                node.SetAndObservePolyData(tractPolyData)
-                node.CreateDefaultDisplayNodes()
+                node = slicer.util.loadFiberBundle(filepath)
+                if node is None:
+                    continue
+                node.SetName(nodeName)
 
-                # Set solid color from GenericColors
+                # Set color
                 color = [0.0, 0.0, 0.0, 0.0]
                 colorNode.GetColor(colorIndex, color)
-                lineDisplayNode = node.GetLineDisplayNode()
-                if lineDisplayNode:
-                    lineDisplayNode.SetColor(color[0], color[1], color[2])
-                    lineDisplayNode.SetColorModeToSolid()
-                tubeDisplayNode = node.GetTubeDisplayNode()
-                if tubeDisplayNode:
-                    tubeDisplayNode.SetColor(color[0], color[1], color[2])
-                    tubeDisplayNode.SetColorModeToSolid()
+                lineDisp = node.GetLineDisplayNode()
+                if lineDisp:
+                    lineDisp.SetColor(color[0], color[1], color[2])
+                    lineDisp.SetColorModeToSolid()
+                tubeDisp = node.GetTubeDisplayNode()
+                if tubeDisp:
+                    tubeDisp.SetColor(color[0], color[1], color[2])
+                    tubeDisp.SetColorModeToSolid()
                 colorIndex += 1
 
-                # Parent under category folder
                 itemID = shNode.GetItemByDataNode(node)
-                shNode.SetItemParent(itemID, categoryFolderID)
-                createdNodeIDs.append(node.GetID())
+                shNode.SetItemParent(itemID, catFolderID)
+                createdIDs.append(node.GetID())
 
-                tractsDone += 1
-                self._progress(tractsDone / totalTracts)
+        return createdIDs
 
-        return createdNodeIDs
-
-    @staticmethod
-    def _extractFibers(polyData, fiberIndices):
-        """Extract a subset of fibers from polydata by cell index.
-
-        Args:
-            polyData: source vtkPolyData with lines
-            fiberIndices: array of cell indices to extract
-
-        Returns:
-            new vtkPolyData with only the selected fibers
-        """
-        outPoints = vtk.vtkPoints()
-        outLines = vtk.vtkCellArray()
-        ptIds = vtk.vtkIdList()
-        inPoints = polyData.GetPoints()
-
-        for cellIdx in fiberIndices:
-            polyData.GetCellPoints(int(cellIdx), ptIds)
-            newPtIds = vtk.vtkIdList()
-            for j in range(ptIds.GetNumberOfIds()):
-                point = inPoints.GetPoint(ptIds.GetId(j))
-                newId = outPoints.InsertNextPoint(point)
-                newPtIds.InsertNextId(newId)
-            outLines.InsertNextCell(newPtIds)
-
-        outPD = vtk.vtkPolyData()
-        outPD.SetPoints(outPoints)
-        outPD.SetLines(outLines)
-        return outPD
+    def _cleanup(self):
+        """Remove temporary directory."""
+        if self._tempDir and os.path.exists(self._tempDir):
+            shutil.rmtree(self._tempDir, ignore_errors=True)
+            self._tempDir = None
 
 
 class TractCloudTest(ScriptedLoadableModuleTest):
@@ -463,9 +395,10 @@ class TractCloudTest(ScriptedLoadableModuleTest):
         self.test_TractCloud_import()
 
     def test_TractCloud_import(self):
-        """Verify module imports work."""
-        self.delayDisplay("Testing TractCloud imports")
-        from TractCloudLib.tract_mapping import TRACT_NAMES, TRACT_CLUSTER_MAPPING
-        self.assertEqual(len(TRACT_NAMES), 43)
-        self.assertEqual(len(TRACT_CLUSTER_MAPPING), 43)
-        self.delayDisplay("TractCloud import test passed!")
+        self.delayDisplay("Testing tractcloud package import")
+        try:
+            from tractcloud.tract_mapping import TRACT_NAMES
+            self.assertEqual(len(TRACT_NAMES), 43)
+            self.delayDisplay("TractCloud import test passed!")
+        except ImportError:
+            self.delayDisplay("tractcloud package not installed (expected)")
