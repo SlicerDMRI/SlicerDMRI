@@ -1,17 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,169,213,194"/>
-<area shape="rect" id="Node000001" href="$classDTINotReproducibleIssue3977_1_1DTINotReproducibleIssue3977Test.html" title=" " alt="" coords="279,5,523,45"/>
-<area shape="poly" id="edge59_Node000000_Node000001" title=" " alt="" coords="130,157,185,105,221,78,260,55,290,43,292,48,263,60,224,82,189,109,133,161"/>
-<area shape="rect" id="Node000002" href="$classNIfTIFile_1_1NIfTIFileTest.html" title=" " alt="" coords="321,70,481,95"/>
-<area shape="poly" id="edge60_Node000000_Node000002" title=" " alt="" coords="142,159,197,131,261,104,320,90,321,95,262,109,199,135,145,164"/>
-<area shape="rect" id="Node000003" href="$classTRXFile_1_1TRXFileTest.html" title=" " alt="" coords="325,119,476,145"/>
-<area shape="poly" id="edge61_Node000000_Node000003" title=" " alt="" coords="198,164,325,142,326,147,199,169"/>
-<area shape="rect" id="Node000004" href="$classTemplateKey_1_1TemplateKeyTest.html" title=" " alt="" coords="291,169,510,194"/>
-<area shape="poly" id="edge62_Node000000_Node000004" title=" " alt="" coords="227,179,291,179,291,184,227,184"/>
-<area shape="rect" id="Node000005" href="$classTractCloud_1_1TractCloudTest.html" title=" " alt="" coords="307,218,495,243"/>
-<area shape="poly" id="edge63_Node000000_Node000005" title=" " alt="" coords="199,194,325,215,324,221,198,199"/>
-<area shape="rect" id="Node000006" href="$classTractographyDownsample_1_1TractographyDownsampleTest.html" title=" " alt="" coords="261,268,540,308"/>
-<area shape="poly" id="edge64_Node000000_Node000006" title=" " alt="" coords="146,198,200,226,262,252,305,265,304,271,260,257,198,231,144,203"/>
-<area shape="rect" id="Node000007" href="$classTractographyExportPLY_1_1TractographyExportPLYTest.html" title=" " alt="" coords="273,332,528,372"/>
-<area shape="poly" id="edge65_Node000000_Node000007" title=" " alt="" coords="131,203,186,261,223,292,263,318,290,329,288,334,260,322,219,296,182,265,127,207"/>
+<area shape="rect" id="Node000000" href="$structTrackInfo.html" title=" " alt="" coords="5,5,87,31"/>
 </map>

@@ -1,23 +1,4 @@
 var searchData=
 [
-  ['qmrmlscenetractographydisplaymodel_0',['qMRMLSceneTractographyDisplayModel',['../classqMRMLSceneTractographyDisplayModel.html',1,'']]],
-  ['qmrmlscenetractographydisplaymodelprivate_1',['qMRMLSceneTractographyDisplayModelPrivate',['../classqMRMLSceneTractographyDisplayModelPrivate.html',1,'']]],
-  ['qmrmltractographydisplaytreeview_2',['qMRMLTractographyDisplayTreeView',['../classqMRMLTractographyDisplayTreeView.html',1,'']]],
-  ['qmrmltractographydisplaytreeviewprivate_3',['qMRMLTractographyDisplayTreeViewPrivate',['../classqMRMLTractographyDisplayTreeViewPrivate.html',1,'']]],
-  ['qslicerfiberbundlereader_4',['qSlicerFiberBundleReader',['../classqSlicerFiberBundleReader.html',1,'']]],
-  ['qslicerfiberbundlereaderprivate_5',['qSlicerFiberBundleReaderPrivate',['../classqSlicerFiberBundleReaderPrivate.html',1,'']]],
-  ['qslicertractographydisplaybasicwidget_6',['qSlicerTractographyDisplayBasicWidget',['../classqSlicerTractographyDisplayBasicWidget.html',1,'']]],
-  ['qslicertractographydisplaybasicwidgetprivate_7',['qSlicerTractographyDisplayBasicWidgetPrivate',['../classqSlicerTractographyDisplayBasicWidgetPrivate.html',1,'']]],
-  ['qslicertractographydisplayglyphwidget_8',['qSlicerTractographyDisplayGlyphWidget',['../classqSlicerTractographyDisplayGlyphWidget.html',1,'']]],
-  ['qslicertractographydisplayglyphwidgetprivate_9',['qSlicerTractographyDisplayGlyphWidgetPrivate',['../classqSlicerTractographyDisplayGlyphWidgetPrivate.html',1,'']]],
-  ['qslicertractographydisplaymodule_10',['qSlicerTractographyDisplayModule',['../classqSlicerTractographyDisplayModule.html',1,'']]],
-  ['qslicertractographydisplaymodulewidget_11',['qSlicerTractographyDisplayModuleWidget',['../classqSlicerTractographyDisplayModuleWidget.html',1,'']]],
-  ['qslicertractographydisplaymodulewidgetprivate_12',['qSlicerTractographyDisplayModuleWidgetPrivate',['../classqSlicerTractographyDisplayModuleWidgetPrivate.html',1,'']]],
-  ['qslicertractographydisplaywidget_13',['qSlicerTractographyDisplayWidget',['../classqSlicerTractographyDisplayWidget.html',1,'']]],
-  ['qslicertractographydisplaywidgetprivate_14',['qSlicerTractographyDisplayWidgetPrivate',['../classqSlicerTractographyDisplayWidgetPrivate.html',1,'']]],
-  ['qslicertractographyeditorroiwidget_15',['qSlicerTractographyEditorROIWidget',['../classqSlicerTractographyEditorROIWidget.html',1,'']]],
-  ['qslicertractographyeditorroiwidgetprivate_16',['qSlicerTractographyEditorROIWidgetPrivate',['../classqSlicerTractographyEditorROIWidgetPrivate.html',1,'']]],
-  ['qslicertractographyinteractiveseedingmodule_17',['qSlicerTractographyInteractiveSeedingModule',['../classqSlicerTractographyInteractiveSeedingModule.html',1,'']]],
-  ['qslicertractographyinteractiveseedingmodulewidget_18',['qSlicerTractographyInteractiveSeedingModuleWidget',['../classqSlicerTractographyInteractiveSeedingModuleWidget.html',1,'']]],
-  ['qslicertractographyinteractiveseedingmodulewidgetprivate_19',['qSlicerTractographyInteractiveSeedingModuleWidgetPrivate',['../classqSlicerTractographyInteractiveSeedingModuleWidgetPrivate.html',1,'']]]
+  ['registerdmrimoduletemplates_0',['RegisterDMRIModuleTemplates',['../classRegisterDMRIModuleTemplates_1_1RegisterDMRIModuleTemplates.html',1,'RegisterDMRIModuleTemplates']]]
 ];

@@ -9,6 +9,5 @@ var searchData=
   ['fiberbundletolabelmaplogic_6',['FiberBundleToLabelMapLogic',['../classFiberBundleToLabelMap_1_1FiberBundleToLabelMapLogic.html',1,'FiberBundleToLabelMap']]],
   ['fiberbundletolabelmaptest_7',['FiberBundleToLabelMapTest',['../classFiberBundleToLabelMap_1_1FiberBundleToLabelMapTest.html',1,'FiberBundleToLabelMap']]],
   ['fiberbundletolabelmapwidget_8',['FiberBundleToLabelMapWidget',['../classFiberBundleToLabelMap_1_1FiberBundleToLabelMapWidget.html',1,'FiberBundleToLabelMap']]],
-  ['forward_9',['forward',['../classTractCloudLib_1_1models_1_1TractDGCNN.html#a6e68eebd5513dc3a33df78dd1c88aa5d',1,'TractCloudLib::models::TractDGCNN']]],
-  ['full_5ftractography_5fworkflow_5fslicelet_10',['full_tractography_workflow_slicelet',['../classDICOM2FullBrainTractographyLib_1_1full__tractography__workflow_1_1full__tractography__workflow__slicelet.html',1,'DICOM2FullBrainTractographyLib::full_tractography_workflow']]]
+  ['full_5ftractography_5fworkflow_5fslicelet_9',['full_tractography_workflow_slicelet',['../classDICOM2FullBrainTractographyLib_1_1full__tractography__workflow_1_1full__tractography__workflow__slicelet.html',1,'DICOM2FullBrainTractographyLib::full_tractography_workflow']]]
 ];
