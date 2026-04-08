@@ -86,7 +86,7 @@ vtkMRMLTractographyDisplayDisplayableManager::~vtkMRMLTractographyDisplayDisplay
 //---------------------------------------------------------------------------
 void vtkMRMLTractographyDisplayDisplayableManager::PrintSelf(std::ostream &os, vtkIndent indent)
 {
-  os<<indent<<"Print logic"<<endl;
+  os<<indent<<"Print logic"<<std::endl;
 }
 
 //---------------------------------------------------------------------------

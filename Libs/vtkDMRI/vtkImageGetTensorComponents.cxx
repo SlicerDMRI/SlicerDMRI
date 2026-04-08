@@ -120,7 +120,7 @@ static void vtkImageGetTensorComponentsExecute(vtkImageGetTensorComponents *self
   offset[3]=4;
   offset[4]=5;
   offset[5]=8;
-//  cout << "off0 " << offset[0] << endl;
+//  std::cout << "off0 " << offset[0] << std::endl;
   for (idxZ = 0; idxZ <= maxZ; idxZ++)
     {
     for (idxY = 0; !self->AbortExecute && idxY <= maxY; idxY++)
