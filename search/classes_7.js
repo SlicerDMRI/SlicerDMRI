@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['slicelet_0',['Slicelet',['../classDICOM2FullBrainTractographyLib_1_1full__tractography__workflow_1_1Slicelet.html',1,'DICOM2FullBrainTractographyLib::full_tractography_workflow']]],
-  ['slicermrb_1',['SlicerMRB',['../classSlicerMRBTest_1_1SlicerMRB.html',1,'SlicerMRBTest']]],
-  ['slicermrbtest_2',['SlicerMRBTest',['../classSlicerMRBTest_1_1SlicerMRBTest.html',1,'SlicerMRBTest']]],
-  ['slicermrbtestwidget_3',['SlicerMRBTestWidget',['../classSlicerMRBTest_1_1SlicerMRBTestWidget.html',1,'SlicerMRBTest']]]
+  ['realdatadataset_0',['RealDataDataset',['../classTractCloudLib_1_1inference_1_1RealDataDataset.html',1,'TractCloudLib::inference']]],
+  ['registerdmrimoduletemplates_1',['RegisterDMRIModuleTemplates',['../classRegisterDMRIModuleTemplates_1_1RegisterDMRIModuleTemplates.html',1,'RegisterDMRIModuleTemplates']]]
 ];

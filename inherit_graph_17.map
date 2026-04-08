@@ -1,3 +1,17 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classTRXFile_1_1TRXFileFileReader.html" title=" " alt="" coords="5,5,199,31"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,169,233,194"/>
+<area shape="rect" id="Node000001" href="$classDTINotReproducibleIssue3977_1_1DTINotReproducibleIssue3977Widget.html" title=" " alt="" coords="289,5,553,45"/>
+<area shape="poly" id="edge66_Node000000_Node000001" title=" " alt="" coords="141,157,201,106,239,78,280,55,311,43,313,48,282,60,242,83,204,110,144,161"/>
+<area shape="rect" id="Node000002" href="$classNIfTIFile_1_1NIfTIFileWidget.html" title=" " alt="" coords="331,70,511,95"/>
+<area shape="poly" id="edge67_Node000000_Node000002" title=" " alt="" coords="154,160,212,131,281,104,330,92,331,97,282,109,214,136,157,164"/>
+<area shape="rect" id="Node000003" href="$classTRXFile_1_1TRXFileWidget.html" title=" " alt="" coords="335,119,506,145"/>
+<area shape="poly" id="edge68_Node000000_Node000003" title=" " alt="" coords="210,164,342,142,343,147,211,169"/>
+<area shape="rect" id="Node000004" href="$classTemplateKey_1_1TemplateKeyWidget.html" title=" " alt="" coords="301,169,540,194"/>
+<area shape="poly" id="edge69_Node000000_Node000004" title=" " alt="" coords="247,179,301,179,301,184,247,184"/>
+<area shape="rect" id="Node000005" href="$classTractCloud_1_1TractCloudWidget.html" title=" " alt="" coords="317,218,525,243"/>
+<area shape="poly" id="edge70_Node000000_Node000005" title=" " alt="" coords="211,194,343,215,342,221,210,199"/>
+<area shape="rect" id="Node000006" href="$classTractographyDownsample_1_1TractographyDownsampleWidget.html" title=" " alt="" coords="281,268,560,308"/>
+<area shape="poly" id="edge71_Node000000_Node000006" title=" " alt="" coords="159,198,216,226,282,252,327,265,325,271,280,257,214,230,156,203"/>
+<area shape="rect" id="Node000007" href="$classTractographyExportPLY_1_1TractographyExportPLYWidget.html" title=" " alt="" coords="293,332,548,372"/>
+<area shape="poly" id="edge72_Node000000_Node000007" title=" " alt="" coords="143,203,202,261,240,292,283,318,311,330,309,334,280,322,237,296,198,265,139,207"/>
 </map>

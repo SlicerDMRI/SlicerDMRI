@@ -1,15 +1,17 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,145,213,170"/>
-<area shape="rect" id="Node000001" href="$classDTINotReproducibleIssue3977_1_1DTINotReproducibleIssue3977Test.html" title=" " alt="" coords="279,5,523,45"/>
-<area shape="poly" id="edge52_Node000000_Node000001" title=" " alt="" coords="135,134,191,94,260,55,294,43,296,48,262,60,193,98,138,138"/>
-<area shape="rect" id="Node000002" href="$classNIfTIFile_1_1NIfTIFileTest.html" title=" " alt="" coords="321,70,481,95"/>
-<area shape="poly" id="edge53_Node000000_Node000002" title=" " alt="" coords="156,137,261,104,320,92,321,97,262,109,157,142"/>
-<area shape="rect" id="Node000003" href="$classTRXFile_1_1TRXFileTest.html" title=" " alt="" coords="325,119,476,145"/>
-<area shape="poly" id="edge54_Node000000_Node000003" title=" " alt="" coords="227,144,325,136,325,141,227,150"/>
-<area shape="rect" id="Node000004" href="$classTemplateKey_1_1TemplateKeyTest.html" title=" " alt="" coords="291,169,510,194"/>
-<area shape="poly" id="edge55_Node000000_Node000004" title=" " alt="" coords="228,164,291,170,291,175,227,170"/>
-<area shape="rect" id="Node000005" href="$classTractographyDownsample_1_1TractographyDownsampleTest.html" title=" " alt="" coords="261,219,540,259"/>
-<area shape="poly" id="edge56_Node000000_Node000005" title=" " alt="" coords="162,172,262,203,313,216,312,221,261,208,160,177"/>
-<area shape="rect" id="Node000006" href="$classTractographyExportPLY_1_1TractographyExportPLYTest.html" title=" " alt="" coords="273,283,528,323"/>
-<area shape="poly" id="edge57_Node000000_Node000006" title=" " alt="" coords="135,177,191,224,225,248,262,268,293,280,291,285,260,273,223,252,187,228,132,181"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,169,188,194"/>
+<area shape="rect" id="Node000001" href="$classDTINotReproducibleIssue3977_1_1DTINotReproducibleIssue3977.html" title=" " alt="" coords="264,5,487,45"/>
+<area shape="poly" id="edge47_Node000000_Node000001" title=" " alt="" coords="115,156,166,105,199,78,235,55,263,43,265,48,237,60,202,82,169,109,119,160"/>
+<area shape="rect" id="Node000002" href="$classNIfTIFile_1_1NIfTIFile.html" title=" " alt="" coords="308,70,443,95"/>
+<area shape="poly" id="edge48_Node000000_Node000002" title=" " alt="" coords="127,159,176,130,235,104,307,87,309,92,237,109,179,135,129,164"/>
+<area shape="rect" id="Node000003" href="$classTRXFile_1_1TRXFile.html" title=" " alt="" coords="313,119,437,145"/>
+<area shape="poly" id="edge49_Node000000_Node000003" title=" " alt="" coords="179,164,236,153,313,140,314,145,236,159,180,169"/>
+<area shape="rect" id="Node000004" href="$classTemplateKey_1_1TemplateKey.html" title=" " alt="" coords="279,169,471,194"/>
+<area shape="poly" id="edge50_Node000000_Node000004" title=" " alt="" coords="202,179,279,179,279,184,202,184"/>
+<area shape="rect" id="Node000005" href="$classTractCloud_1_1TractCloud.html" title=" " alt="" coords="294,218,457,243"/>
+<area shape="poly" id="edge51_Node000000_Node000005" title=" " alt="" coords="183,194,303,215,302,221,182,199"/>
+<area shape="rect" id="Node000006" href="$classTractographyDownsample_1_1TractographyDownsample.html" title=" " alt="" coords="236,268,515,308"/>
+<area shape="poly" id="edge52_Node000000_Node000006" title=" " alt="" coords="131,199,180,226,237,252,278,265,276,270,235,257,178,231,129,204"/>
+<area shape="rect" id="Node000007" href="$classTractographyExportPLY_1_1TractographyExportPLY.html" title=" " alt="" coords="248,332,503,372"/>
+<area shape="poly" id="edge53_Node000000_Node000007" title=" " alt="" coords="117,203,167,262,200,292,237,318,263,329,261,334,235,322,197,296,163,265,113,207"/>
 </map>

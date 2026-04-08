@@ -1,5 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,13,123,38"/>
-<area shape="rect" id="Node000001" href="$classvtkMRMLTractographyInteractiveSeedingNode.html" title=" " alt="" coords="171,5,407,45"/>
-<area shape="poly" id="edge88_Node000000_Node000001" title=" " alt="" coords="137,23,170,23,170,28,137,28"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,163,31"/>
+<area shape="rect" id="Node000001" href="$classvtkMRMLFiberBundleNode.html" title=" " alt="" coords="211,5,405,31"/>
+<area shape="poly" id="edge95_Node000000_Node000001" title=" " alt="" coords="176,15,211,15,211,21,176,21"/>
 </map>
