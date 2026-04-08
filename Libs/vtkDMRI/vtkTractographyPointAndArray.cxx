@@ -54,6 +54,7 @@ vtkTractographyPoint& vtkTractographyPoint::operator=(const vtkTractographyPoint
   this->SubId = hp.SubId;
   this->S = hp.S;
   this->D = hp.D;
+  this->IndexInArray = hp.IndexInArray;
 
   return *this;
 }
