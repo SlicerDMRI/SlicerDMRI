@@ -20,6 +20,9 @@
 #include "vtkTransform.h"
 #include <vtkVersion.h>
 
+// STD includes
+#include <iosfwd>
+
 class vtkFloatArray;
 class vtkImageData;
 
@@ -34,7 +37,7 @@ class vtkDMRI_EXPORT vtkTensorRotate : public vtkThreadedImageAlgorithm
 public:
   static vtkTensorRotate *New();
   vtkTypeMacro(vtkTensorRotate,vtkThreadedImageAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(std::ostream& os, vtkIndent indent) override;
 
   /// Set the tensor type for the filter
   void SetTensorTypeToFloat(){this->SetTensorType(VTK_FLOAT);};

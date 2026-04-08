@@ -31,6 +31,7 @@
 #include <vtkVersion.h>
 
 // STD includes
+#include <iostream>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -156,15 +157,15 @@ vtkHyperStreamline * vtkSeedTracts::CreateHyperStreamline()
       if (this->VtkHyperStreamlineTeemSettings)
         {
           // create object
-          std::cout << "Creatng HST" << endl;
+          std::cout << "Creatng HST" << std::endl;
           currHST=vtkHyperStreamlineTeem::New();
 
-          std::cout << "settings for HST" << endl;
+          std::cout << "settings for HST" << std::endl;
 
           this->UpdateHyperStreamlineTeemSettings(currHST);
 
 
-          std::cout << "returning HST" << endl;
+          std::cout << "returning HST" << std::endl;
 
           return((vtkHyperStreamline *)currHST);
         }
@@ -337,7 +338,7 @@ void vtkSeedTracts::UpdateHyperStreamlinePointsSettings( vtkHyperStreamlineDTMRI
 void vtkSeedTracts::UpdateHyperStreamlineTeemSettings( vtkHyperStreamlineTeem *currHST)
 {
 
-  std::cout << "in settings  function HST" << endl;
+  std::cout << "in settings  function HST" << std::endl;
 
   // Potentially this should update the tendFiberContext class for the given volume,
   // instead of updating all streamlines.
@@ -366,7 +367,7 @@ void vtkSeedTracts::UpdateHyperStreamlineTeemSettings( vtkHyperStreamlineTeem *c
 
   currHST->SetIntegrationStepLength(this->VtkHyperStreamlineTeemSettings->GetIntegrationStepLength());
 
-  std::cout << "DONE in settings  function HST" << endl;
+  std::cout << "DONE in settings  function HST" << std::endl;
 }
 
 
@@ -393,7 +394,7 @@ int vtkSeedTracts::PointWithinTensorData(double *point, double *pointw)
 
   if (inbounds ==0)
     {
-      std::cout << "point " << pointw[0] << " " << pointw[1] << " " << pointw[2] << " outside of tensor dataset" << endl;
+      std::cout << "point " << pointw[0] << " " << pointw[1] << " " << pointw[2] << " outside of tensor dataset" << std::endl;
     }
 
   return(inbounds);
@@ -577,7 +578,7 @@ void vtkSeedTracts::SeedStreamlinesInROI()
   for (idxZ = 0; idxZ <= maxZ; idxZ+=gridIncZ)
     {
       // just output (fractional or integer) current slice number
-      std::cout << idxZ << " / " << maxZ << endl;
+      std::cout << idxZ << " / " << maxZ << std::endl;
 
       //for (idxY = 0; !this->AbortExecute && idxY <= maxY; idxY++)
       for (idxY = 0; idxY <= maxY; idxY+=gridIncY)
@@ -1177,7 +1178,7 @@ void vtkSeedTracts::SeedStreamlinesFromROIIntersectWithROI2()
     }
 
   timer->StopTimer();
-  std::cout << "Tractography in ROI time: " << timer->GetElapsedTime() << endl;
+  std::cout << "Tractography in ROI time: " << timer->GetElapsedTime() << std::endl;
 }
 
 //----------------------------------------------------------------------------

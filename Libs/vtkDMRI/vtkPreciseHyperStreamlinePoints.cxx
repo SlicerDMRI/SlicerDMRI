@@ -15,6 +15,9 @@
 #include "vtkPreciseHyperStreamlinePoints.h"
 #include "vtkObjectFactory.h"
 #include <vtkVersion.h>
+
+// STD includes
+#include <iostream>
 // is there any problem with including a cxx file?
 // this is done for class vtkPreciseHyperPoint which is defined here
 // otherwise we cannot access the points calculated by superclass
@@ -146,7 +149,7 @@ int vtkPreciseHyperStreamlinePoints::RequestData(vtkInformation* request,
 }
 
 //------------------------------------------------------------------------------
-void vtkPreciseHyperStreamlinePoints::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPreciseHyperStreamlinePoints::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   vtkPreciseHyperStreamline::PrintSelf(os,indent);
 }

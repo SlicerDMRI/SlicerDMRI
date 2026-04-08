@@ -25,6 +25,8 @@
 #include "vtkPreciseHyperArray.h"
 #include "vtkDiffusionTensorMathematics.h"
 
+// STD includes
+#include <iostream>
 
 vtkStandardNewMacro(vtkPreciseHyperStreamline);
 
@@ -755,7 +757,7 @@ void vtkPreciseHyperStreamline::BuildTube()
   output->Squeeze();
 }
 
-void vtkPreciseHyperStreamline::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPreciseHyperStreamline::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 

@@ -19,13 +19,16 @@
 #include "vtkPolyDataAlgorithm.h"
 #include "vtkDMRIConfigure.h"
 
+// STD includes
+#include <iosfwd>
+
 /// \brief Colors the lines in the polydata by their mean orientation.
 class vtkDMRI_EXPORT vtkPolyDataColorLinesByOrientation : public vtkPolyDataAlgorithm
 {
 public:
   static vtkPolyDataColorLinesByOrientation *New();
   vtkTypeMacro(vtkPolyDataColorLinesByOrientation,vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(std::ostream& os, vtkIndent indent) override;
 
   ///
   /// Turn on/off extraction of scalars for color.

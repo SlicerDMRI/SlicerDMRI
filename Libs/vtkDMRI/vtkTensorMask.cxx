@@ -17,6 +17,9 @@
 #include "vtkImageData.h"
 #include "vtkPointData.h"
 
+// STD includes
+#include <iostream>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkTensorMask);
 
@@ -405,7 +408,7 @@ void vtkTensorMask::ThreadedRequestData(
     }
 }
 
-void vtkTensorMask::PrintSelf(ostream& os, vtkIndent indent)
+void vtkTensorMask::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   vtkImageMask::PrintSelf(os,indent);
 }

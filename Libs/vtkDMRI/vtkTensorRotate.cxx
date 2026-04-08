@@ -23,6 +23,8 @@
 #include "vtkDoubleArray.h"
 #include "vtkCellData.h"
 
+// STD includes
+#include <iostream>
 
 vtkStandardNewMacro(vtkTensorRotate);
 
@@ -430,7 +432,7 @@ void vtkTensorRotate::ThreadedExecute(vtkImageData *inData,
 }
 
 //----------------------------------------------------------------------------
-void vtkTensorRotate::PrintSelf(ostream& os, vtkIndent indent)
+void vtkTensorRotate::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }

@@ -19,15 +19,17 @@
 #include "vtkObjectFactory.h"
 #include "vtkTensorImplicitFunctionToFunctionSet.h"
 
+// STD includes
+#include <iostream>
 
 vtkStandardNewMacro(vtkTensorImplicitFunctionToFunctionSet);
 
-void vtkTensorImplicitFunctionToFunctionSet::PrintSelf(ostream& os, vtkIndent indent)
+void vtkTensorImplicitFunctionToFunctionSet::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   for ( int i = 0 ; i < 6 ; i++ ) {
     if ( TensorComponent[i] ) {
-      os << indent << "Tensor Component: " << i <<endl;
+      os << indent << "Tensor Component: " << i <<std::endl;
       TensorComponent[i]->PrintSelf(os,indent);
     }
   }

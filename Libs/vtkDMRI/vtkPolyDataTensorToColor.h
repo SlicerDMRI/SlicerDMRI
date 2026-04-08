@@ -21,6 +21,9 @@
 
 #include "vtkTensorGlyph.h"
 
+// STD includes
+#include <iosfwd>
+
 /// \brief Calculates scalar values from vtkPolyData tensors.
 
 class vtkDMRI_EXPORT vtkPolyDataTensorToColor : public vtkPolyDataAlgorithm
@@ -28,7 +31,7 @@ class vtkDMRI_EXPORT vtkPolyDataTensorToColor : public vtkPolyDataAlgorithm
 public:
   static vtkPolyDataTensorToColor *New();
   vtkTypeMacro(vtkPolyDataTensorToColor,vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(std::ostream& os, vtkIndent indent) override;
 
   vtkSetClampMacro(ColorMode, int, vtkTensorGlyph::COLOR_BY_SCALARS, vtkTensorGlyph::COLOR_BY_EIGENVALUES);
   vtkGetMacro(ColorMode, int);

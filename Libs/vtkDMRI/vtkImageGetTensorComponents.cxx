@@ -22,11 +22,11 @@
 #include "vtkMath.h"
 #include <vtkStructuredPointsWriter.h>
 
+// STD includes
+#include <iostream>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkImageGetTensorComponents);
-
-
-using namespace std;
 
 
 //----------------------------------------------------------------------------
@@ -212,11 +212,11 @@ void vtkImageGetTensorComponents::ThreadedExecute(vtkImageData *inData,
     }
 }
 
-void vtkImageGetTensorComponents::PrintSelf(ostream& os, vtkIndent indent)
+void vtkImageGetTensorComponents::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "NumberOfComponents: " << this->NumberOfComponents << endl;
+  os << indent << "NumberOfComponents: " << this->NumberOfComponents << std::endl;
   os << indent << "Components: ( "
      << this->Components[0] << ", "
      << this->Components[1] << ", "
