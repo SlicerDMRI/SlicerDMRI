@@ -135,9 +135,9 @@ int vtkPreciseHyperStreamlinePoints::RequestData(vtkInformation* request,
         {
           //for (j=0; j<3; j++) // grab point's coordinates
           //{
-          //cout << sPtr->X[j] << " ";
+          //std::cout << sPtr->X[j] << " ";
           //}
-          //cout << endl;
+          //std::cout << std::endl;
 
           this->PreciseHyperStreamlines[ptId]->InsertPoint(i,sPtr->X);
           npts++;

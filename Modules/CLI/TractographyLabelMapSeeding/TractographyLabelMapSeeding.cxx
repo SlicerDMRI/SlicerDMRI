@@ -100,7 +100,7 @@ int main( int argc, char * argv[] )
         }
       else
         {
-        std::cerr << "Mode " << ThresholdMode << " is not supported" << endl;
+        std::cerr << "Mode " << ThresholdMode << " is not supported" << std::endl;
         return EXIT_FAILURE;
         }
 
@@ -231,7 +231,7 @@ int main( int argc, char * argv[] )
       }
     else
       {
-      std::cerr << "Mode " << ThresholdMode << " is not supported" << endl;
+      std::cerr << "Mode " << ThresholdMode << " is not supported" << std::endl;
       return EXIT_FAILURE;
       }
 
@@ -262,7 +262,7 @@ int main( int argc, char * argv[] )
       {
       if (fileExtension != ".vtp")
         {
-        cerr << "Extension not recognize, saving the information in VTP format" << endl;
+        std::cerr << "Extension not recognize, saving the information in VTP format" << std::endl;
         }
       vtkNew<vtkXMLPolyDataWriter> writer;
       writer->SetFileName(OutputFibers.c_str() );
@@ -272,7 +272,7 @@ int main( int argc, char * argv[] )
   }
   catch( ... )
     {
-    cout << "default exception";
+    std::cout << "default exception";
     return EXIT_FAILURE;
     }
 

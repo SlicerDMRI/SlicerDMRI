@@ -157,7 +157,7 @@ static void vtkImageSetTensorComponentsExecute(vtkImageSetTensorComponents *self
         }
       for (idxR = 0; idxR <= maxX; idxR++)
         {
-        //cout << idxR << " " << idxY << " " << idxZ << " " << ptId << endl;
+        //std::cout << idxR << " " << idxY << " " << idxZ << " " << ptId << std::endl;
       outT[0][0]=(float)*inPtr++;
 
       outT[0][1]=(float)*inPtr;

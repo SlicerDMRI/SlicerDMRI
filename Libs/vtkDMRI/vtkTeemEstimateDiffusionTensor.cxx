@@ -159,7 +159,7 @@ void vtkTeemEstimateDiffusionTensor::TransformDiffusionGradients()
     }
 
   vtkDebugMacro("Transforming diffusion gradients");
-  //this->Transform->Print(cout);
+  //this->Transform->Print(std::cout);
 
 
   // transform each gradient by this matrix
