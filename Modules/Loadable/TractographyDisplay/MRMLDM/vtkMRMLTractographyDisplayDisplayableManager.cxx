@@ -47,6 +47,9 @@
 #include "vtkPolyData.h"
 #include "vtkPointData.h"
 
+// STD includes
+#include <iostream>
+
 // ITKSys includes
 //#include <itksys/SystemTools.hxx>
 //#include <itksys/Directory.hxx>

@@ -24,6 +24,8 @@
 
 #include "vtkMRMLModelNode.h"
 
+// STD includes
+#include <iosfwd>
 
 // Tractography includes
 #include "vtkSlicerTractographyDisplayModuleMRMLExport.h"
@@ -44,7 +46,7 @@ public:
   static vtkMRMLFiberBundleNode *New();
   vtkTypeMacro(vtkMRMLFiberBundleNode,vtkMRMLModelNode);
   //vtkTypeMacro(vtkMRMLFiberBundleNode,vtkMRMLTransformableNode);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(std::ostream& os, vtkIndent indent) override;
 
   //--------------------------------------------------------------------------
   /// MRMLNode methods
@@ -58,7 +60,7 @@ public:
 
   ///
   /// Write this node's information to a MRML file in XML format.
-  virtual void WriteXML ( ostream& of, int indent ) override;
+  virtual void WriteXML ( std::ostream& of, int indent ) override;
 
 
   ///

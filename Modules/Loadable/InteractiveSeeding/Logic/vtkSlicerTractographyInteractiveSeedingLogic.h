@@ -23,6 +23,7 @@
 #define __vtkSlicerTractographyInteractiveSeedingLogic_h
 
 #include <cstdlib>
+#include <iosfwd>
 
 #include "vtkSlicerModuleLogic.h"
 #include "vtkIntxSeedingLogicExport.h"
@@ -44,7 +45,7 @@ public:
   // The Usual vtk class functions
   static vtkSlicerTractographyInteractiveSeedingLogic *New();
   vtkTypeMacro(vtkSlicerTractographyInteractiveSeedingLogic,vtkSlicerModuleLogic);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(std::ostream& os, vtkIndent indent) override;
 
   virtual void ProcessMRMLNodesEvents(vtkObject* caller,
                                       unsigned long event,

@@ -10,6 +10,9 @@
 // ITK includes
 #include <itkFloatingPointExceptions.h>
 
+// STD includes
+#include <iostream>
+
 #include "DiffusionTensorScalarMeasurementsCLP.h"
 
 int main( int argc, char * argv[] )

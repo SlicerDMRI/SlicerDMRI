@@ -28,6 +28,7 @@ Version:   $Revision: 1.3 $
 #include <vtkPointData.h>
 
 // STD includes
+#include <iostream>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -59,7 +60,7 @@ vtkMRMLFiberBundleDisplayNode::~vtkMRMLFiberBundleDisplayNode()
 }
 
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleDisplayNode::WriteXML(ostream& of, int nIndent)
+void vtkMRMLFiberBundleDisplayNode::WriteXML(std::ostream& of, int nIndent)
 {
   // Write all attributes not equal to their defaults
 
@@ -134,7 +135,7 @@ void vtkMRMLFiberBundleDisplayNode::Copy(vtkMRMLNode *anode)
   }
 
 //----------------------------------------------------------------------------
-void vtkMRMLFiberBundleDisplayNode::PrintSelf(ostream& os, vtkIndent indent)
+void vtkMRMLFiberBundleDisplayNode::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   //int idx;
 

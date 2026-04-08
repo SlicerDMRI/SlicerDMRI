@@ -25,6 +25,7 @@
 
 // STD includes
 #include <cstdlib>
+#include <iosfwd>
 
 class vtkMRMLFiberBundleNode;
 
@@ -36,7 +37,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_LOGIC_EXPORT vtkSlicerFiberBundleLog
   // The Usual vtk class functions
   static vtkSlicerFiberBundleLogic *New();
   vtkTypeMacro(vtkSlicerFiberBundleLogic,vtkSlicerModuleLogic);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(std::ostream& os, vtkIndent indent) override;
 
   // Description:
   // Create new mrml fiber bundle node and read its polydata from a specified file.

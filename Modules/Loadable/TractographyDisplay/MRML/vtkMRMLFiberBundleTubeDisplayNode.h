@@ -24,6 +24,9 @@
 
 #include "vtkMRMLFiberBundleDisplayNode.h"
 
+// STD includes
+#include <iosfwd>
+
 class vtkPolyData;
 class vtkPolyDataTensorToColor;
 class vtkTubeFilter;
@@ -34,7 +37,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleTubeDi
  public:
   static vtkMRMLFiberBundleTubeDisplayNode *New (  );
   vtkTypeMacro ( vtkMRMLFiberBundleTubeDisplayNode, vtkMRMLFiberBundleDisplayNode );
-  void PrintSelf ( ostream& os, vtkIndent indent ) override;
+  void PrintSelf ( std::ostream& os, vtkIndent indent ) override;
 
   //--------------------------------------------------------------------------
   /// MRMLNode methods
@@ -48,7 +51,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleTubeDi
 
   ///
   /// Write this node's information to a MRML file in XML format.
-  virtual void WriteXML ( ostream& of, int indent ) override;
+  virtual void WriteXML ( std::ostream& of, int indent ) override;
 
 
   ///

@@ -42,6 +42,9 @@
 #include <vtkPointData.h>
 #include <vtkSeedTracts.h>
 #include <vtkSmartPointer.h>
+
+// STD includes
+#include <iostream>
 #include <vtkVersion.h>
 
 // STD includes
@@ -77,7 +80,7 @@ void vtkSlicerTractographyInteractiveSeedingLogic::RemoveMRMLNodesObservers()
 }
 
 //----------------------------------------------------------------------------
-void vtkSlicerTractographyInteractiveSeedingLogic::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSlicerTractographyInteractiveSeedingLogic::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->vtkObject::PrintSelf(os, indent);
 }

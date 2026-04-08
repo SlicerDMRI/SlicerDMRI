@@ -24,6 +24,9 @@
 
 #include "vtkMRMLFiberBundleDisplayNode.h"
 
+// STD includes
+#include <iosfwd>
+
 class vtkDiffusionTensorGlyph;
 class vtkCleanPolyData;
 class vtkPolyData;
@@ -33,7 +36,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleGlyphD
  public:
   static vtkMRMLFiberBundleGlyphDisplayNode *New (  );
   vtkTypeMacro ( vtkMRMLFiberBundleGlyphDisplayNode,vtkMRMLFiberBundleDisplayNode );
-  void PrintSelf ( ostream& os, vtkIndent indent ) override;
+  void PrintSelf ( std::ostream& os, vtkIndent indent ) override;
 
   //--------------------------------------------------------------------------
   /// MRMLNode methods
@@ -47,7 +50,7 @@ class VTK_SLICER_TRACTOGRAPHYDISPLAY_MODULE_MRML_EXPORT vtkMRMLFiberBundleGlyphD
 
   ///
   /// Write this node's information to a MRML file in XML format.
-  virtual void WriteXML ( ostream& of, int indent ) override;
+  virtual void WriteXML ( std::ostream& of, int indent ) override;
 
 
   ///
