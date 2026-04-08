@@ -530,8 +530,8 @@ void vtkSeedTracts::SeedStreamlinesInROI()
   maxY = inExt[3] - inExt[2];
   maxZ = inExt[5] - inExt[4];
 
-  //cout << "Dims: " << maxX << " " << maxY << " " << maxZ << endl;
-  //cout << "Incr: " << inIncX << " " << inIncY << " " << inIncZ << endl;
+  //std::cout << "Dims: " << maxX << " " << maxY << " " << maxZ << std::endl;
+  //std::cout << "Incr: " << inIncX << " " << inIncY << " " << inIncZ << std::endl;
 
   // If we are iterating over a non-voxel (isotropic) grid, change the increments
   // to reflect this.  So we want to iterate in voxel (IJK) space still, but with
@@ -1022,8 +1022,8 @@ void vtkSeedTracts::SeedStreamlinesFromROIIntersectWithROI2()
   maxY = inExt[3] - inExt[2];
   maxZ = inExt[5] - inExt[4];
 
-  //cout << "Dims: " << maxX << " " << maxY << " " << maxZ << endl;
-  //cout << "Incr: " << inIncX << " " << inIncY << " " << inIncZ << endl;
+  //std::cout << "Dims: " << maxX << " " << maxY << " " << maxZ << std::endl;
+  //std::cout << "Incr: " << inIncX << " " << inIncY << " " << inIncZ << std::endl;
 
   // for progress notification
   //target = (unsigned long)((maxZ+1)*(maxY+1)/50.0);
