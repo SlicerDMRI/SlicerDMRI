@@ -221,10 +221,12 @@ Protected Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<pre class="fragment">Install tractcloud package if needed.
+<pre class="fragment">Install tractcloud package and PyTorch if needed.
 
 Uses importlib.util.find_spec to check for packages without
 importing them, avoiding loading torch/CUDA in the main process.
+PyTorch is installed via the PyTorchUtils extension for correct
+CUDA/CPU wheel selection.
 </pre> 
 </div>
 </div>
