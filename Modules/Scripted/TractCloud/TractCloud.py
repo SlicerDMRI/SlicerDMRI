@@ -191,19 +191,30 @@ class TractCloudLogic(ScriptedLoadableModuleLogic):
             self.progressCallback(fraction)
 
     def _ensureDependencies(self):
-        """Install tractcloud package if needed.
+        """Install tractcloud package and PyTorch if needed.
 
         Uses importlib.util.find_spec to check for packages without
         importing them, avoiding loading torch/CUDA in the main process.
+        PyTorch is installed via the PyTorchUtils extension for correct
+        CUDA/CPU wheel selection.
         """
         import importlib.util
+        if importlib.util.find_spec("torch") is None:
+            self._status("Installing PyTorch via PyTorchUtils...")
+            try:
+                import PyTorchUtils
+                torchLogic = PyTorchUtils.PyTorchUtilsLogic()
+                torchLogic.installTorch()
+            except Exception as e:
+                logging.warning(
+                    f"PyTorchUtils install failed ({e}), "
+                    "falling back to pip")
+                slicer.util.pip_install("torch torchvision torchaudio")
         if importlib.util.find_spec("tractcloud") is None:
             self._status("Installing tractcloud package...")
             slicer.util.pip_install(
-                "git+https://github.com/SlicerDMRI/TractCloud.git@inference-cli")
-        if importlib.util.find_spec("torch") is None:
-            self._status("Installing PyTorch...")
-            slicer.util.pip_install("torch torchvision torchaudio")
+                "https://github.com/SlicerDMRI/TractCloud/"
+                "archive/inference-cli.zip")
 
     def run(self, inputNode, includeOther=False, device="auto",
             batchSize=2048):
