@@ -214,7 +214,7 @@ class TractCloudLogic(ScriptedLoadableModuleLogic):
             self._status("Installing tractcloud package...")
             slicer.util.pip_install(
                 "https://github.com/SlicerDMRI/TractCloud/"
-                "archive/inference-cli.zip")
+                "archive/main.zip")
 
     def run(self, inputNode, includeOther=False, device="auto",
             batchSize=2048):
