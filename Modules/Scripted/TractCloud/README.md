@@ -45,22 +45,6 @@ On first use the module automatically downloads pre-trained model weights
   https://github.com/SlicerDMRI/TractCloud
 - GPU (CUDA) is used automatically when available
 
-### Testing with the development branch
-
-To test the TractCloud module before the `tractcloud` package is merged
-to `main`, install the `inference-cli` branch into Slicer's Python:
-
-```python
-# In Slicer's Python console:
-slicer.util.pip_install("git+https://github.com/SlicerDMRI/TractCloud.git@inference-cli")
-```
-
-Or from the command line:
-
-```bash
-PythonSlicer -m pip install "git+https://github.com/SlicerDMRI/TractCloud.git@inference-cli"
-```
-
 ### Output tracts (42)
 
 | Category | Tracts |
