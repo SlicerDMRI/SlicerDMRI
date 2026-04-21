@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<executable>
+  <category>Diffusion.Utilities.CF</category>
+  <title>Cut Fiber</title>
+  <description><![CDATA[TBD]]></description>
+  <version>0.1</version>
+  <documentation-url>http://dmri.slicer.org</documentation-url>
+  <license/>
+  <contributor>Huan Luo</contributor>
+  <acknowledgements><![CDATA[TBD]]></acknowledgements>
+  <parameters>
+    <label>Input and Output</label>
+    <description><![CDATA[Input/output parameters]]></description>
+    <file>
+      <name>inputfiber</name>
+      <longflag>inputfiber</longflag>
+      <label>Input Fiber Bundle</label>
+      <channel>input</channel>
+      <description><![CDATA[Input Fiber Bundle (VTK) path]]></description>
+    </file>
+    <file>
+      <name>label_map_file</name>
+      <longflag>label_map_file</longflag>
+      <label>Region Label Map</label>
+      <description><![CDATA[Region Label Map (NRRD) path]]></description>
+    </file>
+    <file>
+      <name>outputDirectory</name>
+      <longflag>outputDirectory</longflag>
+      <label>Directory of results</label>
+      <channel>output</channel>
+      <description><![Directory of cutting results]]></description>
+    </file>
+    <integer>
+      <name>labelValue1</name>
+      <longflag>labelValue1</longflag>
+      <default>1</default>
+      <label>inclusion label1</label>
+      <description><![CDATA[inclusion label1 (int)]]></description>
+    </integer>
+     <integer>
+      <name>labelValue2</name>
+      <longflag>labelValue2</longflag>
+      <default>2</default>
+      <label>inclusion label2</label>
+      <description><![CDATA[inclusion label2 (int)]]></description>
+    </integer>
+    <float>
+      <name>sampling_distance</name>
+      <longflag>sampling_distance</longflag>
+      <default>2</default>
+      <label>sampling distance</label>
+      <description><![CDATA[sampling distance (float)]]></description>
+    </float>
+  </parameters>
+</executable>
