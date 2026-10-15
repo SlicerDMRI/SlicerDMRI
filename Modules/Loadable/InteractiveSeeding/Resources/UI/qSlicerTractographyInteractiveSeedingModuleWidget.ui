@@ -201,7 +201,6 @@
           <property name="nodeTypes">
            <stringlist>
             <string>vtkMRMLMarkupsFiducialNode</string>
-            <string>vtkMRMLAnnotationHierarchyNode</string>
             <string>vtkMRMLModelNode</string>
             <string>vtkMRMLLabelMapVolumeNode</string>
            </stringlist>

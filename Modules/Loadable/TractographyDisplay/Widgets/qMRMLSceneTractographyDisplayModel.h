@@ -24,11 +24,11 @@
 #include "qSlicerTractographyDisplayModuleWidgetsExport.h"
 
 // MRMLWidgets includes
-#include "qMRMLSceneDisplayableModel.h"
+#include "qMRMLSceneModel.h"
 class qMRMLSceneTractographyDisplayModelPrivate;
 
 /// The Visibility icon is in the same column than the name by default.
-class Q_SLICER_MODULE_TRACTOGRAPHYDISPLAY_WIDGETS_EXPORT qMRMLSceneTractographyDisplayModel : public qMRMLSceneDisplayableModel
+class Q_SLICER_MODULE_TRACTOGRAPHYDISPLAY_WIDGETS_EXPORT qMRMLSceneTractographyDisplayModel : public qMRMLSceneModel
 {
   Q_OBJECT
   /// Control in which column vtkMRMLModelDisplayNode::Color are displayed
@@ -60,7 +60,7 @@ class Q_SLICER_MODULE_TRACTOGRAPHYDISPLAY_WIDGETS_EXPORT qMRMLSceneTractographyD
   //Q_PROPERTY (int opacityColumn READ opacityColumn WRITE setOpacityColumn)
 
 public:
-  typedef qMRMLSceneDisplayableModel Superclass;
+  typedef qMRMLSceneModel Superclass;
   qMRMLSceneTractographyDisplayModel(QObject *parent=0);
   virtual ~qMRMLSceneTractographyDisplayModel();
 

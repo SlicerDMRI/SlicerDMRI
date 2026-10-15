@@ -31,7 +31,6 @@
 class vtkMRMLTractographyInteractiveSeedingNode;
 class vtkMRMLDiffusionTensorVolumeNode;
 class vtkMRMLScalarVolumeNode;
-class vtkMRMLAnnotationHierarchyNode;
 class vtkMRMLFiberBundleNode;
 class vtkMRMLTransformableNode;
 class vtkMaskPoints;

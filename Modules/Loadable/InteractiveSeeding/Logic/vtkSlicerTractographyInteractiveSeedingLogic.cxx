@@ -15,9 +15,6 @@
 #include "vtkSlicerTractographyInteractiveSeedingLogic.h"
 
 // MRML includes
-#include <vtkMRMLAnnotationControlPointsNode.h>
-#include <vtkMRMLAnnotationFiducialNode.h>
-#include <vtkMRMLAnnotationHierarchyNode.h>
 #include <vtkMRMLDiffusionTensorVolumeNode.h>
 #include <vtkMRMLFiberBundleDisplayNode.h>
 #include <vtkMRMLFiberBundleNode.h>
@@ -111,47 +108,10 @@ void vtkSlicerTractographyInteractiveSeedingLogic::AddMRMLNodesObservers()
     {
     vtkMRMLNode *seedinNode = this->GetMRMLScene()->GetNodeByID(this->TractographyInteractiveSeedingNode->GetInputFiducialRef());
 
-    vtkMRMLAnnotationHierarchyNode *annotationHierarchyNode = vtkMRMLAnnotationHierarchyNode::SafeDownCast(seedinNode);
     vtkMRMLTransformableNode *transformableNode = vtkMRMLTransformableNode::SafeDownCast(seedinNode);
     vtkMRMLMarkupsFiducialNode *markupsFiducialNode = vtkMRMLMarkupsFiducialNode::SafeDownCast(seedinNode);
 
-    if (annotationHierarchyNode)
-      {
-      this->ObservedNodes.push_back(NULL);
-      vtkNew<vtkIntArray> annotationHierarchyNodeEvents;
-      annotationHierarchyNodeEvents->InsertNextValue ( vtkMRMLHierarchyNode::ChildNodeAddedEvent );
-      annotationHierarchyNodeEvents->InsertNextValue ( vtkMRMLHierarchyNode::ChildNodeRemovedEvent );
-      annotationHierarchyNodeEvents->InsertNextValue ( vtkMRMLNode::HierarchyModifiedEvent );
-
-      vtkSetAndObserveMRMLNodeEventsMacro(
-            this->ObservedNodes[this->ObservedNodes.size()-1],
-            annotationHierarchyNode,
-            annotationHierarchyNodeEvents.GetPointer());
-
-      vtkNew<vtkCollection> annotationNodes;
-      annotationHierarchyNode->GetDirectChildren(annotationNodes.GetPointer());
-      int nf = annotationNodes->GetNumberOfItems();
-      for (int f=0; f<nf; f++)
-        {
-        vtkMRMLAnnotationControlPointsNode *annotationNode = vtkMRMLAnnotationControlPointsNode::SafeDownCast(
-                                                      annotationNodes->GetItemAsObject(f));
-        if (annotationNode)
-          {
-          this->ObservedNodes.push_back(NULL);
-
-          vtkNew<vtkIntArray> annotationNodeEvents;
-          annotationNodeEvents->InsertNextValue ( vtkMRMLTransformableNode::TransformModifiedEvent );
-          annotationNodeEvents->InsertNextValue ( vtkMRMLModelNode::PolyDataModifiedEvent );
-          annotationNodeEvents->InsertNextValue ( vtkCommand::ModifiedEvent );
-
-          vtkSetAndObserveMRMLNodeEventsMacro(
-                this->ObservedNodes[this->ObservedNodes.size()-1],
-                annotationNode,
-                annotationNodeEvents.GetPointer());
-          }
-        }
-      }
-    else if (markupsFiducialNode)
+    if (markupsFiducialNode)
       {
       this->ObservedNodes.push_back(NULL);
       vtkNew<vtkIntArray> markupEvents;
@@ -313,36 +273,10 @@ void vtkSlicerTractographyInteractiveSeedingLogic::CreateTractsForOneSeed(vtkSee
         seed->GetInputTensorFieldConnection()->GetProducer()->GetOutputDataObject(0));
   inputTensorField->GetPointData()->SetScalars(volumeNode->GetImageData()->GetPointData()->GetScalars());
 
-  vtkMRMLAnnotationControlPointsNode *annotationNode = vtkMRMLAnnotationControlPointsNode::SafeDownCast(transformableNode);
   vtkMRMLMarkupsFiducialNode *markupsFiducialNode = vtkMRMLMarkupsFiducialNode::SafeDownCast(transformableNode);
   vtkMRMLModelNode *modelNode = vtkMRMLModelNode::SafeDownCast(transformableNode);
 
-  // if annotation
-  if (annotationNode && annotationNode->GetNumberOfControlPoints() &&
-     (!seedSelectedFiducials || (seedSelectedFiducials && annotationNode->GetSelected())) )
-    {
-    for (int i=0; i < annotationNode->GetNumberOfControlPoints(); i++)
-      {
-      double *xyzf = annotationNode->GetControlPointCoordinates(i);
-      for (double x = -regionSize/2.0; x <= regionSize/2.0; x+=sampleStep)
-        {
-        for (double y = -regionSize/2.0; y <= regionSize/2.0; y+=sampleStep)
-          {
-          for (double z = -regionSize/2.0; z <= regionSize/2.0; z+=sampleStep)
-            {
-            float newXYZ[3];
-            newXYZ[0] = xyzf[0] + x;
-            newXYZ[1] = xyzf[1] + y;
-            newXYZ[2] = xyzf[2] + z;
-            float *xyz = transFiducial->TransformFloatPoint(newXYZ);
-            //Run the thing
-            seed->SeedStreamlineFromPoint(xyz[0], xyz[1], xyz[2]);
-            }
-          }
-        }
-      }
-    }
-  else if (markupsFiducialNode && markupsFiducialNode->GetNumberOfControlPoints())
+  if (markupsFiducialNode && markupsFiducialNode->GetNumberOfControlPoints())
     {
     int numberOfFiducials = markupsFiducialNode->GetNumberOfControlPoints();
     for (int i = 0; i < numberOfFiducials; ++i)
@@ -422,8 +356,6 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTracts(vtkMRMLTractograp
 
   //1. Set Input
 
-  vtkMRMLAnnotationHierarchyNode *annotationListNode = vtkMRMLAnnotationHierarchyNode::SafeDownCast(seedingNode);
-  vtkMRMLAnnotationControlPointsNode *annotationNode = vtkMRMLAnnotationControlPointsNode::SafeDownCast(seedingNode);
   vtkMRMLMarkupsFiducialNode *markupsFiducialNode = vtkMRMLMarkupsFiducialNode::SafeDownCast(seedingNode);
   vtkMRMLModelNode *modelNode = vtkMRMLModelNode::SafeDownCast(seedingNode);
   vtkMRMLScalarVolumeNode *labelMapNode = vtkMRMLScalarVolumeNode::SafeDownCast(seedingNode);
@@ -475,33 +407,6 @@ int vtkSlicerTractographyInteractiveSeedingLogic::CreateTracts(vtkMRMLTractograp
                                     parametersNode->GetMaximumPathLength());
       }
     }
-  else if (annotationListNode) // loop over annotation nodes
-    {
-    vtkNew<vtkCollection> annotationNodes;
-    annotationListNode->GetDirectChildren(annotationNodes.GetPointer());
-    int nf = annotationNodes->GetNumberOfItems();
-    for (int f=0; f<nf; f++)
-      {
-      vtkMRMLAnnotationControlPointsNode *annotationNode = vtkMRMLAnnotationControlPointsNode::SafeDownCast(
-                                                    annotationNodes->GetItemAsObject(f));
-      if (!annotationNode || (seedSelectedFiducials && !annotationNode->GetSelected()))
-        {
-        continue;
-        }
-
-      this->CreateTractsForOneSeed(seed.GetPointer(), volumeNode, annotationNode,
-                                   thresholdMode, stoppingValue, stoppingCurvature,
-                                   integrationStepLength, minPathLength, regionSize,
-                                   sampleStep, maxNumberOfSeeds, seedSelectedFiducials);
-      }
-    }
-  else if (annotationNode) // loop over points in the models
-    {
-    this->CreateTractsForOneSeed(seed.GetPointer(), volumeNode, annotationNode,
-                                 thresholdMode, stoppingValue, stoppingCurvature,
-                                 integrationStepLength, minPathLength, regionSize,
-                                 sampleStep, maxNumberOfSeeds, seedSelectedFiducials);
-    }
   else if (markupsFiducialNode) // loop over points in the markup
     {
     this->CreateTractsForOneSeed(seed.GetPointer(), volumeNode, markupsFiducialNode,
@@ -549,10 +454,7 @@ void vtkSlicerTractographyInteractiveSeedingLogic::ProcessMRMLNodesEvents(vtkObj
     {
     this->UpdateOnce();
     }
-  else if (event == vtkMRMLHierarchyNode::ChildNodeAddedEvent ||
-      event == vtkMRMLHierarchyNode::ChildNodeRemovedEvent ||
-      event == vtkMRMLNode::HierarchyModifiedEvent ||
-      event == vtkMRMLTransformableNode::TransformModifiedEvent ||
+  else if (event == vtkMRMLTransformableNode::TransformModifiedEvent ||
       event == vtkMRMLMarkupsNode::PointAddedEvent ||
       event == vtkMRMLMarkupsNode::PointRemovedEvent)
     {

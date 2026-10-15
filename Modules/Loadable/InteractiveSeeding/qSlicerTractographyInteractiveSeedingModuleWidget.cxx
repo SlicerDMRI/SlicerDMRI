@@ -6,8 +6,6 @@
 #include "vtkMRMLFiberBundleNode.h"
 #include "vtkMRMLFiberBundleDisplayNode.h"
 #include "vtkMRMLDiffusionTensorVolumeNode.h"
-#include "vtkMRMLAnnotationHierarchyNode.h"
-#include "vtkMRMLAnnotationFiducialNode.h"
 #include "vtkMRMLMarkupsFiducialNode.h"
 #include "vtkMRMLLabelMapVolumeNode.h"
 #include "vtkMRMLScene.h"
@@ -106,33 +104,12 @@ void qSlicerTractographyInteractiveSeedingModuleWidget::onEnter()
   // if we have one Fiducial List node select it
   if (d->FiducialNodeSelector->currentNode() == 0)
     {
-    int numAnnotationLists = this->mrmlScene()->GetNumberOfNodesByClass("vtkMRMLAnnotationHierarchyNode");
     int numMarkups = this->mrmlScene()->GetNumberOfNodesByClass("vtkMRMLMarkupsFiducialNode");
     nodes.clear();
     if (numMarkups > 0)
       {
       this->mrmlScene()->GetNodesByClass("vtkMRMLMarkupsFiducialNode", nodes);
       this->setSeedingNode(nodes[0]);
-      }
-    else if (numAnnotationLists > 1)
-      {
-      this->mrmlScene()->GetNodesByClass("vtkMRMLAnnotationHierarchyNode", nodes);
-      for (unsigned int i=0; i<nodes.size(); i++)
-        {
-        vtkMRMLAnnotationHierarchyNode *hnode = vtkMRMLAnnotationHierarchyNode::SafeDownCast(nodes[i]);
-        vtkCollection *cnodes = vtkCollection::New();
-        hnode->GetDirectChildren(cnodes);
-        if (cnodes->GetNumberOfItems() > 0 && cnodes->GetNumberOfItems() < 5 &&
-            vtkMRMLAnnotationFiducialNode::SafeDownCast(cnodes->GetItemAsObject(0)) != NULL)
-          {
-          this->setSeedingNode(nodes[i]);
-          cnodes->RemoveAllItems();
-          cnodes->Delete();
-          break;
-          }
-        cnodes->RemoveAllItems();
-        cnodes->Delete();
-        }
       }
     }
 
@@ -859,7 +836,6 @@ bool qSlicerTractographyInteractiveSeedingModuleWidget::setEditedNode(
     return true;
     }
   else if ( vtkMRMLMarkupsFiducialNode::SafeDownCast(node)
-    || vtkMRMLAnnotationHierarchyNode::SafeDownCast(node)
     || vtkMRMLModelNode::SafeDownCast(node)
     || vtkMRMLLabelMapVolumeNode::SafeDownCast(node) )
     {
@@ -877,7 +853,6 @@ double qSlicerTractographyInteractiveSeedingModuleWidget::nodeEditable(vtkMRMLNo
     return 0.9;
     }
   else if ( vtkMRMLMarkupsFiducialNode::SafeDownCast(node)
-    || vtkMRMLAnnotationHierarchyNode::SafeDownCast(node)
     || vtkMRMLModelNode::SafeDownCast(node)
     || vtkMRMLLabelMapVolumeNode::SafeDownCast(node) )
     {

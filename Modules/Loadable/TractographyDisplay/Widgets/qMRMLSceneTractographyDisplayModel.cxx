@@ -20,9 +20,11 @@
 
 // qMRML includes
 #include "qMRMLSceneTractographyDisplayModel.h"
-#include "qMRMLSceneDisplayableModel_p.h"
+#include "qMRMLSceneModel_p.h"
 
 // MRML includes
+#include <vtkMRMLDisplayableNode.h>
+#include <vtkMRMLDisplayNode.h>
 #include <vtkMRMLScene.h>
 #include <vtkMRMLFiberBundleNode.h>
 #include <vtkMRMLFiberBundleDisplayNode.h>
@@ -31,14 +33,16 @@
 #include <vtkMRMLFiberBundleGlyphDisplayNode.h>
 
 
-class qMRMLSceneTractographyDisplayModelPrivate: public qMRMLSceneDisplayableModelPrivate
+class qMRMLSceneTractographyDisplayModelPrivate: public qMRMLSceneModelPrivate
 {
 protected:
   Q_DECLARE_PUBLIC(qMRMLSceneTractographyDisplayModel);
 public:
-  typedef qMRMLSceneDisplayableModelPrivate Superclass;
+  typedef qMRMLSceneModelPrivate Superclass;
   qMRMLSceneTractographyDisplayModelPrivate(qMRMLSceneTractographyDisplayModel& object);
   virtual void init();
+  /// Return the display node of the node (the node itself if it is a display node)
+  vtkMRMLDisplayNode* displayNode(vtkMRMLNode* node)const;
 
   int ColorColumn;
   int LineVisibilityColumn;
@@ -61,6 +65,22 @@ qMRMLSceneTractographyDisplayModelPrivate
 }
 
 //------------------------------------------------------------------------------
+vtkMRMLDisplayNode* qMRMLSceneTractographyDisplayModelPrivate::displayNode(vtkMRMLNode* node)const
+{
+  vtkMRMLDisplayNode* displayNode = vtkMRMLDisplayNode::SafeDownCast(node);
+  if (displayNode)
+    {
+    return displayNode;
+    }
+  vtkMRMLDisplayableNode* displayableNode = vtkMRMLDisplayableNode::SafeDownCast(node);
+  if (displayableNode)
+    {
+    return displayableNode->GetDisplayNode();
+    }
+  return 0;
+}
+
+//------------------------------------------------------------------------------
 void qMRMLSceneTractographyDisplayModelPrivate::init()
 {
   //Q_Q(qMRMLSceneTractographyDisplayModel);
@@ -79,7 +99,6 @@ qMRMLSceneTractographyDisplayModel::qMRMLSceneTractographyDisplayModel(QObject *
   d->init();
 
   this->setVisibilityColumn(-1);
-  this->setOpacityColumn(-1);
   this->setCheckableColumn(-1);
 
   this->setNameColumn(0);

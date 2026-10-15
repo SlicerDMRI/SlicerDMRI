@@ -19,7 +19,6 @@ set(${KIT}_TARGET_LIBRARIES
   vtkDMRI
   ${ITK_LIBRARIES}
   vtkSlicerMarkupsModuleMRML
-  vtkSlicerAnnotationsModuleMRML
   vtkSlicerTractographyDisplayModuleMRML
   )
 
