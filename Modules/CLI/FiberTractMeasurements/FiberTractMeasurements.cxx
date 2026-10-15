@@ -27,7 +27,6 @@
 #include <vtksys/SystemTools.hxx>
 
 // MRML
-#include <vtkMRMLModelHierarchyNode.h>
 #include <vtkMRMLModelNode.h>
 #include <vtkMRMLModelStorageNode.h>
 #include <vtkMRMLScene.h>
@@ -36,9 +35,20 @@
 #include <vtkMRMLFiberBundleTubeDisplayNode.h>
 #include <vtkMRMLFiberBundleGlyphDisplayNode.h>
 #include <vtkMRMLFiberBundleStorageNode.h>
-#include <vtkMRMLSceneViewNode.h>
-#include <vtkMRMLSceneViewStorageNode.h>
 #include <vtkMRMLCommandLineModuleNode.h>
+#include <vtkMRMLSubjectHierarchyNode.h>
+
+// Slicer versions that store models in model hierarchies (instead of subject hierarchy folders)
+// pass the input fibers in a model hierarchy. These classes are not available in recent Slicer versions.
+#include <vtkMRMLConfigure.h>
+#ifndef MRML_NO_LEGACY_HIERARCHY_NODES
+# define FIBERTRACTMEASUREMENTS_HAS_MODEL_HIERARCHY
+#endif
+#ifdef FIBERTRACTMEASUREMENTS_HAS_MODEL_HIERARCHY
+# include <vtkMRMLModelHierarchyNode.h>
+# include <vtkMRMLSceneViewNode.h>
+# include <vtkMRMLSceneViewStorageNode.h>
+#endif
 
 // ITK includes
 #include <itkFloatingPointExceptions.h>
@@ -88,9 +98,16 @@ int computeTensorMeasurement(vtkSmartPointer<vtkPolyData> input,
                              std::string &operation,
                              bool moreStatistics);
 
+#ifdef FIBERTRACTMEASUREMENTS_HAS_MODEL_HIERARCHY
 void getPathFromParentToChild(vtkMRMLHierarchyNode *parent,
                               vtkMRMLHierarchyNode *child,
                               std::string &path);
+#endif
+
+void getPathFromFolderToItem(vtkMRMLSubjectHierarchyNode *shNode,
+                             vtkIdType folderItemID,
+                             vtkIdType itemID,
+                             std::string &path);
 
 bool setTensors(vtkPolyData *poly);
 
@@ -128,6 +145,33 @@ namespace {
 
 //=============================================================================
 // Function definitions
+void getPathFromFolderToItem(vtkMRMLSubjectHierarchyNode *shNode,
+                             vtkIdType folderItemID,
+                             vtkIdType itemID,
+                             std::string &path)
+{
+  vtkIdType parentItemID = shNode->GetItemParent(itemID);
+  if (!parentItemID || parentItemID == shNode->GetSceneItemID())
+    {
+    return;
+    }
+  std::string parentName = shNode->GetItemName(parentItemID);
+  std::string childName = shNode->GetItemName(itemID);
+  std::map<std::string, std::string>::iterator it = ClusterNames.find(childName);
+  if (it != ClusterNames.end())
+    {
+    ClusterNames[childName] = parentName + std::string(":") + it->second;
+    }
+  path = parentName + std::string(":") + path;
+  ClusterNames[parentName] = parentName;
+
+  if (parentItemID != folderItemID)
+    {
+    getPathFromFolderToItem(shNode, folderItemID, parentItemID, path);
+    }
+}
+
+#ifdef FIBERTRACTMEASUREMENTS_HAS_MODEL_HIERARCHY
 void getPathFromParentToChild(vtkMRMLHierarchyNode *parent,
                               vtkMRMLHierarchyNode *child,
                               std::string &path)
@@ -151,6 +195,7 @@ void getPathFromParentToChild(vtkMRMLHierarchyNode *parent,
       }
     }
 }
+#endif
 
 double computeMeanLineLength(vtkSmartPointer<vtkPolyData> poly)
 {
@@ -938,8 +983,10 @@ int main( int argc, char * argv[] )
     // load the scene that Slicer will re-read
     modelScene->SetURL(sceneFilename.c_str());
 
+#ifdef FIBERTRACTMEASUREMENTS_HAS_MODEL_HIERARCHY
     modelScene->RegisterNodeClass(vtkNew<vtkMRMLSceneViewNode>().GetPointer());
     modelScene->RegisterNodeClass(vtkNew<vtkMRMLSceneViewStorageNode>().GetPointer());
+#endif
     modelScene->RegisterNodeClass(vtkNew<vtkMRMLCommandLineModuleNode>().GetPointer());
     modelScene->RegisterNodeClass(vtkNew<vtkMRMLFiberBundleNode>().GetPointer());
     modelScene->RegisterNodeClass(vtkNew<vtkMRMLFiberBundleLineDisplayNode>().GetPointer());
@@ -959,42 +1006,73 @@ int main( int argc, char * argv[] )
 
     if (inputType == std::string("Fibers_Hierarchy"))
       {
-      // make sure we have a model hierarchy node
       vtkMRMLNode *node = modelScene->GetNodeByID(inputNodeID);
-      vtkSmartPointer<vtkMRMLModelHierarchyNode> topHierNode =
-         vtkMRMLModelHierarchyNode::SafeDownCast(node);
-      if (!topHierNode)
-        {
-        std::cerr << "Model hierachy node doesn't exist: " <<  inputNodeID.c_str() << std::endl;
-        return EXIT_FAILURE;
-        }
 
-      // get all the children nodes
-      std::vector< vtkMRMLHierarchyNode *> allChildren;
-      topHierNode->GetAllChildrenNodes(allChildren);
-
-      // and loop over them
-      for (unsigned int i = 0; i < allChildren.size(); ++i)
+      // Fibers in a subject hierarchy folder (the input node is the folder display node of the folder)
+      vtkMRMLSubjectHierarchyNode *shNode = vtkMRMLSubjectHierarchyNode::GetSubjectHierarchyNode(modelScene);
+      vtkIdType folderItemID = (shNode && node) ? shNode->GetItemByDataNode(node) : 0;
+      if (folderItemID)
         {
-        vtkMRMLDisplayableHierarchyNode *dispHierarchyNode = vtkMRMLDisplayableHierarchyNode::SafeDownCast(allChildren[i]);
-        if (dispHierarchyNode)
+        std::vector<vtkIdType> childItemIDs;
+        shNode->GetItemChildren(folderItemID, childItemIDs, true);
+        for (vtkIdType childItemID : childItemIDs)
           {
-          // get any associated node
-          vtkMRMLFiberBundleNode *fiberNode = vtkMRMLFiberBundleNode::SafeDownCast(
-              dispHierarchyNode->GetAssociatedNode());
-
-          if (fiberNode)
+          vtkMRMLFiberBundleNode *fiberNode = vtkMRMLFiberBundleNode::SafeDownCast(shNode->GetItemDataNode(childItemID));
+          if (!fiberNode)
             {
-            std::string id = std::string(fiberNode->GetName());
-            // concat hierarchy path to id
-            getPathFromParentToChild(topHierNode, dispHierarchyNode, id);
-            vtkSmartPointer<vtkPolyData> data = fiberNode->GetPolyData();
-            computeFiberStats(data, id);
-            computeScalarMeasurements(data, id, EMPTY_OP, moreStatistics);
-            computeAllTensorMeasurements(data, id, operations, moreStatistics);
-            } // if (fiberNode)
-          } // if (dispHierarchyNode)
-        } // for (unsigned int i = 0; i < allChildren.size(); ++i)
+            continue;
+            }
+          std::string id = std::string(fiberNode->GetName());
+          // concat folder path to id
+          getPathFromFolderToItem(shNode, folderItemID, childItemID, id);
+          vtkSmartPointer<vtkPolyData> data = fiberNode->GetPolyData();
+          computeFiberStats(data, id);
+          computeScalarMeasurements(data, id, EMPTY_OP, moreStatistics);
+          computeAllTensorMeasurements(data, id, operations, moreStatistics);
+          }
+        }
+      else
+        {
+#ifdef FIBERTRACTMEASUREMENTS_HAS_MODEL_HIERARCHY
+        vtkSmartPointer<vtkMRMLModelHierarchyNode> topHierNode =
+           vtkMRMLModelHierarchyNode::SafeDownCast(node);
+        if (!topHierNode)
+          {
+          std::cerr << "Model hierachy node doesn't exist: " <<  inputNodeID.c_str() << std::endl;
+          return EXIT_FAILURE;
+          }
+
+        // get all the children nodes
+        std::vector< vtkMRMLHierarchyNode *> allChildren;
+        topHierNode->GetAllChildrenNodes(allChildren);
+
+        // and loop over them
+        for (unsigned int i = 0; i < allChildren.size(); ++i)
+          {
+          vtkMRMLDisplayableHierarchyNode *dispHierarchyNode = vtkMRMLDisplayableHierarchyNode::SafeDownCast(allChildren[i]);
+          if (dispHierarchyNode)
+            {
+            // get any associated node
+            vtkMRMLFiberBundleNode *fiberNode = vtkMRMLFiberBundleNode::SafeDownCast(
+                dispHierarchyNode->GetAssociatedNode());
+
+            if (fiberNode)
+              {
+              std::string id = std::string(fiberNode->GetName());
+              // concat hierarchy path to id
+              getPathFromParentToChild(topHierNode, dispHierarchyNode, id);
+              vtkSmartPointer<vtkPolyData> data = fiberNode->GetPolyData();
+              computeFiberStats(data, id);
+              computeScalarMeasurements(data, id, EMPTY_OP, moreStatistics);
+              computeAllTensorMeasurements(data, id, operations, moreStatistics);
+              } // if (fiberNode)
+            } // if (dispHierarchyNode)
+          } // for (unsigned int i = 0; i < allChildren.size(); ++i)
+#else
+        std::cerr << "Input folder doesn't exist: " << inputNodeID.c_str() << std::endl;
+        return EXIT_FAILURE;
+#endif
+        }
       } // if (inputType == std::string("Fibers_Hierarchy"))
     } //if (inputType == ... || ... )
   else if (inputType == std::string("Fibers_File_Folder"))

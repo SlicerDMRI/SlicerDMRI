@@ -205,8 +205,7 @@ execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Pyt
     self.delayDisplay("Scene and MRB loaded and compared")
 
     for tractName,tubeColor in zip(tracts, tractColors):
-      sceneView = slicer.util.getNode(f'{tractName}-view')
-      sceneView.RestoreScene()
+      self.assertTrue(slicer.modules.sceneviews.logic().RestoreSceneView(f'{tractName}-view'))
       self.delayDisplay(f"Should now see tubes for tract {tractName} in color {tractColors}")
 
     self.delayDisplay("Test Finished")
@@ -270,7 +269,6 @@ execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Pyt
     """
     layoutManager = slicer.app.layoutManager()
 
-    sceneViewNode = slicer.vtkMRMLSceneViewNode()
     view1 = layoutManager.threeDWidget(0).threeDView()
 
     w2i1 = vtk.vtkWindowToImageFilter()
@@ -278,15 +276,9 @@ execfile('/Users/pieper/slicer4/latest/Slicer/Applications/SlicerApp/Testing/Pyt
 
     w2i1.Update()
     image1 = w2i1.GetOutput()
-    sceneViewNode.SetScreenShot(image1)
-    sceneViewNode.UpdateStoredScene()
-    slicer.mrmlScene.AddNode(sceneViewNode)
 
-    sceneViewNode.SetName(name)
-    sceneViewNode.SetSceneViewDescription(description)
-    sceneViewNode.StoreScene()
-
-    return sceneViewNode
+    sceneViewsLogic = slicer.modules.sceneviews.logic()
+    sceneViewsLogic.CreateSceneView(name, description, sceneViewsLogic.ScreenShotType3D, image1)
 
   def tempDirectory(self,key='__SlicerTestTemp__',tempDir=None):
     """Come up with a unique directory name in the temp dir and make it and return it
